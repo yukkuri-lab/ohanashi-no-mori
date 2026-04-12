@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { Character } from '@/data/stories'
-import { speak, stopSpeaking } from '@/lib/speech'
+import { speak, stopSpeaking, unlockAudio } from '@/lib/speech'
 
 interface Props {
   storyTitle: string
@@ -121,7 +121,7 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
       {/* ── ボタン ── */}
       {phase >= 4 && (
         <button
-          onClick={onNext}
+          onClick={() => { unlockAudio(); onNext() }}
           className="animate-slideUp w-full max-w-xs
                      py-5 rounded-full text-2xl font-bold text-white tracking-widest
                      bg-gradient-to-br from-forest-400 to-forest-600

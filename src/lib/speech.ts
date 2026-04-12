@@ -10,6 +10,20 @@ const SPEAK_URL = '/api/speak'
 // 再生中の Audio インスタンスを保持
 let currentAudio: HTMLAudioElement | null = null
 
+// iOS Safari はユーザージェスチャーの中で一度 play() しないと
+// その後の自動再生がすべてブロックされる。
+// ボタンを押した瞬間にこれを呼ぶことでブロックを解除する。
+let audioUnlocked = false
+export function unlockAudio(): void {
+  if (audioUnlocked) return
+  audioUnlocked = true
+  // 無音の最短 WAV を再生してオーディオコンテキストを起動
+  const silent = new Audio(
+    'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='
+  )
+  silent.play().catch(() => {})
+}
+
 /** テキストを読み上げる */
 export function speak(text: string, onEnd?: () => void): void {
   // 再生中なら止める

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import { recordOpen } from '@/lib/storage'
+import { unlockAudio } from '@/lib/speech'
 
 interface Props {
   onStart: () => void
@@ -45,7 +46,7 @@ export default function TitleScreen({ onStart }: Props) {
 
         {/* はじめるボタン：大きく・押しやすく */}
         <button
-          onClick={onStart}
+          onClick={() => { unlockAudio(); onStart() }}
           className="w-full py-5 rounded-full text-2xl font-bold text-white tracking-widest
                      bg-gradient-to-br from-forest-400 to-forest-600
                      shadow-[0_6px_0_#224f35]
