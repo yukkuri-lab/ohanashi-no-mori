@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { speak, stopSpeaking, isSpeaking } from '@/lib/speech'
+import { speak, stopSpeaking } from '@/lib/speech'
 import { StoryPage } from '@/data/stories'
 
 interface Props {
@@ -53,17 +53,11 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
   useEffect(() => {
     speakTimerRef.current = setTimeout(() => {
       setIsReading(true)
-      speak(page.text)
-
-      // 読み上げ終了を監視
-      checkDoneRef.current = setInterval(() => {
-        if (!isSpeaking()) {
-          clearInterval(checkDoneRef.current!)
-          checkDoneRef.current = null
-          setIsReading(false)
-          startAutoAdvance() // 読み終わったらカウントダウン開始
-        }
-      }, 500)
+      // onEnd コールバックで読み終わりを確実に検知
+      speak(page.text, () => {
+        setIsReading(false)
+        startAutoAdvance()
+      })
     }, 600) // 絵を見る間（0.6秒）
 
     return () => {
@@ -85,16 +79,10 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       setIsReading(false)
     } else {
       setIsReading(true)
-      speak(page.text)
-
-      checkDoneRef.current = setInterval(() => {
-        if (!isSpeaking()) {
-          clearInterval(checkDoneRef.current!)
-          checkDoneRef.current = null
-          setIsReading(false)
-          startAutoAdvance()
-        }
-      }, 500)
+      speak(page.text, () => {
+        setIsReading(false)
+        startAutoAdvance()
+      })
     }
   }
 
