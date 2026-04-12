@@ -108,58 +108,56 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
         </span>
       </div>
 
-      {/* ── スクロールエリア ── */}
-      <div className="flex-1 scroll-area">
-        <div className="max-w-lg mx-auto px-5 pb-4 flex flex-col gap-4 animate-fadeInUp">
+      {/* ── コンテンツエリア（スクロールなし） ── */}
+      <div className="flex-1 flex flex-col px-4 pb-2 gap-2 min-h-0 animate-fadeInUp">
 
-          {/* 絵 */}
-          <div className="rounded-3xl overflow-hidden shadow-md border border-[#e8dcc8]">
-            {page.imageSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={page.imageSrc}
-                alt={page.imageLabel}
-                className="w-full object-cover"
-                style={{ maxHeight: 'min(38vw, 200px)' }}
-              />
-            ) : (
-              <div
-                className="flex flex-col items-center justify-center py-12 gap-2"
-                style={{ background: 'linear-gradient(135deg, #dceade 0%, #c8e6c9 50%, #b2dfdb 100%)' }}
-              >
-                <span className="text-5xl">🖼️</span>
-                <span className="text-[#5a7a5a] font-bold text-sm">{page.imageLabel}</span>
-              </div>
-            )}
-          </div>
-
-          {/* 本文テキスト */}
-          <div className="bg-white rounded-3xl px-6 py-5 shadow-sm border border-[#e8dcc8]">
-            <p className="story-text text-[1.05rem] font-bold text-[#3d3028]">
-              {page.text}
-            </p>
-          </div>
-
-          {/* よみあげボタン */}
-          <button
-            onClick={handleSpeak}
-            className={`
-              w-full py-4 rounded-2xl text-lg font-bold tracking-wide
-              flex items-center justify-center gap-3
-              border-2 transition-all duration-200 active:scale-95
-              ${isReading
-                ? 'bg-[#fff3e0] border-[#e0943a] text-[#b85c00]'
-                : 'bg-[#fffbf0] border-[#e8c97a] text-[#7a5c1a] active:bg-[#fff3d0]'
-              }
-            `}
-          >
-            <span className={`text-2xl ${isReading ? 'animate-bounce' : ''}`}>
-              {isReading ? '🔊' : '🔈'}
-            </span>
-            <span>{isReading ? 'よんでいるよ…（とめる）' : 'もういちど よむ'}</span>
-          </button>
-
+        {/* 絵 */}
+        <div className="rounded-2xl overflow-hidden shadow-md border border-[#e8dcc8] flex-shrink-0">
+          {page.imageSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={page.imageSrc}
+              alt={page.imageLabel}
+              className="w-full object-cover"
+              style={{ maxHeight: 'min(28vw, 140px)' }}
+            />
+          ) : (
+            <div
+              className="flex flex-col items-center justify-center py-8 gap-1"
+              style={{ background: 'linear-gradient(135deg, #dceade 0%, #c8e6c9 50%, #b2dfdb 100%)' }}
+            >
+              <span className="text-4xl">🖼️</span>
+              <span className="text-[#5a7a5a] font-bold text-sm">{page.imageLabel}</span>
+            </div>
+          )}
         </div>
+
+        {/* 本文テキスト */}
+        <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-[#e8dcc8] flex-1 min-h-0 overflow-y-auto">
+          <p className="story-text text-[0.95rem] font-bold text-[#3d3028]">
+            {page.text}
+          </p>
+        </div>
+
+        {/* よみあげボタン */}
+        <button
+          onClick={handleSpeak}
+          className={`
+            w-full py-3 rounded-2xl text-base font-bold tracking-wide flex-shrink-0
+            flex items-center justify-center gap-2
+            border-2 transition-all duration-200 active:scale-95
+            ${isReading
+              ? 'bg-[#fff3e0] border-[#e0943a] text-[#b85c00]'
+              : 'bg-[#fffbf0] border-[#e8c97a] text-[#7a5c1a] active:bg-[#fff3d0]'
+            }
+          `}
+        >
+          <span className={`text-xl ${isReading ? 'animate-bounce' : ''}`}>
+            {isReading ? '🔊' : '🔈'}
+          </span>
+          <span>{isReading ? 'よんでいるよ…（とめる）' : 'もういちど よむ'}</span>
+        </button>
+
       </div>
 
       {/* ── フッター ── */}
