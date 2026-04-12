@@ -120,7 +120,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
                 src={page.imageSrc}
                 alt={page.imageLabel}
                 className="w-full object-cover"
-                style={{ maxHeight: 'min(45vw, 260px)' }}
+                style={{ maxHeight: 'min(38vw, 200px)' }}
               />
             ) : (
               <div
@@ -135,7 +135,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
 
           {/* 本文テキスト */}
           <div className="bg-white rounded-3xl px-6 py-5 shadow-sm border border-[#e8dcc8]">
-            <p className="story-text text-[1.2rem] font-bold text-[#3d3028]">
+            <p className="story-text text-[1.05rem] font-bold text-[#3d3028]">
               {page.text}
             </p>
           </div>
