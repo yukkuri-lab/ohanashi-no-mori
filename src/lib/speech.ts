@@ -62,17 +62,19 @@ export function isSpeaking(): boolean {
   return false
 }
 
-/** iOS のオーディオブロック解除（非iOS では不要だが念のため残す） */
+/** オーディオブロック解除 — ボタンを押した瞬間（ユーザージェスチャー内）に呼ぶ */
 export function unlockAudio(): void {
   if (typeof window === 'undefined') return
-  // iOS SpeechSynthesis はユーザージェスチャー不要のため何もしなくてよい
-  // 非iOS 向けに Audio context を起こす
-  if (!isIOS()) {
-    const silent = new Audio(
-      'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='
-    )
-    silent.play().catch(() => {})
+  if ('speechSynthesis' in window) {
+    // iOS Safari: 最初のユーザージェスチャーで空の utterance を speak() しないとブロックされる
+    const unlock = new SpeechSynthesisUtterance('')
+    window.speechSynthesis.speak(unlock)
   }
+  // 非iOS 向けに Audio コンテキストも起こす
+  const silent = new Audio(
+    'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='
+  )
+  silent.play().catch(() => {})
 }
 
 /** VoicePreloader から呼ばれる（互換性のため残す） */
