@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #faf6ea;
+  --card: #ffffff;
+  --text: #3d3028;
+  --text-muted: #7a6555;
+  --border: #e8dcc8;
+}
+
+/* ─── iOS Safari 基本対策 ───────────────────────── */
+
+html {
+  /* dvh = dynamic viewport height（アドレスバーを除いた実際の高さ）*/
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+  /* iOS でのバウンス・引っ張りスクロールを抑制 */
+  overscroll-behavior-y: none;
+}
+
+* {
+  box-sizing: border-box;
+  /* タップ時の青いハイライトを消す */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── セーフエリア対応ユーティリティ ───────────── */
+
+/* ノッチ・ホームインジケーター対応のパディング */
+@layer utilities {
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  }
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+  /* 画面全体をちょうど埋める高さ（dvh対応） */
+  .h-screen-safe {
+    height: 100dvh;
+  }
+  .min-h-screen-safe {
+    min-height: 100dvh;
+  }
+}
+
+/* ─── スクロール ──────────────────────────────── */
+
+/* iOS でのスムーズな慣性スクロール */
+.scroll-area {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ─── お話テキスト ───────────────────────────── */
+
+.story-text {
+  white-space: pre-wrap;
+  line-height: 2.2;
+}

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open /Users/matsukawatakamasa/yukkuri-lab/ohanashi-no-mori/index.html)",
+      "Bash(export NVM_DIR=\"$HOME/.nvm\")",
+      "Bash(source \"$NVM_DIR/nvm.sh\")",
+      "Bash(npm install:*)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(open http://localhost:3000)"
+    ]
+  }
+}
