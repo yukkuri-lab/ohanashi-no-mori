@@ -19,6 +19,11 @@ const THEME: Record<string, { bg: string; border: string; badge: string }> = {
     border: '#7dc89a',
     badge:  '#3a9e5f',
   },
+  'tanpopo-no-chie': {
+    bg:     'linear-gradient(135deg, #fffde7 0%, #fff9c4 100%)',
+    border: '#f9d342',
+    badge:  '#c8a000',
+  },
 }
 
 const DEFAULT_THEME = {
