@@ -60,10 +60,16 @@ export default function QuestionScreen({
     setIsCorrect(correct)
     recordAnswer(correct)
 
-    // フィードバックセリフを読み上げ
+    // フィードバックを読み上げ
     stopSpeaking()
     setTimeout(() => {
-      speak(correct ? question.correctFeedback : question.incorrectFeedback)
+      const feedback = correct ? question.correctFeedback : question.incorrectFeedback
+      speak(feedback, () => {
+        // 正解なら読み上げ終了後に自動で次へ
+        if (correct) {
+          setTimeout(() => onNext(true), 500)
+        }
+      })
     }, 200)
   }
 
