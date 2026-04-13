@@ -9,11 +9,18 @@ const SPEAK_URL = '/api/speak'
 let currentAudio: HTMLAudioElement | null = null
 let currentUtterance: SpeechSynthesisUtterance | null = null
 
-/** iOS Safari かどうか判定 */
+/**
+ * iOS Safari かどうか判定
+ * Chrome iOS (CriOS) や Firefox iOS (FxiOS) は除外する
+ * → それらは Audio API が使えるので Google TTS を利用
+ */
 function isIOS(): boolean {
   if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  // Chrome iOS・Firefox iOS は除外
+  if (/CriOS|FxiOS/.test(ua)) return false
   return (
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    /iPad|iPhone|iPod/.test(ua) ||
     // iPadOS 13+ は MacIntel と報告するが maxTouchPoints で区別
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
   )
