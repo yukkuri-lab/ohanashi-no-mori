@@ -24,6 +24,11 @@ const THEME: Record<string, { bg: string; border: string; badge: string }> = {
     border: '#f9d342',
     badge:  '#c8a000',
   },
+  swimmy: {
+    bg:     'linear-gradient(135deg, #e8f4fd 0%, #c9e8f8 100%)',
+    border: '#5b9fd4',
+    badge:  '#2e7ab5',
+  },
 }
 
 const DEFAULT_THEME = {
