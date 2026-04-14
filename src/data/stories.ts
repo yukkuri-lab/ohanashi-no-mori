@@ -738,25 +738,25 @@ export const stories: Story[] = [
         // 場面1：あめはひとりじゃうたえない
         text: 'あめのうた\n\nあめは ひとりじゃ うたえない、\nきっと だれかと いっしょだよ。',
         imageLabel: '雨が降っている様子',
-        imageSrc: undefined,
+        imageSrc: '/ame1.jpeg',
       },
       {
         // 場面2：やねとつちのうた
         text: 'あめと やねと いっしょに やねのうた\nあめと つちと いっしょに つちのうた',
         imageLabel: 'やねと土に雨が降る',
-        imageSrc: undefined,
+        imageSrc: '/ame2.jpg',
       },
       {
         // 場面3：かわとはなのうた
         text: 'あめと かわと いっしょに かわのうた\nあめと はなと いっしょに はなのうた\n\nあめは だれとも なかよし、\nどんな うたでも しってるよ。',
         imageLabel: '川と花に雨が降る',
-        imageSrc: undefined,
+        imageSrc: '/ame3.jpeg',
       },
       {
         // 場面4：雨の音
         text: 'やねで とんとん やねのうた\nつちで ぴんちん つちのうた\nかわで つんつん かわのうた\nはなで とんしとし はなのうた。',
         imageLabel: '雨の音のリズム',
-        imageSrc: undefined,
+        imageSrc: '/ame4.jpg',
       },
     ],
     questions: [
