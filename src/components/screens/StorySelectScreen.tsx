@@ -34,6 +34,11 @@ const THEME: Record<string, { bg: string; border: string; badge: string }> = {
     border: '#b07ed4',
     badge:  '#7b3fa8',
   },
+  'doubutsuen-no-juui': {
+    bg:     'linear-gradient(135deg, #edf8ee 0%, #c8e8ca 100%)',
+    border: '#5aad6a',
+    badge:  '#2d7a40',
+  },
   'ame-no-uta': {
     bg:     'linear-gradient(135deg, #eef5ff 0%, #d0e8f8 100%)',
     border: '#7aaed8',
