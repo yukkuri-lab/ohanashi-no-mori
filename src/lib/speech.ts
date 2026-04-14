@@ -36,7 +36,10 @@ export function speak(text: string, onEnd?: () => void): void {
     utterance.lang  = 'ja-JP'
     utterance.rate  = 0.88
     utterance.pitch = 1.05
-    if (onEnd) utterance.onend = () => onEnd()
+    if (onEnd) {
+      utterance.onend   = () => onEnd()
+      utterance.onerror = () => onEnd()  // エラー時もフェーズを進める
+    }
     currentUtterance = utterance
     window.speechSynthesis.speak(utterance)
   } else {
@@ -44,8 +47,15 @@ export function speak(text: string, onEnd?: () => void): void {
     const url   = `${SPEAK_URL}?text=${encodeURIComponent(text)}`
     const audio = new Audio(url)
     currentAudio = audio
-    if (onEnd) audio.onended = () => onEnd()
-    audio.play().catch((err) => console.error('[speech] 再生エラー:', err))
+    if (onEnd) {
+      audio.onended = () => onEnd()
+      // エラー時もコールバックを呼ぶ（フェーズが止まらないように）
+      audio.onerror = () => { console.error('[speech] 読み込みエラー'); onEnd() }
+    }
+    audio.play().catch((err) => {
+      console.error('[speech] 再生エラー:', err)
+      onEnd?.()  // play() 自体が失敗した場合もフェーズを進める
+    })
   }
 }
 
