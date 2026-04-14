@@ -34,6 +34,11 @@ const THEME: Record<string, { bg: string; border: string; badge: string }> = {
     border: '#b07ed4',
     badge:  '#7b3fa8',
   },
+  'ame-no-uta': {
+    bg:     'linear-gradient(135deg, #eef5ff 0%, #d0e8f8 100%)',
+    border: '#7aaed8',
+    badge:  '#3a6ea8',
+  },
 }
 
 const DEFAULT_THEME = {
