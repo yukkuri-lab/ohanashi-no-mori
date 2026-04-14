@@ -29,6 +29,11 @@ const THEME: Record<string, { bg: string; border: string; badge: string }> = {
     border: '#5b9fd4',
     badge:  '#2e7ab5',
   },
+  millie: {
+    bg:     'linear-gradient(135deg, #f5eeff 0%, #e8d5f8 100%)',
+    border: '#b07ed4',
+    badge:  '#7b3fa8',
+  },
 }
 
 const DEFAULT_THEME = {
