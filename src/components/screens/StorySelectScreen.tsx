@@ -34,6 +34,11 @@ const THEME: Record<string, { bg: string; border: string; badge: string }> = {
     border: '#b07ed4',
     badge:  '#7b3fa8',
   },
+  otegami: {
+    bg:     'linear-gradient(135deg, #fff8ee 0%, #fde8c8 100%)',
+    border: '#e8a870',
+    badge:  '#c0602a',
+  },
   'doubutsuen-no-juui': {
     bg:     'linear-gradient(135deg, #edf8ee 0%, #c8e8ca 100%)',
     border: '#5aad6a',
