@@ -134,9 +134,19 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
 
         {/* 本文テキスト */}
         <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-[#e8dcc8] flex-1 min-h-0 overflow-y-auto">
-          <p className="story-text text-[0.95rem] font-bold text-[#3d3028]">
-            {page.text}
-          </p>
+          <div className="text-[0.95rem] font-bold text-[#3d3028] leading-[1.85]">
+            {page.text
+              // 。の後に改行を入れて読みやすく（TTSテキストは変えない）
+              .replace(/。(?!\n)/g, '。\n')
+              .split('\n')
+              .filter(s => s.trim() !== '')
+              .map((line, i) => (
+                <p key={i} className="mb-2 last:mb-0">
+                  {line}
+                </p>
+              ))
+            }
+          </div>
         </div>
 
         {/* よみあげボタン */}
