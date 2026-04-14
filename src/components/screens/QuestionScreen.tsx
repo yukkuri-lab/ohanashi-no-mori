@@ -133,7 +133,8 @@ export default function QuestionScreen({
               >
                 {/* 回答前：質問のセリフ */}
                 {isCorrect === null ? (
-                  <p className="text-lg font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
+                  <p className="text-lg font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap"
+                     style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>
                     {question.speech}
                   </p>
                 ) : (
