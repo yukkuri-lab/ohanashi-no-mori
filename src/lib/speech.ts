@@ -11,6 +11,15 @@ let _audioCtx: AudioContext | null = null
 let _currentSource: AudioBufferSourceNode | null = null
 let currentUtterance: SpeechSynthesisUtterance | null = null
 
+// iOS Safari: ページが再表示されたとき speechSynthesis が pause 状態になる問題を修正
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && typeof window !== 'undefined' && window.speechSynthesis?.paused) {
+      window.speechSynthesis.resume()
+    }
+  })
+}
+
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null
   if (!_audioCtx) {
@@ -97,10 +106,9 @@ export function stopSpeaking(): void {
     try { _currentSource.stop() } catch { /* ignore */ }
     _currentSource = null
   }
-  if (currentUtterance) {
-    window.speechSynthesis?.cancel()
-    currentUtterance = null
-  }
+  // iOS Safari: 常にキューをクリア（詰まり防止）
+  if (typeof window !== 'undefined') window.speechSynthesis?.cancel()
+  currentUtterance = null
 }
 
 /** 読み上げ中かどうか */
@@ -113,9 +121,12 @@ export function isSpeaking(): boolean {
 export function unlockAudio(): void {
   if (typeof window === 'undefined') return
 
-  // iOS Safari: 空の utterance で speechSynthesis を起こす
+  // iOS Safari: 一度 cancel() してからダミー utterance で起こす
   if ('speechSynthesis' in window) {
-    const unlock = new SpeechSynthesisUtterance('')
+    window.speechSynthesis.cancel()
+    const unlock = new SpeechSynthesisUtterance('・')
+    unlock.volume = 0.001  // ほぼ無音だが確実にアンロック
+    unlock.lang = 'ja-JP'
     window.speechSynthesis.speak(unlock)
   }
 
