@@ -32,7 +32,7 @@ export default function ChoiceButton({ text, onClick, state, animationDelay = 0 
       aria-pressed={state === 'correct' || state === 'incorrect'}
     >
       <span className="text-2xl w-8 text-center select-none">{icon}</span>
-      <span>{text}</span>
+      <span style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>{text}</span>
     </button>
   )
 }
