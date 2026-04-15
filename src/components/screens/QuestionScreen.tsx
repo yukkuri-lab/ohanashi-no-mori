@@ -60,10 +60,13 @@ export default function QuestionScreen({
     setIsCorrect(correct)
     recordAnswer(correct)
 
+    const correctText = question.choices.find(c => c.id === question.correctId)?.text ?? ''
+    const incorrectFull = `${question.incorrectFeedback}正解は「${correctText}」だよ！`
+
     // フィードバックを読み上げ
     stopSpeaking()
     setTimeout(() => {
-      const feedback = correct ? question.correctFeedback : question.incorrectFeedback
+      const feedback = correct ? question.correctFeedback : incorrectFull
       speak(feedback, () => {
         // 正解なら読み上げ終了後に自動で次へ
         if (correct) {
@@ -73,10 +76,11 @@ export default function QuestionScreen({
     }, 200)
   }
 
+  const correctText = question.choices.find(c => c.id === question.correctId)?.text ?? ''
   const feedbackMessage =
     isCorrect === null ? null
     : isCorrect ? question.correctFeedback
-    : question.incorrectFeedback
+    : `${question.incorrectFeedback}正解は「${correctText}」だよ！`
 
   return (
     <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
