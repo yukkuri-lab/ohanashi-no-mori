@@ -5,7 +5,7 @@
 
 import { NextRequest } from 'next/server'
 
-const VOICE_NAME   = 'ja-JP-Neural2-B' // 自然でやさしい女性の声
+const VOICE_NAME   = 'ja-JP-Journey-D' // Journey: より自然で温かみのある女性の声
 const SPEAKING_RATE = 0.88             // 読み上げ速度（子ども向けにゆっくりめ）
 
 export async function GET(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+      `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
