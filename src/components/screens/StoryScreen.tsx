@@ -14,19 +14,26 @@ interface Props {
 // 読み上げ完了後、この秒数待って自動で次へ進む
 const AUTO_ADVANCE_DELAY = 1800 // ms
 
-/** テキストを「。」単位で分割（。を各文に含める） */
-function splitSentences(text: string): string[] {
+interface SentenceChunk {
+  prefix: string  // 直前の改行（spanの外に出してハイライトを汚さない）
+  text: string    // 実際の文内容（読み上げ・ハイライト対象）
+}
+
+/** テキストを「。」単位で分割。先頭の改行はprefixとして分離する */
+function splitSentences(text: string): SentenceChunk[] {
   const parts = text.split('。')
-  const sentences: string[] = []
+  const chunks: SentenceChunk[] = []
   for (let i = 0; i < parts.length; i++) {
-    const part = parts[i]
-    if (i < parts.length - 1) {
-      sentences.push(part + '。')
-    } else if (part.trim().length > 0) {
-      sentences.push(part)
+    const raw = i < parts.length - 1 ? parts[i] + '。' : parts[i]
+    // 先頭の改行を分離（s フラグなしで安全に処理）
+    const firstNonNL = raw.search(/[^\n]/)
+    const prefix  = firstNonNL > 0 ? raw.slice(0, firstNonNL) : ''
+    const content = firstNonNL >= 0 ? raw.slice(firstNonNL) : raw
+    if (content.trim().length > 0) {
+      chunks.push({ prefix, text: content })
     }
   }
-  return sentences.length > 0 ? sentences : [text]
+  return chunks.length > 0 ? chunks : [{ prefix: '', text }]
 }
 
 export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLastPage }: Props) {
@@ -37,7 +44,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
   const speakTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const sentences = splitSentences(page.text)
+  const sentences = splitSentences(page.text)   // SentenceChunk[]
 
   function clearAll() {
     if (speakTimerRef.current)    clearTimeout(speakTimerRef.current)
@@ -61,15 +68,15 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
   }
 
   /** 文を順番に読み上げてハイライト */
-  function speakFrom(sentenceList: string[], index: number) {
-    if (index >= sentenceList.length) {
+  function speakFrom(chunks: SentenceChunk[], index: number) {
+    if (index >= chunks.length) {
       setIsReading(false)
       setReadingIndex(-1)
       startAutoAdvance()
       return
     }
     setReadingIndex(index)
-    speak(sentenceList[index], () => speakFrom(sentenceList, index + 1))
+    speak(chunks[index].text, () => speakFrom(chunks, index + 1))
   }
 
   // 画面表示時に自動読み上げ開始
@@ -153,19 +160,21 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
         {/* 本文テキスト */}
         <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-[#e8dcc8] flex-1 min-h-0 overflow-y-auto">
           <p className="story-text text-[0.95rem] font-bold text-[#3d3028] leading-relaxed">
-            {sentences.map((sentence, i) => (
-              <span
-                key={i}
-                style={{
-                  backgroundColor: readingIndex === i && isReading ? '#fef08a' : 'transparent',
-                  borderRadius: '4px',
-                  boxDecorationBreak: 'clone',
-                  WebkitBoxDecorationBreak: 'clone',
-                  padding: readingIndex === i && isReading ? '1px 2px' : '0',
-                  transition: 'background-color 0.2s ease',
-                }}
-              >
-                {sentence}
+            {sentences.map((chunk, i) => (
+              <span key={i}>
+                {/* 改行はspanの外に置く → 前行に黄色が漏れない */}
+                {chunk.prefix}
+                <span
+                  style={{
+                    backgroundColor: readingIndex === i && isReading ? '#fef08a' : 'transparent',
+                    borderRadius: '4px',
+                    boxDecorationBreak: 'clone',
+                    WebkitBoxDecorationBreak: 'clone',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                >
+                  {chunk.text}
+                </span>
               </span>
             ))}
           </p>
