@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+      `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     if (!res.ok) {
       const err = await res.text()
-      console.error('[speak API] Google TTS error:', err)
+      console.error('[speak API] Google TTS error:', res.status, err)
       return new Response('音声の生成に失敗しました', { status: 500 })
     }
 
