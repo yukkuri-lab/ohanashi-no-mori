@@ -124,11 +124,11 @@ export function isSpeaking(): boolean {
 export function unlockAudio(): void {
   if (typeof window === 'undefined') return
 
-  // iOS Safari: cancel してからダミー発話でアンロック
+  // iOS Safari: cancel してから空の utterance でアンロック
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel()
-    const unlock = new SpeechSynthesisUtterance('・')
-    unlock.volume = 0.001
+    const unlock = new SpeechSynthesisUtterance(' ')
+    unlock.volume = 0
     unlock.lang = 'ja-JP'
     window.speechSynthesis.speak(unlock)
   }

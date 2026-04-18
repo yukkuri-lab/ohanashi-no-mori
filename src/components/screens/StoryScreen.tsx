@@ -76,7 +76,8 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       return
     }
     setReadingIndex(index)
-    speak(chunks[index].text, () => speakFrom(chunks, index + 1))
+    // iOS Safari: onEnd 直後に次の speak() を呼ぶとエラーになるため少し待つ
+    speak(chunks[index].text, () => setTimeout(() => speakFrom(chunks, index + 1), 150))
   }
 
   // 画面表示時に自動読み上げ開始
