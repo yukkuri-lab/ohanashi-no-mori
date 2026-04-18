@@ -1,19 +1,25 @@
 // =============================================
 // speech.ts — 読み上げ機能
-// 全プラットフォーム: Google Cloud TTS (Journey voice) + AudioContext
+// iOS Safari    : Web Speech API（ブラウザ内蔵・自然な声）
+// Chrome iOS 他 : Google Cloud TTS + AudioContext
 // =============================================
 
 const SPEAK_URL = '/api/speak'
 
-// AudioContext を一度だけ作成してキープする
 let _audioCtx: AudioContext | null = null
 let _currentSource: AudioBufferSourceNode | null = null
+let _currentUtterance: SpeechSynthesisUtterance | null = null
 
-// iOS Safari: ページが再表示されたとき AudioContext が suspend される問題を修正
+// iOS Safari: ページ非表示 → 再表示時に speechSynthesis が pause する問題を修正
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && _audioCtx?.state === 'suspended') {
-      _audioCtx.resume().catch(() => {})
+    if (!document.hidden) {
+      if (typeof window !== 'undefined' && window.speechSynthesis?.paused) {
+        window.speechSynthesis.resume()
+      }
+      if (_audioCtx?.state === 'suspended') {
+        _audioCtx.resume().catch(() => {})
+      }
     }
   })
 }
@@ -26,10 +32,41 @@ function getAudioContext(): AudioContext | null {
   return _audioCtx
 }
 
-/** テキストを読み上げる（全プラットフォーム: Google TTS + AudioContext） */
+/**
+ * iOS Safari かどうか判定
+ * Chrome iOS (CriOS) / Firefox iOS (FxiOS) は除外 → AudioContext を使う
+ */
+function isIOSSafari(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  if (/CriOS|FxiOS/.test(ua)) return false
+  return (
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  )
+}
+
+/** テキストを読み上げる */
 export function speak(text: string, onEnd?: () => void): void {
   stopSpeaking()
-  speakWithAudioContext(text, onEnd)
+
+  if (isIOSSafari() && 'speechSynthesis' in window) {
+    // ── iOS Safari: Web Speech API ──
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang  = 'ja-JP'
+    utterance.rate  = 0.88
+    utterance.pitch = 1.05
+    let ended = false
+    const safeEnd = () => { if (!ended) { ended = true; onEnd?.() } }
+    utterance.onend   = safeEnd
+    utterance.onerror = safeEnd
+    _currentUtterance = utterance
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(utterance)
+  } else {
+    // ── Chrome iOS / その他: Google Cloud TTS + AudioContext ──
+    speakWithAudioContext(text, onEnd)
+  }
 }
 
 async function speakWithAudioContext(text: string, onEnd?: () => void): Promise<void> {
@@ -71,10 +108,15 @@ export function stopSpeaking(): void {
     try { _currentSource.stop() } catch { /* ignore */ }
     _currentSource = null
   }
+  if (typeof window !== 'undefined') {
+    window.speechSynthesis?.cancel()
+  }
+  _currentUtterance = null
 }
 
 /** 読み上げ中かどうか */
 export function isSpeaking(): boolean {
+  if (_currentUtterance) return window.speechSynthesis?.speaking ?? false
   return _currentSource !== null
 }
 
@@ -82,6 +124,16 @@ export function isSpeaking(): boolean {
 export function unlockAudio(): void {
   if (typeof window === 'undefined') return
 
+  // iOS Safari: cancel してからダミー発話でアンロック
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+    const unlock = new SpeechSynthesisUtterance('・')
+    unlock.volume = 0.001
+    unlock.lang = 'ja-JP'
+    window.speechSynthesis.speak(unlock)
+  }
+
+  // AudioContext unlock（Chrome iOS 他）
   const ctx = getAudioContext()
   if (ctx && ctx.state === 'suspended') {
     ctx.resume().catch(() => {})
