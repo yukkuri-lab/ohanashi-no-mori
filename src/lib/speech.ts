@@ -36,7 +36,7 @@ function getAudioContext(): AudioContext | null {
  * iOS Safari かどうか判定
  * Chrome iOS (CriOS) / Firefox iOS (FxiOS) は除外 → AudioContext を使う
  */
-function isIOSSafari(): boolean {
+export function isIOSSafari(): boolean {
   if (typeof navigator === 'undefined') return false
   const ua = navigator.userAgent
   if (/CriOS|FxiOS/.test(ua)) return false

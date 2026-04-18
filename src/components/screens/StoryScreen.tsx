@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { speak, stopSpeaking } from '@/lib/speech'
+import { speak, stopSpeaking, isIOSSafari } from '@/lib/speech'
 import { StoryPage } from '@/data/stories'
 
 interface Props {
@@ -67,7 +67,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
     }, 30)
   }
 
-  /** 文を順番に読み上げてハイライト */
+  /** 文を順番に読み上げてハイライト（AudioContext パス用） */
   function speakFrom(chunks: SentenceChunk[], index: number) {
     if (index >= chunks.length) {
       setIsReading(false)
@@ -76,16 +76,29 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       return
     }
     setReadingIndex(index)
-    // iOS Safari: onEnd 直後に次の speak() を呼ぶとエラーになるため少し待つ
-    speak(chunks[index].text, () => setTimeout(() => speakFrom(chunks, index + 1), 150))
+    speak(chunks[index].text, () => speakFrom(chunks, index + 1))
+  }
+
+  /** iOS Safari: ページ全体を1回で読み上げ（readingIndex=-2 で全文ハイライト） */
+  function speakWhole() {
+    setReadingIndex(-2)
+    speak(page.text, () => {
+      setIsReading(false)
+      setReadingIndex(-1)
+      startAutoAdvance()
+    })
   }
 
   // 画面表示時に自動読み上げ開始
   useEffect(() => {
-    const s = splitSentences(page.text)
     speakTimerRef.current = setTimeout(() => {
       setIsReading(true)
-      speakFrom(s, 0)
+      if (isIOSSafari()) {
+        speakWhole()
+      } else {
+        const s = splitSentences(page.text)
+        speakFrom(s, 0)
+      }
     }, 600)
 
     return () => {
@@ -106,9 +119,13 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       setIsReading(false)
       setReadingIndex(-1)
     } else {
-      const s = splitSentences(page.text)
       setIsReading(true)
-      speakFrom(s, 0)
+      if (isIOSSafari()) {
+        speakWhole()
+      } else {
+        const s = splitSentences(page.text)
+        speakFrom(s, 0)
+      }
     }
   }
 
@@ -167,7 +184,10 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
                 {chunk.prefix}
                 <span
                   style={{
-                    backgroundColor: readingIndex === i && isReading ? '#fef08a' : 'transparent',
+                    backgroundColor:
+                      isReading && (readingIndex === i || readingIndex === -2)
+                        ? '#fef08a'
+                        : 'transparent',
                     borderRadius: '4px',
                     boxDecorationBreak: 'clone',
                     WebkitBoxDecorationBreak: 'clone',
