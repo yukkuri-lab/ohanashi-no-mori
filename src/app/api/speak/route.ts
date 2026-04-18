@@ -5,8 +5,8 @@
 
 import { NextRequest } from 'next/server'
 
-const VOICE_NAME   = 'ja-JP-Neural2-B' // 自然でやさしい女性の声
-const SPEAKING_RATE = 0.9              // 読み上げ速度（1.0が標準、小さいほどゆっくり）
+const VOICE_NAME   = 'ja-JP-Journey-D' // Journey: Neural2より大幅に自然な女性の声
+const SPEAKING_RATE = 0.87             // 読み上げ速度（子ども向けにゆっくりめ）
 
 export async function GET(req: NextRequest) {
   const text = req.nextUrl.searchParams.get('text') ?? ''
