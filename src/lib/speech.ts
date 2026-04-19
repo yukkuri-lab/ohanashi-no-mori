@@ -1,29 +1,37 @@
 // =============================================
 // speech.ts — 読み上げ機能
-// 全プラットフォーム: Google Cloud TTS + AudioContext
-// iOS Safari も AudioContext を使用（Journey-D の高品質な声）
+// 全プラットフォーム: <audio> 要素 + Google Cloud TTS
+// iOS Safari / Chrome iOS でも確実に動く方法
 // =============================================
 
 const SPEAK_URL = '/api/speak'
 
-let _audioCtx: AudioContext | null = null
-let _currentSource: AudioBufferSourceNode | null = null
+// iOS アンロック用のミニマムな無音 WAV（44バイト）
+const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='
 
-// ページ非表示 → 再表示時に AudioContext が suspend される問題を修正
-if (typeof document !== 'undefined') {
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && _audioCtx?.state === 'suspended') {
-      _audioCtx.resume().catch(() => {})
-    }
-  })
+let _audioEl: HTMLAudioElement | null = null
+
+function getAudio(): HTMLAudioElement | null {
+  if (typeof document === 'undefined') return null
+  if (!_audioEl) {
+    _audioEl = new Audio()
+    _audioEl.setAttribute('playsinline', '')  // iOS: インライン再生
+    _audioEl.preload = 'none'
+  }
+  return _audioEl
 }
 
-function getAudioContext(): AudioContext | null {
-  if (typeof window === 'undefined') return null
-  if (!_audioCtx) {
-    _audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-  }
-  return _audioCtx
+// ページ再表示時に再生が止まっていたら再開
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      const el = getAudio()
+      // iOS がバックグラウンド時に pause した場合に再開
+      if (el && el.paused && el.src && !el.ended && el.currentTime > 0) {
+        el.play().catch(() => {})
+      }
+    }
+  })
 }
 
 /**
@@ -40,82 +48,53 @@ export function isIOSSafari(): boolean {
   )
 }
 
-/** テキストを読み上げる（全プラットフォーム: Google Cloud TTS） */
+/** テキストを読み上げる */
 export function speak(text: string, onEnd?: () => void): void {
   stopSpeaking()
-  speakWithAudioContext(text, onEnd)
-}
 
-async function speakWithAudioContext(text: string, onEnd?: () => void): Promise<void> {
+  const el = getAudio()
+  if (!el) { onEnd?.(); return }
+
   let ended = false
   const safeEnd = () => { if (!ended) { ended = true; onEnd?.() } }
 
-  const ctx = getAudioContext()
-  if (!ctx) { safeEnd(); return }
+  const url = `${SPEAK_URL}?text=${encodeURIComponent(text)}`
+  el.src = url
+  el.onended  = safeEnd
+  el.onerror  = () => { console.error('[speech] audio error'); safeEnd() }
 
-  // suspended なら resume（unlockAudio で既に resume 済みのはず）
-  if (ctx.state === 'suspended') {
-    try { await ctx.resume() } catch { safeEnd(); return }
-  }
-
-  try {
-    const url = `${SPEAK_URL}?text=${encodeURIComponent(text)}`
-    const res  = await fetch(url)
-    if (!res.ok) { console.error('[speech] API error:', res.status); safeEnd(); return }
-
-    const buffer  = await res.arrayBuffer()
-    const decoded = await ctx.decodeAudioData(buffer)
-
-    // 前の再生を止める
-    if (_currentSource) { try { _currentSource.stop() } catch { /* ignore */ } }
-
-    const source = ctx.createBufferSource()
-    source.buffer = decoded
-    source.connect(ctx.destination)
-    source.onended = safeEnd
-    _currentSource = source
-    source.start()
-  } catch (err) {
-    console.error('[speech] 再生エラー:', err)
+  el.play().catch(err => {
+    console.error('[speech] play() rejected:', err)
     safeEnd()
-  }
+  })
 }
 
 /** 読み上げを止める */
 export function stopSpeaking(): void {
-  if (_currentSource) {
-    try { _currentSource.stop() } catch { /* ignore */ }
-    _currentSource = null
-  }
+  const el = getAudio()
+  if (!el) return
+  el.onended = null
+  el.onerror = null
+  el.pause()
 }
 
 /** 読み上げ中かどうか */
 export function isSpeaking(): boolean {
-  return _currentSource !== null
+  const el = getAudio()
+  return el ? !el.paused && !el.ended && el.currentTime > 0 : false
 }
 
 /**
  * オーディオブロック解除 — ボタンを押した瞬間（ユーザージェスチャー内）に呼ぶ
- * iOS Safari では AudioContext を resume + サイレントバッファ再生で確実にアンロック
+ * iOS では <audio>.play() をジェスチャー内で一度呼ぶことで以後の再生が可能になる
  */
 export function unlockAudio(): void {
   if (typeof window === 'undefined') return
-
-  const ctx = getAudioContext()
-  if (!ctx) return
-
-  // resume をユーザージェスチャー内で呼ぶ
-  ctx.resume().catch(() => {})
-
-  // iOS Safari: resume だけでは不十分な場合があるため、
-  // サイレントな 1サンプルバッファを再生してオーディオシステムを確実に起動する
-  try {
-    const buf = ctx.createBuffer(1, 1, 22050)
-    const src = ctx.createBufferSource()
-    src.buffer = buf
-    src.connect(ctx.destination)
-    src.start(0)
-  } catch { /* ignore */ }
+  const el = getAudio()
+  if (!el) return
+  // 無音WAVをジェスチャー内で再生 → iOS オーディオをアンロック
+  el.src = SILENT_WAV
+  el.play().catch(() => {})
 }
 
 /** VoicePreloader から呼ばれる（互換性のため残す） */
