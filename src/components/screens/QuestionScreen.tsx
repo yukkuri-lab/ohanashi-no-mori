@@ -4,6 +4,7 @@ import ChoiceButton from '@/components/ChoiceButton'
 import { Question, Character } from '@/data/stories'
 import { recordAnswer } from '@/lib/storage'
 import { speak, stopSpeaking } from '@/lib/speech'
+import { playCorrect, playIncorrect } from '@/lib/sounds'
 
 interface Props {
   question: Question
@@ -82,6 +83,10 @@ export default function QuestionScreen({
       'よくわかったね！せいかい！',
     ]
     const cheer = cheers[Math.floor(Math.random() * cheers.length)]
+
+    // 効果音（ユーザージェスチャー内で即座に鳴らす）
+    if (correct) playCorrect()
+    else         playIncorrect()
 
     // フィードバックを読み上げ
     stopSpeaking()
