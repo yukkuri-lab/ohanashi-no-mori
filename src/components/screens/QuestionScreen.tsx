@@ -38,7 +38,17 @@ export default function QuestionScreen({
     // アリさんが歩いてきて止まる（1.8s）→ 吹き出し＋読み上げ
     t1.current = setTimeout(() => {
       setShowBubble(true)
-      speak(question.speech)
+
+      // 選択肢を「１、〇〇、２、〇〇、３、〇〇、どれかな？」と読み上げるテキストを作成
+      const nums = ['１', '２', '３', '４', '５']
+      const choicesText = question.choices
+        .map((c, i) => `${nums[i]}、${c.text.replace(/\n/g, '')}`)
+        .join('、') + '、どれかな？'
+
+      // 質問を読み上げ → 終わったら選択肢を読み上げ
+      speak(question.speech, () => {
+        setTimeout(() => speak(choicesText), 400)
+      })
     }, 1900)
 
     // 吹き出しから少し遅れて選択肢を表示
