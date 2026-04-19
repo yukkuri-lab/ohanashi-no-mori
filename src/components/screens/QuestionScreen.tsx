@@ -73,24 +73,39 @@ export default function QuestionScreen({
     const correctText = question.choices.find(c => c.id === question.correctId)?.text ?? ''
     const incorrectFull = `${question.incorrectFeedback}正解は「${correctText}」だよ！`
 
+    // 正解のときの掛け声をランダムに選ぶ
+    const cheers = [
+      'やったー！せいかい！',
+      'ピンポーン！せいかい！',
+      'すごい！せいかい！',
+      'その通り！せいかい！',
+      'よくわかったね！せいかい！',
+    ]
+    const cheer = cheers[Math.floor(Math.random() * cheers.length)]
+
     // フィードバックを読み上げ
     stopSpeaking()
     setTimeout(() => {
-      const feedback = correct ? question.correctFeedback : incorrectFull
-      speak(feedback, () => {
-        // 正解なら読み上げ終了後に自動で次へ
-        if (correct) {
-          setTimeout(() => onNext(true), 500)
-        }
-      })
+      if (correct) {
+        // 正解：まず掛け声→少し間→説明
+        speak(cheer, () => {
+          setTimeout(() => {
+            speak(question.correctFeedback, () => {
+              setTimeout(() => onNext(true), 500)
+            })
+          }, 300)
+        })
+      } else {
+        speak(incorrectFull)
+      }
     }, 200)
   }
 
-  const correctText = question.choices.find(c => c.id === question.correctId)?.text ?? ''
+  const correctText2 = question.choices.find(c => c.id === question.correctId)?.text ?? ''
   const feedbackMessage =
     isCorrect === null ? null
     : isCorrect ? question.correctFeedback
-    : `${question.incorrectFeedback}正解は「${correctText}」だよ！`
+    : `${question.incorrectFeedback}正解は「${correctText2}」だよ！`
 
   return (
     <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
@@ -151,10 +166,19 @@ export default function QuestionScreen({
                      style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>
                     {question.speech}
                   </p>
+                ) : isCorrect ? (
+                  /* 正解！大きく祝福 → 説明 */
+                  <div className="animate-popIn flex flex-col items-center gap-2">
+                    <p className="text-3xl font-black text-forest-600 tracking-wide">
+                      🎉 せいかい！
+                    </p>
+                    <p className="text-base font-bold text-forest-700 leading-relaxed">
+                      {feedbackMessage}
+                    </p>
+                  </div>
                 ) : (
-                  /* 回答後：フィードバック */
-                  <p className={`text-xl font-bold leading-relaxed animate-popIn
-                    ${isCorrect ? 'text-forest-700' : 'text-[#b85c00]'}`}>
+                  /* 不正解：フィードバック */
+                  <p className="text-xl font-bold leading-relaxed animate-popIn text-[#b85c00]">
                     {feedbackMessage}
                   </p>
                 )}
