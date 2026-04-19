@@ -21,38 +21,41 @@ export default function QuestionScreen({
   character,
   onNext,
 }: Props) {
-  const [showBubble,  setShowBubble]  = useState(false) // アリさんの吹き出し
-  const [showChoices, setShowChoices] = useState(false) // 選択肢
-  const [selectedId,  setSelectedId]  = useState<string | null>(null)
-  const [isCorrect,   setIsCorrect]   = useState<boolean | null>(null)
+  const [showBubble,    setShowBubble]    = useState(false)
+  const [showChoices,   setShowChoices]   = useState(false)
+  const [choicesLocked, setChoicesLocked] = useState(true)  // 音声読み上げ中はロック
+  const [selectedId,    setSelectedId]    = useState<string | null>(null)
+  const [isCorrect,     setIsCorrect]     = useState<boolean | null>(null)
 
   const t1 = useRef<ReturnType<typeof setTimeout> | null>(null)
   const t2 = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // 画面が出るたびにリセット＆シーケンス開始
   useEffect(() => {
     setShowBubble(false)
     setShowChoices(false)
+    setChoicesLocked(true)
     setSelectedId(null)
     setIsCorrect(null)
 
-    // アリさんが歩いてきて止まる（1.8s）→ 吹き出し＋読み上げ
+    const nums = ['１', '２', '３', '４', '５']
+    const choicesText = question.choices
+      .map((c, i) => `${nums[i]}、${c.text.replace(/\n/g, '')}`)
+      .join('、') + '、どれかな？'
+
+    // アリさんが歩いてくる → 吹き出し → 質問を読む → 選択肢を読む → ロック解除
     t1.current = setTimeout(() => {
       setShowBubble(true)
-
-      // 選択肢を「１、〇〇、２、〇〇、３、〇〇、どれかな？」と読み上げるテキストを作成
-      const nums = ['１', '２', '３', '４', '５']
-      const choicesText = question.choices
-        .map((c, i) => `${nums[i]}、${c.text.replace(/\n/g, '')}`)
-        .join('、') + '、どれかな？'
-
-      // 質問を読み上げ → 終わったら選択肢を読み上げ
       speak(question.speech, () => {
-        setTimeout(() => speak(choicesText), 400)
+        setTimeout(() => {
+          speak(choicesText, () => {
+            // 選択肢読み上げ完了 → ロック解除
+            setChoicesLocked(false)
+          })
+        }, 400)
       })
     }, 1900)
 
-    // 吹き出しから少し遅れて選択肢を表示
+    // 選択肢を画面に表示（ロック状態で）
     t2.current = setTimeout(() => {
       setShowChoices(true)
     }, 2800)
@@ -65,7 +68,7 @@ export default function QuestionScreen({
   }, [question.id, question.speech])
 
   function handleSelect(choiceId: string) {
-    if (selectedId !== null) return
+    if (selectedId !== null || choicesLocked) return   // ロック中は無視
     const correct = choiceId === question.correctId
     setSelectedId(choiceId)
     setIsCorrect(correct)
@@ -74,7 +77,6 @@ export default function QuestionScreen({
     const correctText = question.choices.find(c => c.id === question.correctId)?.text ?? ''
     const incorrectFull = `${question.incorrectFeedback}正解は「${correctText}」だよ！`
 
-    // 正解のときの掛け声をランダムに選ぶ
     const cheers = [
       'やったー！せいかい！',
       'ピンポーン！せいかい！',
@@ -84,15 +86,12 @@ export default function QuestionScreen({
     ]
     const cheer = cheers[Math.floor(Math.random() * cheers.length)]
 
-    // 効果音（ユーザージェスチャー内で即座に鳴らす）
     if (correct) playCorrect()
     else         playIncorrect()
 
-    // フィードバックを読み上げ
     stopSpeaking()
     setTimeout(() => {
       if (correct) {
-        // 正解：まず掛け声→少し間→説明
         speak(cheer, () => {
           setTimeout(() => {
             speak(question.correctFeedback, () => {
@@ -115,7 +114,7 @@ export default function QuestionScreen({
   return (
     <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
 
-      {/* ── 進捗バー（上部固定） ── */}
+      {/* ── 進捗バー ── */}
       <div className="flex-shrink-0 px-5 pt-safe pt-3 pb-2">
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <div className="flex-1 h-2 bg-[#e8dcc8] rounded-full overflow-hidden">
@@ -134,7 +133,7 @@ export default function QuestionScreen({
       <div className="flex-1 scroll-area">
         <div className="max-w-lg mx-auto px-5 pb-6 flex flex-col gap-5">
 
-          {/* ── アリさん：右から歩いてくる ── */}
+          {/* キャラクター */}
           <div className="flex flex-col items-center gap-2 mt-2 animate-walkInFromRight">
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center text-5xl
@@ -146,10 +145,9 @@ export default function QuestionScreen({
             <span className="text-xs text-[#7a6555] font-bold">{character.name}</span>
           </div>
 
-          {/* ── 吹き出し（歩き終わったら表示） ── */}
+          {/* 吹き出し */}
           {showBubble && (
             <div className="animate-popIn relative">
-              {/* 三角 */}
               <div
                 className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0"
                 style={{
@@ -165,14 +163,12 @@ export default function QuestionScreen({
                   border: `2px solid ${character.color}33`,
                 }}
               >
-                {/* 回答前：質問のセリフ */}
                 {isCorrect === null ? (
                   <p className="text-lg font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap"
                      style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>
                     {question.speech}
                   </p>
                 ) : isCorrect ? (
-                  /* 正解！大きく祝福 → 説明 */
                   <div className="animate-popIn flex flex-col items-center gap-2">
                     <p className="text-3xl font-black text-forest-600 tracking-wide">
                       🎉 せいかい！
@@ -182,7 +178,6 @@ export default function QuestionScreen({
                     </p>
                   </div>
                 ) : (
-                  /* 不正解：フィードバック */
                   <p className="text-xl font-bold leading-relaxed animate-popIn text-[#b85c00]">
                     {feedbackMessage}
                   </p>
@@ -191,15 +186,27 @@ export default function QuestionScreen({
             </div>
           )}
 
-          {/* ── 選択肢 ── */}
+          {/* 選択肢 */}
           {showChoices && (
             <div className="flex flex-col gap-3 animate-fadeInUp">
+
+              {/* ロック中：「きいてね…」インジケーター */}
+              {choicesLocked && selectedId === null && (
+                <div className="flex items-center justify-center gap-2 py-1">
+                  <span className="text-lg animate-bounce">🎧</span>
+                  <span className="text-sm font-bold text-[#9a8070]">きいてね…</span>
+                  <span className="text-lg animate-bounce" style={{ animationDelay: '150ms' }}>🎧</span>
+                </div>
+              )}
+
               {question.choices.map((choice, i) => {
                 let state: 'idle' | 'correct' | 'incorrect' | 'disabled' = 'idle'
                 if (selectedId !== null) {
-                  if (choice.id === question.correctId)   state = 'correct'
-                  else if (choice.id === selectedId)       state = 'incorrect'
-                  else                                     state = 'disabled'
+                  if (choice.id === question.correctId)  state = 'correct'
+                  else if (choice.id === selectedId)      state = 'incorrect'
+                  else                                    state = 'disabled'
+                } else if (choicesLocked) {
+                  state = 'disabled'   // 音声中はグレーアウト
                 }
                 return (
                   <ChoiceButton
@@ -212,13 +219,21 @@ export default function QuestionScreen({
                   />
                 )
               })}
+
+              {/* アンロック時：ふわっと「どれかな？」 */}
+              {!choicesLocked && selectedId === null && (
+                <p className="text-center text-sm font-bold text-[#4d9e6e] animate-popIn">
+                  👆 えらんでみよう！
+                </p>
+              )}
+
             </div>
           )}
 
         </div>
       </div>
 
-      {/* ── フッター：つぎへボタン（回答後のみ表示） ── */}
+      {/* フッター */}
       <div
         className="flex-shrink-0 px-5 pt-3 bg-[#faf6ea] border-t border-[#ede5d5]"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}
