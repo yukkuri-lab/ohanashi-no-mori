@@ -1,15 +1,16 @@
 'use client'
 import { useEffect } from 'react'
-import CharacterBubble from '@/components/CharacterBubble'
 import { Character } from '@/data/stories'
 import { recordCompletion } from '@/lib/storage'
+import { unlockAudio } from '@/lib/speech'
 
 interface Props {
   storyId: string
   character: Character
   correctCount: number
   totalQuestions: number
-  onRestart: () => void
+  onReadAgain: () => void   // 同じおはなしをページ1から読み直す
+  onRestart: () => void     // おはなし選択に戻る
   onQuit: () => void
 }
 
@@ -18,6 +19,7 @@ export default function EndingScreen({
   character,
   correctCount,
   totalQuestions,
+  onReadAgain,
   onRestart,
   onQuit,
 }: Props) {
@@ -28,10 +30,8 @@ export default function EndingScreen({
   const stars = Math.round((correctCount / totalQuestions) * 3)
 
   return (
-    <div
-      className="h-screen-safe flex flex-col"
-      style={{ backgroundColor: '#faf6ea' }}
-    >
+    <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
+
       {/* ── スクロールエリア ── */}
       <div className="flex-1 scroll-area">
         <div className="max-w-lg mx-auto px-5 pt-8 pb-4 flex flex-col items-center gap-6 animate-fadeInUp">
@@ -65,26 +65,51 @@ export default function EndingScreen({
             </div>
           </div>
 
+          {/* もう一度よむ：録音への誘い */}
+          <div className="bg-[#e8f5e9] rounded-2xl px-5 py-4 border border-[#a5d6a7] w-full text-center">
+            <p className="text-sm font-bold text-[#2e7d32] leading-relaxed">
+              🎙️ こんどは じぶんの こえで よんでみよう！
+            </p>
+          </div>
+
         </div>
       </div>
 
-      {/* ── フッター：ボタン（常に画面下） ── */}
+      {/* ── フッター：ボタン ── */}
       <div
-        className="flex-shrink-0 px-5 pt-3 pb-safe bg-[#faf6ea] border-t border-[#ede5d5] flex flex-col gap-3"
+        className="flex-shrink-0 px-5 pt-3 bg-[#faf6ea] border-t border-[#ede5d5] flex flex-col gap-3"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}
       >
+        {/* もう一度よむ（メインボタン） */}
         <button
-          onClick={onRestart}
+          onClick={() => { unlockAudio(); onReadAgain() }}
           className="w-full py-5 rounded-full text-2xl font-bold text-white tracking-widest
                      bg-gradient-to-br from-forest-400 to-forest-600
                      shadow-[0_5px_0_#224f35]
                      active:translate-y-1 active:shadow-[0_2px_0_#224f35]
+                     transition-all duration-150 flex items-center justify-center gap-2"
+        >
+          <span>📖</span>
+          <span>もう一度よむ</span>
+        </button>
+
+        {/* ほかのおはなし */}
+        <button
+          onClick={() => { unlockAudio(); onRestart() }}
+          className="w-full py-4 rounded-full text-xl font-bold tracking-widest
+                     text-white
+                     bg-gradient-to-br from-amber-400 to-amber-500
+                     shadow-[0_4px_0_#b45309]
+                     active:translate-y-1 active:shadow-[0_2px_0_#b45309]
                      transition-all duration-150"
         >
-          もういちど 🔄
+          ほかのおはなし 🌿
         </button>
+
+        {/* おわる */}
         <button
           onClick={onQuit}
-          className="w-full py-4 rounded-full text-xl font-bold text-[#7a6555] tracking-widest
+          className="w-full py-3 rounded-full text-base font-bold text-[#9a8070]
                      bg-white border-2 border-[#e8dcc8]
                      active:bg-[#f0f7f2] active:scale-95
                      transition-all duration-150"

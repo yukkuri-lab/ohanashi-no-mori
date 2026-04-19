@@ -78,6 +78,14 @@ export default function App() {
     go('select')
   }
 
+  // おしまい → 同じおはなしをページ1から読み直す
+  function handleReadAgain() {
+    setStoryPageIndex(0)
+    setQuestionIndex(0)
+    setCorrectCount(0)
+    go('story')
+  }
+
   function handleQuit() { handleRestart() }
 
   return (
@@ -130,6 +138,7 @@ export default function App() {
           character={story.character}
           correctCount={correctCount}
           totalQuestions={story.questions.length}
+          onReadAgain={handleReadAgain}
           onRestart={handleRestart}
           onQuit={handleQuit}
         />
