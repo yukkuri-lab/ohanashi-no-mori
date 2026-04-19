@@ -25,7 +25,6 @@ function splitSentences(text: string): SentenceChunk[] {
   const chunks: SentenceChunk[] = []
   for (let i = 0; i < parts.length; i++) {
     const raw = i < parts.length - 1 ? parts[i] + '。' : parts[i]
-    // 先頭の改行を分離（s フラグなしで安全に処理）
     const firstNonNL = raw.search(/[^\n]/)
     const prefix  = firstNonNL > 0 ? raw.slice(0, firstNonNL) : ''
     const content = firstNonNL >= 0 ? raw.slice(firstNonNL) : raw
@@ -36,15 +35,41 @@ function splitSentences(text: string): SentenceChunk[] {
   return chunks.length > 0 ? chunks : [{ prefix: '', text }]
 }
 
+// ── マイクアイコン SVG（スクリーンショットに近いカラフルデザイン）──
+function MicIcon({ size = 36 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+      {/* マイク本体（黄色） */}
+      <rect x="18" y="4" width="12" height="22" rx="6" fill="#FACC15"/>
+      {/* マイク下部のアーチ（青） */}
+      <path d="M10 24a14 14 0 0 0 28 0" stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+      {/* スタンド縦線（青） */}
+      <line x1="24" y1="38" x2="24" y2="44" stroke="#3B82F6" strokeWidth="3.5" strokeLinecap="round"/>
+      {/* スタンド横線（赤） */}
+      <line x1="16" y1="44" x2="32" y2="44" stroke="#EF4444" strokeWidth="3.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+type RecordState = 'idle' | 'recording' | 'recorded'
+
 export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLastPage }: Props) {
   const [isReading,    setIsReading]    = useState(false)
-  const [readingIndex, setReadingIndex] = useState(-1)   // 現在ハイライト中の文のインデックス
+  const [readingIndex, setReadingIndex] = useState(-1)
   const [autoProgress, setAutoProgress] = useState<number | null>(null)
+
+  // 録音関連
+  const [recState,  setRecState]  = useState<RecordState>('idle')
+  const [audioURL,  setAudioURL]  = useState<string | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef   = useRef<Blob[]>([])
+  const playbackRef      = useRef<HTMLAudioElement | null>(null)
 
   const speakTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const sentences = splitSentences(page.text)   // SentenceChunk[]
+  const sentences = splitSentences(page.text)
 
   function clearAll() {
     if (speakTimerRef.current)    clearTimeout(speakTimerRef.current)
@@ -67,7 +92,6 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
     }, 30)
   }
 
-  /** 文を順番に読み上げてハイライト（AudioContext パス用） */
   function speakFrom(chunks: SentenceChunk[], index: number) {
     if (index >= chunks.length) {
       setIsReading(false)
@@ -79,7 +103,6 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
     speak(chunks[index].text, () => speakFrom(chunks, index + 1))
   }
 
-  /** iOS Safari: ページ全体を1回で読み上げ（readingIndex=-2 で全文ハイライト） */
   function speakWhole() {
     setReadingIndex(-2)
     speak(page.text, () => {
@@ -104,9 +127,13 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
     return () => {
       clearAll()
       stopSpeaking()
+      stopRecording()
+      stopPlayback()
       setIsReading(false)
       setReadingIndex(-1)
       setAutoProgress(null)
+      setRecState('idle')
+      setAudioURL(null)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page.text])
@@ -132,10 +159,86 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
   function handleNext() {
     clearAll()
     stopSpeaking()
+    stopRecording()
+    stopPlayback()
     setIsReading(false)
     setReadingIndex(-1)
     setAutoProgress(null)
     onNext()
+  }
+
+  // ── 録音 ──────────────────────────────────────
+  async function handleMic() {
+    if (recState === 'idle') {
+      // 読み上げ中なら止める
+      if (isReading) {
+        clearAll()
+        stopSpeaking()
+        setIsReading(false)
+        setReadingIndex(-1)
+      }
+      await startRecording()
+    } else if (recState === 'recording') {
+      stopRecording()
+    } else {
+      // recorded → もう一度録音
+      stopPlayback()
+      setRecState('idle')
+      setAudioURL(null)
+    }
+  }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mr = new MediaRecorder(stream)
+      mediaRecorderRef.current = mr
+      audioChunksRef.current = []
+
+      mr.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data)
+      }
+      mr.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        const url  = URL.createObjectURL(blob)
+        setAudioURL(url)
+        setRecState('recorded')
+        stream.getTracks().forEach(t => t.stop())
+      }
+
+      mr.start()
+      setRecState('recording')
+    } catch {
+      alert('マイクが使えませんでした。設定を確認してください。')
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop()
+    }
+  }
+
+  function handlePlayback() {
+    if (!audioURL) return
+    if (isPlaying) {
+      stopPlayback()
+      return
+    }
+    const audio = new Audio(audioURL)
+    playbackRef.current = audio
+    setIsPlaying(true)
+    audio.onended  = () => setIsPlaying(false)
+    audio.onerror  = () => setIsPlaying(false)
+    audio.play().catch(() => setIsPlaying(false))
+  }
+
+  function stopPlayback() {
+    if (playbackRef.current) {
+      playbackRef.current.pause()
+      playbackRef.current = null
+    }
+    setIsPlaying(false)
   }
 
   return (
@@ -180,7 +283,6 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
           <p className="story-text text-[0.95rem] font-bold text-[#3d3028] leading-relaxed">
             {sentences.map((chunk, i) => (
               <span key={i}>
-                {/* 改行はspanの外に置く → 前行に黄色が漏れない */}
                 {chunk.prefix}
                 <span
                   style={{
@@ -201,24 +303,78 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
           </p>
         </div>
 
-        {/* よみあげボタン */}
-        <button
-          onClick={handleSpeak}
-          className={`
-            w-full py-3 rounded-2xl text-base font-bold tracking-wide flex-shrink-0
-            flex items-center justify-center gap-2
-            border-2 transition-all duration-200 active:scale-95
-            ${isReading
-              ? 'bg-[#fff3e0] border-[#e0943a] text-[#b85c00]'
-              : 'bg-[#fffbf0] border-[#e8c97a] text-[#7a5c1a] active:bg-[#fff3d0]'
-            }
-          `}
-        >
-          <span className={`text-xl ${isReading ? 'animate-bounce' : ''}`}>
-            {isReading ? '🔊' : '🔈'}
-          </span>
-          <span>{isReading ? 'よんでいるよ…（とめる）' : 'もういちど よむ'}</span>
-        </button>
+        {/* ── ボタン行：よみあげ ＋ マイク ── */}
+        <div className="flex gap-2 flex-shrink-0">
+
+          {/* よみあげボタン */}
+          <button
+            onClick={handleSpeak}
+            className={`
+              flex-1 py-3 rounded-2xl text-base font-bold tracking-wide
+              flex items-center justify-center gap-2
+              border-2 transition-all duration-200 active:scale-95
+              ${isReading
+                ? 'bg-[#fff3e0] border-[#e0943a] text-[#b85c00]'
+                : 'bg-[#fffbf0] border-[#e8c97a] text-[#7a5c1a] active:bg-[#fff3d0]'
+              }
+            `}
+          >
+            <span className={`text-xl ${isReading ? 'animate-bounce' : ''}`}>
+              {isReading ? '🔊' : '🔈'}
+            </span>
+            <span>{isReading ? 'とめる' : 'もういちど'}</span>
+          </button>
+
+          {/* マイクボタン */}
+          <div className="flex flex-col items-center gap-1">
+            <button
+              onClick={handleMic}
+              className={`
+                w-16 h-16 rounded-full flex items-center justify-center
+                shadow-md border-2 transition-all duration-200 active:scale-95
+                ${recState === 'recording'
+                  ? 'bg-red-100 border-red-400 animate-pulse'
+                  : recState === 'recorded'
+                  ? 'bg-green-50 border-green-400'
+                  : 'bg-white border-[#e8dcc8] active:bg-gray-50'
+                }
+              `}
+            >
+              {recState === 'recording' ? (
+                // 録音中：赤い停止ボタン
+                <span className="w-5 h-5 rounded bg-red-500 block" />
+              ) : recState === 'recorded' ? (
+                // 録音済み：もう一度アイコン
+                <span className="text-2xl">🔄</span>
+              ) : (
+                // 待機中：マイクアイコン
+                <MicIcon size={34} />
+              )}
+            </button>
+            <span className="text-[10px] font-bold text-[#9a8070]">
+              {recState === 'recording' ? 'やめる' : recState === 'recorded' ? 'もういちど' : 'じぶんでよむ'}
+            </span>
+          </div>
+        </div>
+
+        {/* 録音済み → きいてみるボタン */}
+        {recState === 'recorded' && audioURL && (
+          <button
+            onClick={handlePlayback}
+            className={`
+              w-full py-3 rounded-2xl text-base font-bold flex-shrink-0
+              flex items-center justify-center gap-2
+              border-2 transition-all duration-200 active:scale-95
+              ${isPlaying
+                ? 'bg-blue-100 border-blue-400 text-blue-700'
+                : 'bg-[#e8f5e9] border-[#66bb6a] text-[#2e7d32]'
+              }
+            `}
+          >
+            <span className="text-xl">{isPlaying ? '⏹' : '▶️'}</span>
+            <span>{isPlaying ? 'とめる' : 'じぶんのこえを きいてみる 🎧'}</span>
+          </button>
+        )}
 
       </div>
 
