@@ -204,6 +204,7 @@ export default function QuestionScreen({
                 return (
                   <ChoiceButton
                     key={choice.id}
+                    number={i + 1}
                     text={choice.text}
                     state={state}
                     onClick={() => handleSelect(choice.id)}
