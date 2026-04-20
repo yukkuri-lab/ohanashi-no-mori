@@ -157,8 +157,8 @@ export default function QuestionScreen({
                   <span className="text-3xl">🖼️</span>
                 </div>
               )}
-              {/* 文しょう */}
-              <div className="bg-white px-4 py-3" style={{ maxHeight: '110px', overflowY: 'auto' }}>
+              {/* 文しょう（全文表示） */}
+              <div className="bg-white px-4 py-3">
                 <p className="story-text text-[0.8rem] font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
                   {referencePage.text}
                 </p>
