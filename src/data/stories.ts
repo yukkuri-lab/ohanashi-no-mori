@@ -186,7 +186,7 @@ export const stories: Story[] = [
       {
         id: 'fq1',
         text: '「おもたいな」と いっているのは だれ？',
-        speech: 'おはなし たのしかった？ クイズだよ！\n「おもたいな」といっているのはだれでしょう？',
+        speech: '「おもたいな」って いってるのは だれか わかる？',
         choices: [
           { id: 'a', text: 'ふきのとう' },
           { id: 'b', text: 'ゆき' },
@@ -195,11 +195,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そうだね！ふきのとうが ゆきを おもたいと いっていたね！',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         id: 'fq2',
         text: 'ふきのとうは なにを しようとしていた？',
-        speech: 'つぎのもんだい！\nふきのとうはなにをしようとしていたでしょう？',
+        speech: 'ふきのとうは なにを しようとしてたんだっけ？',
         choices: [
           { id: 'a', text: 'うたを うたおうとしていた' },
           { id: 'b', text: 'ねようとしていた' },
@@ -208,11 +209,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！「よいしょ、よいしょ」と ふんばって そとに でようとしていたね！',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         id: 'fq3',
         text: '「ごめんね」と いったのは だれ？',
-        speech: 'もうひとつ！\n「ごめんね」といったのはだれでしょう？',
+        speech: '「ごめんね」って いったのは だれだったかな？',
         choices: [
           { id: 'a', text: 'ふきのとう' },
           { id: 'b', text: 'ゆき' },
@@ -221,11 +223,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'そうだね！ゆきが ふきのとうに 「ごめんね」と いったんだね。',
         incorrectFeedback: 'だいじょうぶ、もういっかい',
+        pageIndex: 1,
       },
       {
         id: 'fq4',
         text: 'ゆきが とけられないのは なぜ？',
-        speech: 'むずかしいよ！\nゆきがとけられないのはなぜでしょう？',
+        speech: 'ゆきが とけられないのは どうしてだっけ？',
         choices: [
           { id: 'a', text: 'たけやぶのかげで\nおひさまが あたらない' },
           { id: 'b', text: 'さむすぎるから' },
@@ -234,11 +237,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そのとおり！たけやぶのかげになって おひさまが あたらないから とけられないんだね。',
         incorrectFeedback: 'ふたつめの ばめんを おもいだしてみよう',
+        pageIndex: 1,
       },
       {
         id: 'fq5',
         text: '「すまない」と いったのは だれ？',
-        speech: 'つぎ！\n「すまない」といったのはだれでしょう？',
+        speech: '「すまない」って いったのは だれか おぼえてる？',
         choices: [
           { id: 'a', text: 'ゆき' },
           { id: 'b', text: 'はるかぜ' },
@@ -247,11 +251,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！たけやぶが かげに なってしまって もうしわけない、と いったんだね。',
         incorrectFeedback: 'もういちど みてみよう',
+        pageIndex: 1,
       },
       {
         id: 'fq6',
         text: '「もっこり」は なにが どうした ようす？',
-        speech: 'もうすこし！\n「もっこり」はなにがどうしたようすでしょう？',
+        speech: '「もっこり」って どんな ようすの ことか わかる？',
         choices: [
           { id: 'a', text: 'はるかぜが ふいた' },
           { id: 'b', text: 'ゆきが つもった' },
@@ -260,11 +265,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'そうだね！ふきのとうが もっこりと かおを だしたんだね。かわいいね！',
         incorrectFeedback: 'さいごの ばめんを おもいだしてみよう',
+        pageIndex: 3,
       },
       {
         id: 'fq7',
         text: 'このおはなしは どの きせつ？',
-        speech: 'さいごのもんだいだよ！\nこのおはなしはどのきせつでしょう？',
+        speech: 'このおはなしは どの きせつのおはなしだっけ？',
         choices: [
           { id: 'a', text: 'なつ' },
           { id: 'b', text: 'はる' },
@@ -273,6 +279,7 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'そうだね！「もう、すっかり はるです」って かいてあったね！',
         incorrectFeedback: 'さいごの ばめんを おもいだしてみよう',
+        pageIndex: 3,
       },
     ],
   },
@@ -315,7 +322,7 @@ export const stories: Story[] = [
       {
         id: 'tq1',
         text: 'たんぽぽは いつの きせつに 花をさかせますか？',
-        speech: 'たんぽぽのおはなし、たのしかった？ クイズだよ！\nたんぽぽはいつのきせつに花をさかせますか？',
+        speech: 'たんぽぽは いつのきせつに 花をさかせるか おぼえてる？',
         choices: [
           { id: 'a', text: 'はる' },
           { id: 'b', text: 'なつ' },
@@ -324,11 +331,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そうだね！はるに きいろい きれいな 花が さくんだね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         id: 'tq2',
         text: '花が しぼんだあと、じくは どうなった？',
-        speech: 'つぎのもんだい！\n花がしぼんだあと、じくはどうなったでしょう？',
+        speech: '花がしぼんだあと、じくは どうなったっけ？',
         choices: [
           { id: 'a', text: 'たかく のびた' },
           { id: 'b', text: 'じめんに たおれた' },
@@ -337,11 +345,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'そうだね！じくが ぐったりと じめんに たおれたんだね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         id: 'tq3',
         text: 'じくを たおして たんぽぽは なにをしていた？',
-        speech: 'もうひとつ！\nじくをたおしてたんぽぽはなにをしていたでしょう？',
+        speech: 'じくをたおして たんぽぽは なにをしていたのかな？',
         choices: [
           { id: 'a', text: 'たねに えいようを おくっていた' },
           { id: 'b', text: 'やすんでいた' },
@@ -350,11 +359,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！たねに えいようを おくって、たねを ふとらせていたんだね。',
         incorrectFeedback: 'ふたつめの ばめんを おもいだしてみよう',
+        pageIndex: 1,
       },
       {
         id: 'tq4',
         text: 'たおれていた じくは そのあと どうなった？',
-        speech: 'つぎ！\nたおれていたじくはそのあとどうなったでしょう？',
+        speech: 'たおれていたじくは そのあと どうなったか わかる？',
         choices: [
           { id: 'a', text: 'そのまま たおれていた' },
           { id: 'b', text: 'きれいな 花を さかせた' },
@@ -363,11 +373,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'そうだね！せのびをするように ぐんぐん のびたんだね。',
         incorrectFeedback: 'みっつめの ばめんを おもいだしてみよう',
+        pageIndex: 2,
       },
       {
         id: 'tq5',
         text: 'じくが たかく のびるのは なぜ？',
-        speech: 'むずかしいよ！\nじくがたかくのびるのはなぜでしょう？',
+        speech: 'じくが たかくのびるのは どうしてだっけ？',
         choices: [
           { id: 'a', text: 'わた毛に かぜが よくあたって\nたねを とおくに とばせるから' },
           { id: 'b', text: 'おひさまに ちかづくため' },
@@ -376,11 +387,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'すごい！せいを たかくすると わた毛に かぜが よくあたるんだね。',
         incorrectFeedback: 'みっつめの ばめんを おもいだしてみよう',
+        pageIndex: 2,
       },
       {
         id: 'tq6',
         text: 'よく はれたひ、わた毛のらっかさんは どうなる？',
-        speech: 'もうすこし！\nよくはれてかぜのあるひ、わた毛のらっかさんはどうなるでしょう？',
+        speech: 'はれてかぜのある日、わた毛のらっかさんは どうなるか わかる？',
         choices: [
           { id: 'a', text: 'すぼんでしまう' },
           { id: 'b', text: 'いっぱいに ひらいて\nとおくまで とんでいく' },
@@ -389,11 +401,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！はれたひは わた毛のらっかさんが とおくまで とべるんだね！',
         incorrectFeedback: 'さいごの ばめんを おもいだしてみよう',
+        pageIndex: 3,
       },
       {
         id: 'tq7',
         text: 'わた毛のらっかさんが すぼむのは なぜ？',
-        speech: 'さいごのもんだいだよ！\nわた毛のらっかさんが すぼむのは\nなぜでしょう？',
+        speech: 'わた毛のらっかさんが すぼんじゃうのは どうしてだっけ？',
         choices: [
           { id: 'a', text: 'かぜが つよすぎるから' },
           { id: 'b', text: 'たねが まだ できていないから' },
@@ -402,6 +415,7 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'そのとおり！ぬれると おもくなって とびにくくなるんだね。たんぽぽって かしこいね！',
         incorrectFeedback: 'さいごの ばめんを おもいだしてみよう',
+        pageIndex: 3,
       },
     ],
   },
@@ -449,7 +463,7 @@ export const stories: Story[] = [
         // p.24 ①「ミサイルみたいに」→まぐろのようす
         id: 'sq1',
         text: '「ミサイルみたいに」から まぐろの どんな ようすが わかる？',
-        speech: 'スイミーの おはなし\nたのしかった？\nクイズだよ！\nみさいるみたいに、という ことばから、\nまぐろの どんな ようすが わかりますか？',
+        speech: '「みさいるみたいに」って どんな ようすか わかる？',
         choices: [
           { id: 'a', text: 'まっすぐに むかって\nくる ようす' },
           { id: 'b', text: 'まわりを ぐるぐる\nまわって くる ようす' },
@@ -458,12 +472,13 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そうだね！まっすぐに すごい はやさで むかって くる ようすだね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         // p.24 ②まぐろは赤い魚たちをどうした
         id: 'sq2',
         text: 'まぐろは あかい さかなたちを どうした？',
-        speech: 'つぎのもんだい！\nまぐろは あかい さかなたちを\nどうしたでしょう？',
+        speech: 'まぐろは あかい さかなたちを どうしたっけ？',
         choices: [
           { id: 'a', text: 'おいかけて にがした' },
           { id: 'b', text: 'ひとくちで のこらず\nのみこんだ' },
@@ -472,12 +487,13 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！ひとくちで のこらず のみこんでしまったんだね。こわいね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         // p.24 ③スイミーのきもち（さびしかった・かなしかった）
         id: 'sq3',
         text: 'くらい うみの そこを およぐ スイミーの きもちは？',
-        speech: 'もうひとつ！\nひとりで くらい うみの そこを\nおよぐ スイミーは\nどんな きもちでしたか？',
+        speech: 'ひとりで くらい うみの そこを およぐ スイミーは どんな きもちだったかな？',
         choices: [
           { id: 'a', text: 'さびしくて かなしい きもち' },
           { id: 'b', text: 'うれしくて たのしい きもち' },
@@ -486,12 +502,13 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そうだね！「さびしかった。とても かなしかった。」と かいてあったね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         // p.25 ④おもしろいものを見るたびにどうなった
         id: 'sq4',
         text: 'おもしろい ものを みる たびに スイミーは どうなった？',
-        speech: 'つぎ！\nおもしろい ものを みる たびに、\nスイミーは どうなったでしょう？',
+        speech: 'おもしろい ものを みる たびに、スイミーは どうなったっけ？',
         choices: [
           { id: 'a', text: 'もっと さびしくなった' },
           { id: 'b', text: 'はやく にげようと おもった' },
@@ -500,12 +517,13 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！うみの すばらしい ものを みて だんだん げんきに なったんだね！',
         incorrectFeedback: 'ふたつめの ばめんを おもいだしてみよう',
+        pageIndex: 1,
       },
       {
         // p.25 ⑤①くらげは何にたとえられた
         id: 'sq5',
         text: 'くらげは なにに たとえられた？',
-        speech: 'もうひとつ！\nくらげは なにに\nたとえられたでしょう？',
+        speech: 'くらげは なにに たとえられたか おぼえてる？',
         choices: [
           { id: 'a', text: 'にじいろの ゼリー' },
           { id: 'b', text: 'すいちゅうブルドーザー' },
@@ -514,12 +532,13 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そうだね！にじいろの ぜりいのような くらげ、きれいだね！',
         incorrectFeedback: 'ふたつめの ばめんを おもいだしてみよう',
+        pageIndex: 1,
       },
       {
         // p.25 ⑤②いせえびは何にたとえられた
         id: 'sq6',
         text: 'いせえびは なにに たとえられた？',
-        speech: 'つぎ！\nいせえびは なにに\nたとえられたでしょう？',
+        speech: 'いせえびは なにに たとえられたっけ？',
         choices: [
           { id: 'a', text: 'にじいろの ゼリー' },
           { id: 'b', text: 'ミサイル' },
@@ -528,12 +547,13 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！すいちゅうぶるどおざあみたいな いせえびだね。つよそう！',
         incorrectFeedback: 'ふたつめの ばめんを おもいだしてみよう',
+        pageIndex: 1,
       },
       {
         // p.30 ①魚の兄弟が出てこない理由
         id: 'sq7',
         text: 'ちいさな さかなたちが でてこないのは なぜ？',
-        speech: 'むずかしいよ！\nちいさな さかなたちが\nいわかげから でてこないのは\nなぜでしょう？',
+        speech: 'ちいさな さかなたちが いわかげから でてこないのは なぜだっけ？',
         choices: [
           { id: 'a', text: 'うみが つめたいから' },
           { id: 'b', text: 'おおきな さかなに\nたべられてしまうから' },
@@ -542,12 +562,13 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'そうだね！おおきな さかなに たべられるのが こわかったんだね。',
         incorrectFeedback: 'みっつめの ばめんを おもいだしてみよう',
+        pageIndex: 2,
       },
       {
         // p.30 ②スイミーが考えたこと
         id: 'sq8',
         text: 'スイミーは どんな ほうほうを かんがえた？',
-        speech: 'もうすこし！\nスイミーは どんな ほうほうを\nかんがえたでしょう？',
+        speech: 'スイミーは どんな ほうほうを かんがえたかな？',
         choices: [
           { id: 'a', text: 'おおきな さかなに たべられないで\nうみの なかを じゆうに およぐほうほう' },
           { id: 'b', text: 'おおきな さかなより\nはやく およぐ ほうほう' },
@@ -556,12 +577,13 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！みんなで じゆうに うみを およぐ ほうほうを かんがえたんだね。',
         incorrectFeedback: 'みっつめの ばめんを おもいだしてみよう',
+        pageIndex: 2,
       },
       {
         // p.31 ④スイミーがみんなに教えたこと
         id: 'sq9',
         text: 'スイミーが みんなに おしえたのは どんな こと？',
-        speech: 'あと すこし！\nスイミーが みんなに\nおしえたのは どんな こと でしょう？',
+        speech: 'スイミーが みんなに おしえたのは どんな こと？',
         choices: [
           { id: 'a', text: 'いわかげに かくれて じっとして いる こと' },
           { id: 'b', text: 'おおきな さかなの ふりを して\nいっしょに はなれずに およぐ こと' },
@@ -570,12 +592,13 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'そうだね！みんなで かたちを まもって おおきな さかなに なったんだね！',
         incorrectFeedback: 'さいごの ばめんを おもいだしてみよう',
+        pageIndex: 3,
       },
       {
         // p.31 ⑤みんなで泳いだらどうなった
         id: 'sq10',
         text: 'みんなで いっしょに およいだら どうなった？',
-        speech: 'さいごのもんだいだよ！\nみんなで いっしょに\nおよいだら どうなったでしょう？',
+        speech: 'みんなで いっしょに およいだら どうなったか おぼえてる？',
         choices: [
           { id: 'a', text: 'まぐろと なかよくなった' },
           { id: 'b', text: 'うみの そこに にげた' },
@@ -584,6 +607,7 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'そうだね！みんなで ちからを あわせて まぐろを おいだしたんだね。すごいね！',
         incorrectFeedback: 'さいごの ばめんを おもいだしてみよう',
+        pageIndex: 3,
       },
     ],
   },
@@ -631,7 +655,7 @@ export const stories: Story[] = [
         // p.36 ①「ただいま」のいみ
         id: 'mq1',
         text: '「ただいま」は どういう いみ？',
-        speech: 'ミリーのおはなし たのしかった？\nクイズだよ！\n「ただいま」は どういう いみでしょう？',
+        speech: '「ただいま」って どういう いみか わかる？',
         choices: [
           { id: 'a', text: 'いますぐに\nもってきます、という いみ' },
           { id: 'b', text: 'いま、おみせに かえってきます、という いみ' },
@@ -640,12 +664,13 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そうだね！「ただいま」は いますぐに もってきます、という いみだね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         // p.36 ③「かしこまりました」のいみ
         id: 'mq2',
         text: '「かしこまりました」は どういう いみ？',
-        speech: 'つぎのもんだい！\n「かしこまりました」は\nどういう いみでしょう？',
+        speech: '「かしこまりました」って どういう いみだっけ？',
         choices: [
           { id: 'a', text: 'きんちょう しました' },
           { id: 'b', text: 'わかりました' },
@@ -654,12 +679,13 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！「かしこまりました」は「わかりました」という ていねいな いみだね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 0,
       },
       {
         // p.36 ④やすいぼうしをたのんだわけ
         id: 'mq3',
         text: 'ミリーが やすいぼうしを たのんだのは なぜ？',
-        speech: 'もうひとつ！\nミリーが やすいぼうしを\nたのんだのは なぜでしょう？',
+        speech: 'ミリーが やすいぼうしを たのんだのは どうしてだっけ？',
         choices: [
           { id: 'a', text: 'やすいほうが すきだから' },
           { id: 'b', text: 'おさいふの なかが たりなかったから' },
@@ -668,12 +694,13 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'そうだね！おさいふが からっぽで おかねが たりなかったんだね。',
         incorrectFeedback: 'さいしょの ばめんを おもいだしてみよう',
+        pageIndex: 1,
       },
       {
         // p.37 ⑤「このくらい」と言ったのはだれ
         id: 'mq4',
         text: '「あの、このくらい。」と いったのは だれ？',
-        speech: 'つぎ！\n「あの、このくらい。」と\nいったのは だれでしょう？',
+        speech: '「あの、このくらい。」って いったのは だれかな？',
         choices: [
           { id: 'a', text: 'ミリー' },
           { id: 'b', text: 'みせのひと' },
@@ -682,12 +709,13 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！ミリーが おさいふを みせながら いったんだね。',
         incorrectFeedback: 'ふたつめの ばめんを おもいだしてみよう',
+        pageIndex: 1,
       },
       {
         // p.38 ①「けっこうです」のいみ
         id: 'mq5',
         text: '「けっこうです」は どういう いみ？',
-        speech: 'むずかしいよ！\n「けっこうです」は\nどういう いみでしょう？',
+        speech: '「けっこうです」って どういう いみか わかる？',
         choices: [
           { id: 'a', text: 'ぼうしが きにいらなかった、という いみ' },
           { id: 'b', text: 'もっと やすくして、という いみ' },
@@ -696,12 +724,13 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'そうだね！はこに いれなくて いいです、という ていねいな いいかただね。',
         incorrectFeedback: 'みっつめの ばめんを おもいだしてみよう',
+        pageIndex: 2,
       },
       {
         // p.38 ②「なにかぞうしなくちゃ」の理由
         id: 'mq6',
         text: 'ミリーが「なにかそうぞうしなくちゃ」と おもったのは なぜ？',
-        speech: 'もうすこし！\nミリーが「なにかそうぞうしなくちゃ」と\nおもったのは なぜでしょう？',
+        speech: 'ミリーが「そうぞうしなくちゃ」と おもったのは なぜかな？',
         choices: [
           { id: 'a', text: 'ぼうしを ほめてもらいたいから' },
           { id: 'b', text: 'あたらしい ぼうしの かたちが\nみえないから' },
@@ -710,12 +739,13 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！かたちが みえないから、そうぞうして たのしんだんだね！',
         incorrectFeedback: 'みっつめの ばめんを おもいだしてみよう',
+        pageIndex: 2,
       },
       {
         // p.38/39 ミリーがそうぞうしたぼうし
         id: 'mq7',
         text: 'こうえんで ぼうしは なんの ぼうしに なった？',
-        speech: 'さいごのもんだいだよ！\nこうえんで ミリーの ぼうしは\nなんの ぼうしに なったでしょう？',
+        speech: 'こうえんで ミリーの ぼうしは なんに へんしんしたっけ？',
         choices: [
           { id: 'a', text: 'けえきの ぼうし' },
           { id: 'b', text: '花いっぱいの ぼうし' },
@@ -724,6 +754,7 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'そうだね！こうえんでは ふんすいの ぼうしに なったんだね。すてきだね！',
         incorrectFeedback: 'さいごの ばめんを おもいだしてみよう',
+        pageIndex: 3,
       },
     ],
   },
@@ -782,7 +813,7 @@ export const stories: Story[] = [
       {
         id: 'tegamiq1',
         text: 'かえるくんが「いちどもかい。」とたずねたのは、なぜですか？',
-        speech: 'もんだいだよ！\nかえるくんが「いちどもかい。」とたずねたのは、なぜですか？',
+        speech: 'かえるくんが「いちどもかい。」って たずねたのは なぜかわかる？',
         choices: [
           { id: 'a', text: 'がまくんを なぐさめようとしたから' },
           { id: 'b', text: 'がまくんの話が しんじられなかったから' },
@@ -791,11 +822,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！いちどもないなんて、ほんとう？とおどろいたんだね！',
         incorrectFeedback: 'かえるくんとがまくんが話している場面を もういちど よんでみよう！',
+        pageIndex: 1,
       },
       {
         id: 'tegamiq2',
         text: 'なぜかえるくんも「かなしい気分」になったのですか？',
-        speech: 'つぎのもんだいだよ！\nなぜかえるくんも「かなしい気分」になったのですか？',
+        speech: 'かえるくんも「かなしい気分」に なったのは なぜかな？',
         choices: [
           { id: 'a', text: 'がまくんのことが よく 分からなかったから' },
           { id: 'b', text: 'がまくんが きげんをなおしてくれなかったから' },
@@ -804,11 +836,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！友だちがかなしんでいると、じぶんもかなしくなるんだね！',
         incorrectFeedback: 'ふたりがげんかんにすわっている場面を もういちど よんでみよう！',
+        pageIndex: 1,
       },
       {
         id: 'tegamiq3',
         text: 'かえるくんは、家に帰って何をしましたか？',
-        speech: 'つぎのもんだいだよ！\nかえるくんは、家に帰って何をしましたか？',
+        speech: 'かえるくんは 家に帰って なにをしたっけ？',
         choices: [
           { id: 'a', text: 'えんぴつと紙で がまくんに お手紙を書いた' },
           { id: 'b', text: 'ごはんを たべて やすんだ' },
@@ -817,11 +850,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！えんぴつと紙を見つけて、がまくんにお手紙を書いたんだね！',
         incorrectFeedback: 'かえるくんが家に帰った場面を もういちど よんでみよう！',
+        pageIndex: 2,
       },
       {
         id: 'tegamiq4',
         text: 'かえるくんが家からとびだしたのは、なぜですか？',
-        speech: 'つぎのもんだいだよ！\nかえるくんが家からとびだしたのは、なぜですか？',
+        speech: 'かえるくんが 家から とびだしたのは なぜだろう？',
         choices: [
           { id: 'a', text: 'かたつむりくんが 家の外を通るのを見かけたから' },
           { id: 'b', text: 'がまくんに すこしでも早く お手紙をとどけたかったから' },
@@ -830,11 +864,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！がまくんに早くとどけたくて、とびだしたんだね！',
         incorrectFeedback: 'かえるくんが外にとびだした場面を もういちど よんでみよう！',
+        pageIndex: 3,
       },
       {
         id: 'tegamiq5',
         text: 'がまくんの家にもどったとき、がまくんはどうしていましたか？',
-        speech: 'つぎのもんだいだよ！\nがまくんの家にもどったとき、がまくんはどうしていましたか？',
+        speech: 'かえるくんが もどったとき、がまくんは どうしていたっけ？',
         choices: [
           { id: 'a', text: 'ベッドで お昼ねをしていた' },
           { id: 'b', text: 'げんかんの前に すわっていた' },
@@ -843,11 +878,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！がまくんはベッドでお昼ねをしていたんだね！',
         incorrectFeedback: 'かえるくんがもどってきた場面を もういちど よんでみよう！',
+        pageIndex: 4,
       },
       {
         id: 'tegamiq6',
         text: '「きみが。」と聞いたとき、がまくんはどんな気もちでしたか？',
-        speech: 'つぎのもんだいだよ！\n「きみが。」と聞いたとき、がまくんはどんな気もちでしたか？',
+        speech: '「きみが。」と聞いたとき、がまくんは どんな気もちだったかな？',
         choices: [
           { id: 'a', text: 'ばかにした気もち' },
           { id: 'b', text: 'おどろいた気もち' },
@@ -856,11 +892,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！かえるくんがお手紙をくれたと知って、びっくりしたんだね！',
         incorrectFeedback: 'かえるくんがお手紙のことを話した場面を もういちど よんでみよう！',
+        pageIndex: 4,
       },
       {
         id: 'tegamiq7',
         text: 'げんかんでお手紙をまっていたとき、ふたりはどんな気もちでしたか？',
-        speech: 'つぎのもんだいだよ！\nげんかんでお手紙をまっていたとき、ふたりはどんな気もちでしたか？',
+        speech: 'げんかんで まっているとき、ふたりは どんな気もちだったっけ？',
         choices: [
           { id: 'a', text: '手紙のいみが よく分からない気もち' },
           { id: 'b', text: '手紙など どうでもいいという気もち' },
@@ -869,11 +906,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！ふたりとも、とてもしあわせな気もちでまっていたんだね！',
         incorrectFeedback: 'さいごの場面を もういちど よんでみよう！',
+        pageIndex: 5,
       },
       {
         id: 'tegamiq8',
         text: 'かえるくんが「しあわせな気もち」になったのは、なぜですか？',
-        speech: 'さいごのもんだいだよ！\nかえるくんが「しあわせな気もち」になったのは、なぜですか？',
+        speech: 'かえるくんが「しあわせな気もち」に なったのは なぜかな？',
         choices: [
           { id: 'a', text: 'がまくんが 元気になってくれたから' },
           { id: 'b', text: '親友のがまくんに お手紙を書いて ふたりでまったから' },
@@ -882,6 +920,7 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！大切な友だちのためにしたことが、うれしかったんだね！',
         incorrectFeedback: 'かえるくんがお手紙を書いた場面を もういちど よんでみよう！',
+        pageIndex: 5,
       },
     ],
   },
@@ -928,7 +967,7 @@ export const stories: Story[] = [
       {
         id: 'juuiq1',
         text: 'じゅういさんの 一日のはじまりのしごとは なんですか？',
-        speech: 'もんだいだよ！\nじゅういさんの 一日のはじまりのしごとは\nなんでしょう？',
+        speech: 'じゅういさんの 一日のはじまりのしごとは なんだっけ？',
         choices: [
           { id: 'a', text: 'どうぶつ園の中を 見回ること' },
           { id: 'b', text: 'どうぶつに えさをあげること' },
@@ -937,11 +976,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！毎朝、どうぶつの元気なようすを 見回るんだね！',
         incorrectFeedback: 'さいしょの場面を おもいだしてみよう！',
+        pageIndex: 0,
       },
       {
         id: 'juuiq2',
         text: '「元気なときのようすを見ておく」のは、なぜですか？',
-        speech: 'つぎのもんだいだよ！\n「元気なときのようすを見ておく」のは、なぜですか？',
+        speech: '「元気なときのようすを見ておく」のは なぜだっけ？',
         choices: [
           { id: 'a', text: 'どうぶつたちに おぼえてもらいやすくなるから' },
           { id: 'b', text: 'びょうきになったとき、すぐに気づくことができるから' },
@@ -950,11 +990,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！いつもと違うことに すぐ気づけるんだね！',
         incorrectFeedback: 'さいしょの場面を もういちど よんでみよう！',
+        pageIndex: 0,
       },
       {
         id: 'juuiq3',
         text: 'じゅういさんは どうぶつたちに なにをおぼえてもらうようにしていましたか？',
-        speech: 'つぎのもんだいだよ！\nじゅういさんはどうぶつたちに、なにをおぼえてもらうようにしていましたか？',
+        speech: 'じゅういさんは どうぶつたちに なにを おぼえてもらうように していたかな？',
         choices: [
           { id: 'a', text: 'なまえをおぼえてもらうようにしていた' },
           { id: 'b', text: 'えさの食べかたをおぼえてもらうようにしていた' },
@@ -963,11 +1004,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！毎日「おはよう」と言って、顔も声もおぼえてもらっていたんだね！',
         incorrectFeedback: 'さいしょの場面を もういちど よんでみよう！',
+        pageIndex: 0,
       },
       {
         id: 'juuiq4',
         text: 'しいくいんさんが じゅういさんをよんだのは、なぜですか？',
-        speech: 'つぎのもんだいだよ！\nしいくいんさんが じゅういさんをよんだのは、なぜですか？',
+        speech: 'しいくいんさんが じゅういさんを よんだのは なぜだっけ？',
         choices: [
           { id: 'a', text: 'いのししのおなかに 赤ちゃんがいるかどうか しらべてほしかったから' },
           { id: 'b', text: 'いのししが けがをしているかどうか たしかめてほしかったから' },
@@ -976,11 +1018,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！いのししのおなかに赤ちゃんがいるかしらべてほしかったんだね！',
         incorrectFeedback: 'いのししの場面を もういちど よんでみよう！',
+        pageIndex: 1,
       },
       {
         id: 'juuiq5',
         text: 'じゅういさんは どのように いのししをしらべましたか？',
-        speech: 'つぎのもんだいだよ！\nじゅういさんは どのように いのししをしらべましたか？',
+        speech: 'じゅういさんは どのように いのししを しらべたのかな？',
         choices: [
           { id: 'a', text: 'いのししをつかまえて、おなかをさわった' },
           { id: 'b', text: 'しいくいんさんが えさを食べさせている間に、おなかにきかいを当てた' },
@@ -989,11 +1032,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！こわがるいのししが気づかないように、そっとしらべたんだね！',
         incorrectFeedback: 'いのししの場面を もういちど よんでみよう！',
+        pageIndex: 1,
       },
       {
         id: 'juuiq6',
         text: 'しいくいんさんから電話がかかってきたのは、なぜですか？',
-        speech: 'つぎのもんだいだよ！\nしいくいんさんから電話がかかってきたのは、なぜですか？',
+        speech: 'しいくいんさんから 電話がきたのは なぜだっけ？',
         choices: [
           { id: 'a', text: 'ペンギンが ボールペンをのみこんでしまったから' },
           { id: 'b', text: 'ペンギンが けがをしてしまったから' },
@@ -1002,11 +1046,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！ペンギンがボールペンをのみこんでしまったんだね！',
         incorrectFeedback: 'ペンギンの場面を もういちど よんでみよう！',
+        pageIndex: 2,
       },
       {
         id: 'juuiq7',
         text: 'ペンギンは なにをえさとまちがえてのみこみましたか？',
-        speech: 'つぎのもんだいだよ！\nペンギンは なにをえさとまちがえてのみこみましたか？',
+        speech: 'ペンギンは なにを えさとまちがえて のみこんじゃったの？',
         choices: [
           { id: 'a', text: '石' },
           { id: 'b', text: 'プラスチックのかけら' },
@@ -1015,11 +1060,12 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！ボールペンを魚とまちがえてのみこんだんだね！',
         incorrectFeedback: 'ペンギンの場面を もういちど よんでみよう！',
+        pageIndex: 2,
       },
       {
         id: 'juuiq8',
         text: '電話をうけたじゅういさんは、どうしましたか？',
-        speech: 'つぎのもんだいだよ！\n電話をうけたじゅういさんは、どうしましたか？',
+        speech: '電話をうけた じゅういさんは どうしたっけ？',
         choices: [
           { id: 'a', text: '大いそぎで手当てをして ボールペンをとりだした' },
           { id: 'b', text: 'つぎの日に ペンギンを びょういんへ連れていった' },
@@ -1028,11 +1074,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！早めに手当てできたから、ペンギンは元気になったんだね！',
         incorrectFeedback: 'ペンギンの場面を もういちど よんでみよう！',
+        pageIndex: 2,
       },
       {
         id: 'juuiq9',
         text: '一日のおわりに日記を書くのは、なぜですか？',
-        speech: 'つぎのもんだいだよ！\n一日のおわりに日記を書くのは、なぜですか？',
+        speech: '一日のおわりに 日記を書くのは なぜかな？',
         choices: [
           { id: 'a', text: 'どうぶつのかかりやすいびょうきを 知るため' },
           { id: 'b', text: 'つぎに同じようなびょうきやけがのどうぶつを よりよくちりょうするため' },
@@ -1041,11 +1088,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！つぎのどうぶつをもっとよくなおすために書いているんだね！',
         incorrectFeedback: 'さいごの場面を もういちど よんでみよう！',
+        pageIndex: 3,
       },
       {
         id: 'juuiq10',
         text: 'どうぶつ園を出る前に おふろに入るのは、なぜですか？',
-        speech: 'さいごのもんだいだよ！\nどうぶつ園を出る前に おふろに入るのは、なぜですか？',
+        speech: 'どうぶつ園を出る前に おふろに入るのは なぜだっけ？',
         choices: [
           { id: 'a', text: 'つぎに同じびょうきのどうぶつを よりよくちりょうするため' },
           { id: 'b', text: 'どうぶつのかかりやすいびょうきを 知るため' },
@@ -1054,6 +1102,7 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'せいかい！どうぶつにふれた後は体をきれいにしなければいけないんだね！',
         incorrectFeedback: 'さいごの場面を もういちど よんでみよう！',
+        pageIndex: 3,
       },
     ],
   },
@@ -1100,7 +1149,7 @@ export const stories: Story[] = [
       {
         id: 'aq1',
         text: 'あめは だれと いっしょに うたいますか？',
-        speech: 'もんだいだよ！\nあめは だれと いっしょに うたいますか？\nみんな おもいだしてみよう！',
+        speech: 'あめは だれと いっしょに うたうか おぼえてる？',
         choices: [
           { id: 'a', text: 'やね・つち・かわ・花' },
           { id: 'b', text: 'やね・つち だけ' },
@@ -1109,11 +1158,12 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'せいかい！やね、つち、かわ、花　みんなと いっしょに うたうんだね！',
         incorrectFeedback: 'もういちど しを よんでみよう。やねとつちとかわと花が でてくるよ。',
+        pageIndex: 2,
       },
       {
         id: 'aq2',
         text: 'なぜ「どんな うたでも しってる」のですか？',
-        speech: 'つぎのもんだいだよ！\nあめが「どんな うたでも しってる」のは\nなぜでしょう？',
+        speech: 'あめが「どんな うたでも しってる」のは なぜかな？',
         choices: [
           { id: 'a', text: 'たくさん れんしゅうしたから' },
           { id: 'b', text: 'だれとも なかよしだから' },
@@ -1122,11 +1172,12 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'せいかい！だれとも なかよしだから、どんな うたでも しってるんだね！',
         incorrectFeedback: 'しの なかに「あめは だれとも なかよし」って あったよ。',
+        pageIndex: 2,
       },
       {
         id: 'aq3',
         text: 'この しを どのように よみますか？',
-        speech: 'さいごのもんだいだよ！\nこの しは どのように よむと いいでしょう？',
+        speech: 'この しは どんなふうに よむと いいかな？',
         choices: [
           { id: 'a', text: 'おおきな こえで よむ' },
           { id: 'b', text: 'ゆっくり もじを たどって よむ' },
@@ -1135,6 +1186,7 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'そうだね！りずむを かんじながら よむと たのしいね！',
         incorrectFeedback: 'とんとん、ぴんちん、つんつん…　おとの りずむを かんじてみよう！',
+        pageIndex: 3,
       },
     ],
   },
