@@ -113,6 +113,10 @@ export default function QuestionScreen({
     : isCorrect ? question.correctFeedback
     : `${question.incorrectFeedback}正解は「${correctText2}」だよ！`
 
+  // 関連場面（絵＋文しょう）
+  const referencePage =
+    pages && question.pageIndex !== undefined ? pages[question.pageIndex] : null
+
   return (
     <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
 
@@ -136,34 +140,31 @@ export default function QuestionScreen({
         <div className="max-w-lg mx-auto px-5 pb-6 flex flex-col gap-5">
 
           {/* 関連する場面（絵＋文しょう） */}
-          {pages && question.pageIndex !== undefined && (() => {
-            const page = pages[question.pageIndex!]
-            return (
-              <div className="rounded-2xl overflow-hidden border border-[#e8dcc8] shadow-md animate-fadeInUp flex-shrink-0">
-                {/* 絵 */}
-                {page.imageSrc ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={page.imageSrc}
-                    alt={page.imageLabel}
-                    className="w-full object-cover"
-                    style={{ maxHeight: '130px' }}
-                  />
-                ) : (
-                  <div className="flex items-center justify-center py-4"
-                    style={{ background: 'linear-gradient(135deg, #dceade 0%, #c8e6c9 50%, #b2dfdb 100%)' }}>
-                    <span className="text-3xl">🖼️</span>
-                  </div>
-                )}
-                {/* 文しょう */}
-                <div className="bg-white px-4 py-3" style={{ maxHeight: '110px', overflowY: 'auto' }}>
-                  <p className="story-text text-[0.8rem] font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
-                    {page.text}
-                  </p>
+          {referencePage && (
+            <div className="rounded-2xl overflow-hidden border border-[#e8dcc8] shadow-md animate-fadeInUp">
+              {/* 絵 */}
+              {referencePage.imageSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={referencePage.imageSrc}
+                  alt={referencePage.imageLabel}
+                  className="w-full object-cover"
+                  style={{ maxHeight: '130px' }}
+                />
+              ) : (
+                <div className="flex items-center justify-center py-4"
+                  style={{ background: 'linear-gradient(135deg, #dceade 0%, #c8e6c9 50%, #b2dfdb 100%)' }}>
+                  <span className="text-3xl">🖼️</span>
                 </div>
+              )}
+              {/* 文しょう */}
+              <div className="bg-white px-4 py-3" style={{ maxHeight: '110px', overflowY: 'auto' }}>
+                <p className="story-text text-[0.8rem] font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
+                  {referencePage.text}
+                </p>
               </div>
-            )
-          })()}
+            </div>
+          )}
 
           {/* キャラクター */}
           <div className="flex flex-col items-center gap-2 mt-2 animate-walkInFromRight">
