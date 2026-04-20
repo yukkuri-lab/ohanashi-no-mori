@@ -166,80 +166,86 @@ export default function QuestionScreen({
             </div>
           )}
 
-          {/* キャラクター */}
-          <div className="flex flex-col items-center gap-2 mt-2 animate-walkInFromRight">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden
-                         border-4 border-white shadow-md"
-              style={{ backgroundColor: character.color + '28' }}
-            >
-              {character.imageSrc ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={character.imageSrc}
-                  alt={character.name}
-                  className="w-full h-full object-contain p-1" style={{ mixBlendMode: 'multiply' }}
-                />
-              ) : (
-                <span className="text-5xl">{character.emoji}</span>
-              )}
-            </div>
-            <span className="text-xs text-[#7a6555] font-bold">{character.name}</span>
-          </div>
+          {/* キャラクター ＋ 吹き出し（横並び） */}
+          <div className="flex items-start gap-3 animate-walkInFromRight">
 
-          {/* 吹き出し */}
-          {showBubble && (
-            <div className="animate-popIn relative">
+            {/* アリさん（左） */}
+            <div className="flex flex-col items-center gap-1 flex-shrink-0">
               <div
-                className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0"
-                style={{
-                  borderLeft:   '10px solid transparent',
-                  borderRight:  '10px solid transparent',
-                  borderBottom: `12px solid ${character.color}33`,
-                }}
-              />
-              <div
-                className="rounded-2xl px-6 py-5 text-center shadow-sm"
-                style={{
-                  backgroundColor: character.color + '18',
-                  border: `2px solid ${character.color}33`,
-                }}
+                className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden
+                           border-4 border-white shadow-md"
+                style={{ backgroundColor: character.color + '28' }}
               >
-                {isCorrect === null ? (
-                  <p className="text-lg font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap"
-                     style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>
-                    {question.speech}
-                  </p>
-                ) : isCorrect ? (
-                  <div className="animate-popIn flex flex-col items-center gap-2">
-                    <p className="text-3xl font-black text-forest-600 tracking-wide">
-                      🎉 せいかい！
-                    </p>
-                    <p className="text-base font-bold text-forest-700 leading-relaxed">
-                      {feedbackMessage}
-                    </p>
-                  </div>
+                {character.imageSrc ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={character.imageSrc}
+                    alt={character.name}
+                    className="w-full h-full object-contain p-1"
+                    style={{ mixBlendMode: 'multiply' }}
+                  />
                 ) : (
-                  <p className="text-xl font-bold leading-relaxed animate-popIn text-[#b85c00]">
-                    {feedbackMessage}
-                  </p>
+                  <span className="text-4xl">{character.emoji}</span>
                 )}
               </div>
+              <span className="text-xs text-[#7a6555] font-bold">{character.name}</span>
             </div>
-          )}
+
+            {/* 吹き出し（右、左向きの口） */}
+            {showBubble ? (
+              <div className="relative flex-1 animate-popIn mt-1">
+                {/* 左向き三角 */}
+                <div
+                  className="absolute top-4"
+                  style={{
+                    left: '-9px',
+                    width: 0, height: 0,
+                    borderTop:    '8px solid transparent',
+                    borderBottom: '8px solid transparent',
+                    borderRight:  `10px solid ${character.color}33`,
+                  }}
+                />
+                <div
+                  className="rounded-2xl px-4 py-3 shadow-sm"
+                  style={{
+                    backgroundColor: character.color + '18',
+                    border: `2px solid ${character.color}33`,
+                  }}
+                >
+                  {isCorrect === null ? (
+                    <>
+                      <p className="text-base font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap"
+                         style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>
+                        {question.speech}
+                      </p>
+                      {choicesLocked && selectedId === null && (
+                        <div className="flex items-center gap-1 mt-2">
+                          <span className="text-sm animate-bounce">🎧</span>
+                          <span className="text-xs font-bold text-[#9a8070]">きいてね…</span>
+                        </div>
+                      )}
+                    </>
+                  ) : isCorrect ? (
+                    <div className="animate-popIn flex flex-col items-center gap-1">
+                      <p className="text-2xl font-black text-forest-600">🎉 せいかい！</p>
+                      <p className="text-sm font-bold text-forest-700 leading-relaxed">{feedbackMessage}</p>
+                    </div>
+                  ) : (
+                    <p className="text-base font-bold leading-relaxed animate-popIn text-[#b85c00]">
+                      {feedbackMessage}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* 吹き出し登場前のプレースホルダー */
+              <div className="flex-1" />
+            )}
+          </div>
 
           {/* 選択肢 */}
           {showChoices && (
             <div className="flex flex-col gap-3 animate-fadeInUp">
-
-              {/* ロック中：「きいてね…」インジケーター */}
-              {choicesLocked && selectedId === null && (
-                <div className="flex items-center justify-center gap-2 py-1">
-                  <span className="text-lg animate-bounce">🎧</span>
-                  <span className="text-sm font-bold text-[#9a8070]">きいてね…</span>
-                  <span className="text-lg animate-bounce" style={{ animationDelay: '150ms' }}>🎧</span>
-                </div>
-              )}
 
               {question.choices.map((choice, i) => {
                 let state: 'idle' | 'correct' | 'incorrect' | 'disabled' = 'idle'
@@ -262,9 +268,9 @@ export default function QuestionScreen({
                 )
               })}
 
-              {/* アンロック時：ふわっと「どれかな？」 */}
+              {/* アンロック時 */}
               {!choicesLocked && selectedId === null && (
-                <p className="text-center text-sm font-bold text-[#4d9e6e] animate-popIn">
+                <p className="text-center text-xs font-bold text-[#4d9e6e] animate-popIn">
                   👆 えらんでみよう！
                 </p>
               )}
