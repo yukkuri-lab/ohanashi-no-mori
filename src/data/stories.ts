@@ -87,7 +87,7 @@ export const stories: Story[] = [
       {
         id: 'q1',
         text: 'おじいさんは どこへ いった？',
-        speech: 'おはなし おもしろかった？ クイズだよ！\nおじいさんは どこへいったでしょう？',
+        speech: 'ねえねえ、おじいさんは どこへ いったか おぼえてる？',
         choices: [
           { id: 'a', text: 'やま' },
           { id: 'b', text: 'うみ' },
@@ -101,7 +101,7 @@ export const stories: Story[] = [
       {
         id: 'q2',
         text: 'おむすびは どこに はいった？',
-        speech: 'つぎのもんだいだよ！\nおむすびはどこにはいったでしょう？',
+        speech: 'ころころ ころりん、おむすびは どこに はいっていったっけ？',
         choices: [
           { id: 'a', text: 'いえ' },
           { id: 'b', text: 'あな' },
@@ -115,7 +115,7 @@ export const stories: Story[] = [
       {
         id: 'q3',
         text: 'あなの なかに いたのは だれ？',
-        speech: 'もうひとつ！\nあなのなかにいたのはだれでしょう？',
+        speech: 'あなの なかに いたのは だれだったか おぼえてる？',
         choices: [
           { id: 'a', text: 'おばあさん' },
           { id: 'b', text: 'いぬ' },
@@ -129,7 +129,7 @@ export const stories: Story[] = [
       {
         id: 'q4',
         text: 'おじいさんは どんな きもち？',
-        speech: 'さいごのもんだいだよ！\nおじいさんはどんなきもちだったでしょう？',
+        speech: 'さいごに おじいさんは どんな きもちだったかな？',
         choices: [
           { id: 'a', text: 'かなしい' },
           { id: 'b', text: 'うれしい' },

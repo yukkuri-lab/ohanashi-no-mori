@@ -135,20 +135,35 @@ export default function QuestionScreen({
       <div className="flex-1 scroll-area">
         <div className="max-w-lg mx-auto px-5 pb-6 flex flex-col gap-5">
 
-          {/* 関連する場面の本文 */}
-          {pages && question.pageIndex !== undefined && (
-            <div className="bg-[#fffef5] rounded-2xl px-4 py-3 border-2 border-[#e8dcc8] shadow-sm animate-fadeInUp">
-              <div className="flex items-center gap-1 mb-2">
-                <span className="text-sm">📖</span>
-                <span className="text-xs font-bold text-[#9a8070]">
-                  場面 {question.pageIndex + 1} の文しょう
-                </span>
+          {/* 関連する場面（絵＋文しょう） */}
+          {pages && question.pageIndex !== undefined && (() => {
+            const page = pages[question.pageIndex!]
+            return (
+              <div className="rounded-2xl overflow-hidden border border-[#e8dcc8] shadow-md animate-fadeInUp flex-shrink-0">
+                {/* 絵 */}
+                {page.imageSrc ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={page.imageSrc}
+                    alt={page.imageLabel}
+                    className="w-full object-cover"
+                    style={{ maxHeight: '130px' }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center py-4"
+                    style={{ background: 'linear-gradient(135deg, #dceade 0%, #c8e6c9 50%, #b2dfdb 100%)' }}>
+                    <span className="text-3xl">🖼️</span>
+                  </div>
+                )}
+                {/* 文しょう */}
+                <div className="bg-white px-4 py-3" style={{ maxHeight: '110px', overflowY: 'auto' }}>
+                  <p className="story-text text-[0.8rem] font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
+                    {page.text}
+                  </p>
+                </div>
               </div>
-              <p className="story-text text-[0.85rem] font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
-                {pages[question.pageIndex].text}
-              </p>
-            </div>
-          )}
+            )
+          })()}
 
           {/* キャラクター */}
           <div className="flex flex-col items-center gap-2 mt-2 animate-walkInFromRight">
@@ -273,7 +288,7 @@ export default function QuestionScreen({
                        active:translate-y-1 active:shadow-[0_2px_0_#224f35]
                        transition-all duration-150 animate-popIn"
           >
-            {questionIndex + 1 < totalQuestions ? 'つぎのもんだい →' : 'おしまい 🎉'}
+            {questionIndex + 1 < totalQuestions ? 'つぎへ →' : 'おしまい 🎉'}
           </button>
         ) : (
           <div className="w-full py-5 opacity-0 pointer-events-none" aria-hidden />
