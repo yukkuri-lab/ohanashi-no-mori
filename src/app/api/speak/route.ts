@@ -57,9 +57,9 @@ function isAllowedRequest(req: NextRequest): boolean {
   const allowedOrigin = process.env.ALLOWED_ORIGIN
   if (allowedOrigin && source.startsWith(allowedOrigin)) return true
 
-  // Vercel が自動付与するデプロイ URL も許可
-  const vercelUrl = process.env.VERCEL_URL
-  if (vercelUrl && source.includes(vercelUrl)) return true
+  // Vercel 環境では *.vercel.app からのリクエストを許可
+  // （自分の Vercel アカウントのデプロイURLは全て vercel.app のサブドメイン）
+  if (process.env.VERCEL_URL && source.includes('.vercel.app')) return true
 
   return false
 }
