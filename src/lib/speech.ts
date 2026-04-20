@@ -4,7 +4,7 @@
 // iOS Safari / Chrome iOS でも確実に動く方法
 // =============================================
 
-const SPEAK_URL = '/api/speak?v=2'  // v= を変えるとキャッシュがリセットされる
+const SPEAK_URL = '/api/speak?v=5'  // v= を変えるとキャッシュがリセットされる
 
 // iOS アンロック用のミニマムな無音 WAV（44バイト）
 const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='

@@ -136,11 +136,20 @@ export default function QuestionScreen({
           {/* キャラクター */}
           <div className="flex flex-col items-center gap-2 mt-2 animate-walkInFromRight">
             <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-5xl
+              className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden
                          border-4 border-white shadow-md"
               style={{ backgroundColor: character.color + '28' }}
             >
-              {character.emoji}
+              {character.imageSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={character.imageSrc}
+                  alt={character.name}
+                  className="w-full h-full object-contain p-1" style={{ mixBlendMode: 'multiply' }}
+                />
+              ) : (
+                <span className="text-5xl">{character.emoji}</span>
+              )}
             </div>
             <span className="text-xs text-[#7a6555] font-bold">{character.name}</span>
           </div>

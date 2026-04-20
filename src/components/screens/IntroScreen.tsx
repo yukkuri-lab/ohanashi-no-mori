@@ -59,14 +59,23 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
       className="min-h-screen-safe flex flex-col items-center justify-center px-5 gap-6 overflow-hidden"
       style={{ backgroundColor: '#faf6ea' }}
     >
-      {/* ── アリさん：右から歩いてくる ── */}
+      {/* ── キャラクター：右から歩いてくる ── */}
       <div className="flex flex-col items-center gap-1 animate-walkInFromRight">
         <div
-          className="w-24 h-24 rounded-full flex items-center justify-center text-6xl
+          className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden
                      border-4 border-white shadow-md"
           style={{ backgroundColor: character.color + '28' }}
         >
-          {character.emoji}
+          {character.imageSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={character.imageSrc}
+              alt={character.name}
+              className="w-full h-full object-contain p-1" style={{ mixBlendMode: 'multiply' }}
+            />
+          ) : (
+            <span className="text-6xl">{character.emoji}</span>
+          )}
         </div>
         <span className="text-sm text-[#7a6555] font-bold">{character.name}</span>
       </div>

@@ -38,7 +38,16 @@ export default function EndingScreen({
 
           {/* キャラクター */}
           <div className="animate-popIn">
-            <div className="text-7xl text-center animate-floatY">{character.emoji}</div>
+            {character.imageSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={character.imageSrc}
+                alt={character.name}
+                className="w-28 h-28 object-contain mx-auto animate-floatY" style={{ mixBlendMode: 'multiply' }}
+              />
+            ) : (
+              <div className="text-7xl text-center animate-floatY">{character.emoji}</div>
+            )}
           </div>
 
           {/* メッセージ */}
