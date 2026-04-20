@@ -16,6 +16,7 @@ export interface Question {
   correctId: string
   correctFeedback: string   // 正解時のキャラクターセリフ
   incorrectFeedback: string // 不正解時のキャラクターセリフ
+  pageIndex?: number        // 関連する場面のページ番号（本文表示用）
 }
 
 export interface StoryPage {
@@ -95,6 +96,7 @@ export const stories: Story[] = [
         correctId: 'a',
         correctFeedback: 'そうだね！やまへ いったんだね。',
         incorrectFeedback: 'もういちど みてみよう',
+        pageIndex: 0,
       },
       {
         id: 'q2',
@@ -108,6 +110,7 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'みつけたね！',
         incorrectFeedback: 'だいじょうぶ、もういっかい',
+        pageIndex: 1,
       },
       {
         id: 'q3',
@@ -121,6 +124,7 @@ export const stories: Story[] = [
         correctId: 'c',
         correctFeedback: 'すごいね！よく おぼえてたね！',
         incorrectFeedback: 'もういちど みてみよう',
+        pageIndex: 2,
       },
       {
         id: 'q4',
@@ -135,6 +139,7 @@ export const stories: Story[] = [
         correctId: 'b',
         correctFeedback: 'そうだね！うれしい きもちだね。',
         incorrectFeedback: 'だいじょうぶ、もういっかい',
+        pageIndex: 3,
       },
     ],
   },

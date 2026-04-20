@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import ChoiceButton from '@/components/ChoiceButton'
-import { Question, Character } from '@/data/stories'
+import { Question, Character, StoryPage } from '@/data/stories'
 import { recordAnswer } from '@/lib/storage'
 import { speak, stopSpeaking } from '@/lib/speech'
 import { playCorrect, playIncorrect } from '@/lib/sounds'
@@ -11,6 +11,7 @@ interface Props {
   questionIndex: number
   totalQuestions: number
   character: Character
+  pages?: StoryPage[]
   onNext: (isCorrect: boolean) => void
 }
 
@@ -19,6 +20,7 @@ export default function QuestionScreen({
   questionIndex,
   totalQuestions,
   character,
+  pages,
   onNext,
 }: Props) {
   const [showBubble,    setShowBubble]    = useState(false)
@@ -132,6 +134,21 @@ export default function QuestionScreen({
       {/* ── スクロールエリア ── */}
       <div className="flex-1 scroll-area">
         <div className="max-w-lg mx-auto px-5 pb-6 flex flex-col gap-5">
+
+          {/* 関連する場面の本文 */}
+          {pages && question.pageIndex !== undefined && (
+            <div className="bg-[#fffef5] rounded-2xl px-4 py-3 border-2 border-[#e8dcc8] shadow-sm animate-fadeInUp">
+              <div className="flex items-center gap-1 mb-2">
+                <span className="text-sm">📖</span>
+                <span className="text-xs font-bold text-[#9a8070]">
+                  場面 {question.pageIndex + 1} の文しょう
+                </span>
+              </div>
+              <p className="story-text text-[0.85rem] font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
+                {pages[question.pageIndex].text}
+              </p>
+            </div>
+          )}
 
           {/* キャラクター */}
           <div className="flex flex-col items-center gap-2 mt-2 animate-walkInFromRight">

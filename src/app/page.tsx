@@ -128,6 +128,7 @@ export default function App() {
           questionIndex={questionIndex}
           totalQuestions={story.questions.length}
           character={story.character}
+          pages={story.pages}
           onNext={(isCorrect) => handleQuestionNext(isCorrect)}
         />
       )}
