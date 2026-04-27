@@ -14,62 +14,117 @@ export default function TitleScreen({ onStart }: Props) {
 
   return (
     <div
-      className="min-h-screen-safe flex flex-col items-center justify-center px-5 relative overflow-hidden"
-      style={{ background: 'linear-gradient(160deg, #fff9e6 0%, #e8f5e9 50%, #e3f2fd 100%)' }}
+      className="h-screen-safe flex flex-col relative overflow-hidden"
+      style={{ backgroundColor: '#f7f2e4' }}
     >
-      {/* 背景ツリー（下部・セーフエリア考慮） */}
-      <div className="pointer-events-none fixed bottom-0 left-0 w-full flex justify-between items-end px-3 pb-safe opacity-40">
-        <TreeIcon size="small" />
-        <TreeIcon size="large" />
-        <TreeIcon size="small" />
-        <TreeIcon size="large" />
-        <TreeIcon size="small" />
-      </div>
-
-      {/* メインカード */}
-      <div className="relative z-10 animate-fadeInUp
-                      bg-white/75 backdrop-blur-sm
-                      rounded-3xl shadow-xl border-2 border-white/90
-                      w-full max-w-xs
-                      px-8 py-10
-                      text-center">
-
-        <div className="text-6xl mb-3 animate-floatY">🌳</div>
-
-        <h1 className="text-4xl font-bold text-forest-600 tracking-wider mb-2 leading-snug">
-          おはなしの<br />もり
+      {/* ── メインコンテンツ ── */}
+      <div
+        className="relative z-10 flex flex-col items-center justify-center flex-1 px-8 select-none"
+        style={{ paddingBottom: '38vh' }}
+      >
+        <h1
+          className="font-black text-[#111] text-center leading-tight mb-3"
+          style={{ fontSize: 'clamp(2.6rem, 10vw, 4.2rem)' }}
+        >
+          おはなしの森
         </h1>
 
-        <p className="text-sm text-forest-400 mb-8 tracking-wide">
-          ふしぎな おはなしが まっているよ
+        <p className="text-[#888] text-center mb-10" style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1rem)' }}>
+          ふしぎなおはなしがまってるよ
         </p>
 
-        {/* はじめるボタン：大きく・押しやすく */}
         <button
           onClick={() => { unlockAudio(); onStart() }}
-          className="w-full py-5 rounded-full text-2xl font-bold text-white tracking-widest
-                     bg-gradient-to-br from-forest-400 to-forest-600
-                     shadow-[0_6px_0_#224f35]
-                     active:translate-y-1 active:shadow-[0_3px_0_#224f35]
+          className="font-bold text-white text-xl rounded-[14px]
+                     shadow-[0_5px_0_#1a4520]
+                     active:translate-y-1 active:shadow-[0_2px_0_#1a4520]
                      transition-all duration-150"
+          style={{
+            backgroundColor: '#3c7840',
+            padding: '16px 56px',
+            minWidth: '220px',
+          }}
         >
           はじめる
         </button>
       </div>
-    </div>
-  )
-}
 
-function TreeIcon({ size }: { size: 'small' | 'large' }) {
-  const s = size === 'large'
-    ? { trunk: 'w-3 h-10', t1: 'border-x-[28px] border-b-[52px]', t2: 'border-x-[20px] border-b-[38px] -mb-3', t3: 'border-x-[13px] border-b-[25px] -mb-2' }
-    : { trunk: 'w-2 h-7',  t1: 'border-x-[18px] border-b-[34px]', t2: 'border-x-[13px] border-b-[24px] -mb-2', t3: 'border-x-[8px]  border-b-[16px] -mb-1' }
-  return (
-    <div className="flex flex-col items-center">
-      <div className={`${s.t3} border-x-transparent border-b-[#c8e6c9]`} style={{ width: 0, height: 0, borderStyle: 'solid' }} />
-      <div className={`${s.t2} border-x-transparent border-b-[#a5d6a7]`} style={{ width: 0, height: 0, borderStyle: 'solid' }} />
-      <div className={`${s.t1} border-x-transparent border-b-[#81c784]`} style={{ width: 0, height: 0, borderStyle: 'solid' }} />
-      <div className={`${s.trunk} bg-[#a1887f] rounded`} />
+      {/* ── 波形の森（下部） ── */}
+      <div className="absolute bottom-0 left-0 w-full pointer-events-none" style={{ height: '44vh' }}>
+        <svg
+          viewBox="0 0 1000 440"
+          preserveAspectRatio="none"
+          className="w-full h-full block"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            {/* 葉っぱのテクスチャパターン（濃い目） */}
+            <pattern id="leafDark" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
+              <ellipse cx="12" cy="24" rx="10" ry="4"  fill="rgba(0,0,0,0.13)" transform="rotate(-38 12 24)"/>
+              <ellipse cx="32" cy="12" rx="9"  ry="3.5" fill="rgba(0,0,0,0.10)" transform="rotate(22 32 12)"/>
+              <ellipse cx="36" cy="36" rx="10" ry="4"  fill="rgba(0,0,0,0.11)" transform="rotate(-18 36 36)"/>
+              <ellipse cx="20" cy="40" rx="8"  ry="3"  fill="rgba(0,0,0,0.09)" transform="rotate(32 20 40)"/>
+            </pattern>
+            {/* 葉っぱのテクスチャパターン（薄め） */}
+            <pattern id="leafLight" x="4" y="4" width="48" height="48" patternUnits="userSpaceOnUse">
+              <ellipse cx="14" cy="20" rx="11" ry="4.5" fill="rgba(0,0,0,0.10)" transform="rotate(-42 14 20)"/>
+              <ellipse cx="34" cy="34" rx="9"  ry="3.5" fill="rgba(0,0,0,0.08)" transform="rotate(18 34 34)"/>
+              <ellipse cx="28" cy="8"  rx="8"  ry="3"   fill="rgba(0,0,0,0.09)" transform="rotate(-25 28 8)"/>
+              <ellipse cx="6"  cy="38" rx="9"  ry="3.5" fill="rgba(0,0,0,0.07)" transform="rotate(40 6 38)"/>
+            </pattern>
+          </defs>
+
+          {/* ── Wave 1（最背面・最も暗い緑） ── */}
+          <path
+            d="M0,80 C100,45 220,75 340,55 C460,35 560,65 680,45 C790,25 900,55 1000,38 L1000,440 L0,440 Z"
+            fill="#1c521c"
+          />
+          <path
+            d="M0,80 C100,45 220,75 340,55 C460,35 560,65 680,45 C790,25 900,55 1000,38 L1000,440 L0,440 Z"
+            fill="url(#leafDark)"
+          />
+
+          {/* ── Wave 2 ── */}
+          <path
+            d="M0,135 C130,95 260,130 390,108 C520,86 640,120 770,100 C880,83 950,105 1000,95 L1000,440 L0,440 Z"
+            fill="#286628"
+          />
+          <path
+            d="M0,135 C130,95 260,130 390,108 C520,86 640,120 770,100 C880,83 950,105 1000,95 L1000,440 L0,440 Z"
+            fill="url(#leafDark)"
+          />
+
+          {/* ── Wave 3 ── */}
+          <path
+            d="M0,195 C110,160 230,192 360,172 C490,152 610,185 740,165 C850,148 940,170 1000,158 L1000,440 L0,440 Z"
+            fill="#388038"
+          />
+          <path
+            d="M0,195 C110,160 230,192 360,172 C490,152 610,185 740,165 C850,148 940,170 1000,158 L1000,440 L0,440 Z"
+            fill="url(#leafLight)"
+          />
+
+          {/* ── Wave 4（黄緑） ── */}
+          <path
+            d="M0,262 C140,230 270,258 400,240 C530,222 650,250 780,233 C880,220 950,240 1000,230 L1000,440 L0,440 Z"
+            fill="#7ab420"
+          />
+          <path
+            d="M0,262 C140,230 270,258 400,240 C530,222 650,250 780,233 C880,220 950,240 1000,230 L1000,440 L0,440 Z"
+            fill="url(#leafLight)"
+          />
+
+          {/* ── Wave 5（最前面・明るい黄緑） ── */}
+          <path
+            d="M0,318 C110,296 240,316 370,302 C500,288 620,308 750,295 C860,284 950,298 1000,292 L1000,440 L0,440 Z"
+            fill="#a8c828"
+          />
+          <path
+            d="M0,318 C110,296 240,316 370,302 C500,288 620,308 750,295 C860,284 950,298 1000,292 L1000,440 L0,440 Z"
+            fill="url(#leafLight)"
+          />
+        </svg>
+      </div>
     </div>
   )
 }
