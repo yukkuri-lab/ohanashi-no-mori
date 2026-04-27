@@ -11,8 +11,21 @@ const zenMaru = Zen_Maru_Gothic({
 })
 
 export const metadata: Metadata = {
-  title: 'おはなしのもり',
-  description: '昔話を聞いて、やさしい質問に答えよう',
+  title: 'おはなしの森',
+  description: 'むかしばなしをきいて、やさしいもんだいにこたえよう。小学校1・2年生むけのよみきかせアプリ。',
+  openGraph: {
+    title: 'おはなしの森',
+    description: 'むかしばなしをきいて、やさしいもんだいにこたえよう。',
+    siteName: 'おはなしの森',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'おはなしの森',
+    description: 'むかしばなしをきいて、やさしいもんだいにこたえよう。',
+  },
+  robots: { index: true, follow: true },
 }
 
 // viewport-fit=cover でノッチ・ダイナミックアイランド対応

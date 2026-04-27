@@ -26,7 +26,12 @@ function load(): AppRecord {
 
 function save(record: AppRecord) {
   if (typeof window === 'undefined') return
-  localStorage.setItem(KEY, JSON.stringify(record))
+  try {
+    localStorage.setItem(KEY, JSON.stringify(record))
+  } catch (err) {
+    // localStorage 容量超過時はサイレント失敗（子どもアプリなのでデータ量が少ないため稀）
+    console.warn('[storage] 保存に失敗しました:', err)
+  }
 }
 
 /** アプリを開いたときに呼ぶ */
@@ -56,4 +61,14 @@ export function recordCompletion(storyId: string) {
 /** 保存データを取得する（デバッグ用など） */
 export function getRecord(): AppRecord {
   return load()
+}
+
+/** 学習履歴をすべて削除する */
+export function clearRecord(): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(KEY)
+  } catch (err) {
+    console.warn('[storage] 削除に失敗しました:', err)
+  }
 }

@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import Image from 'next/image'
 import { Character } from '@/data/stories'
 import { recordCompletion } from '@/lib/storage'
 import { unlockAudio } from '@/lib/speech'
@@ -39,11 +40,13 @@ export default function EndingScreen({
           {/* キャラクター */}
           <div className="animate-popIn">
             {character.imageSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={character.imageSrc}
                 alt={character.name}
-                className="w-28 h-28 object-contain mx-auto animate-floatY" style={{ mixBlendMode: 'multiply' }}
+                width={112}
+                height={112}
+                className="w-28 h-28 object-contain mx-auto animate-floatY"
+                style={{ mixBlendMode: 'multiply' }}
               />
             ) : (
               <div className="text-7xl text-center animate-floatY">{character.emoji}</div>

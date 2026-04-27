@@ -48,24 +48,34 @@ export function isIOSSafari(): boolean {
   )
 }
 
+const SPEAK_TIMEOUT_MS = 8000 // 8秒でタイムアウト
+
 /** テキストを読み上げる */
-export function speak(text: string, onEnd?: () => void): void {
+export function speak(text: string, onEnd?: () => void, onError?: () => void): void {
   stopSpeaking()
 
   const el = getAudio()
   if (!el) { onEnd?.(); return }
 
   let ended = false
-  const safeEnd = () => { if (!ended) { ended = true; onEnd?.() } }
+  const safeEnd = () => { if (!ended) { ended = true; clearTimeout(timeoutId); onEnd?.() } }
+  const safeError = () => { if (!ended) { ended = true; clearTimeout(timeoutId); onError?.(); onEnd?.() } }
+
+  // タイムアウト：音声が一定時間内に再生開始しない場合はスキップ
+  const timeoutId = setTimeout(() => {
+    console.warn('[speech] timeout – skipping')
+    el.src = ''
+    safeError()
+  }, SPEAK_TIMEOUT_MS)
 
   const url = `${SPEAK_URL}&text=${encodeURIComponent(text)}`
   el.src = url
   el.onended  = safeEnd
-  el.onerror  = () => { console.error('[speech] audio error'); safeEnd() }
+  el.onerror  = () => { console.error('[speech] audio error'); safeError() }
 
   el.play().catch(err => {
     console.error('[speech] play() rejected:', err)
-    safeEnd()
+    safeError()
   })
 }
 

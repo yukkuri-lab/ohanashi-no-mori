@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { stories } from '@/data/stories'
 import TitleScreen       from '@/components/screens/TitleScreen'
 import StorySelectScreen from '@/components/screens/StorySelectScreen'
@@ -20,8 +20,11 @@ export default function App() {
   const [questionIndex, setQuestionIndex]   = useState(0)
   const [correctCount, setCorrectCount]     = useState(0)
 
-  // 選択中のストーリー
-  const story = stories.find(s => s.id === selectedStoryId) ?? stories[0]
+  // 選択中のストーリー（毎レンダリングで find() が走らないよう useMemo）
+  const story = useMemo(
+    () => stories.find(s => s.id === selectedStoryId) ?? stories[0],
+    [selectedStoryId]
+  )
 
   // 画面遷移時に読み上げを止める
   const go = useCallback((next: Screen) => {

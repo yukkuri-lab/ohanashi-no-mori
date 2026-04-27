@@ -32,6 +32,13 @@ const config: Config = {
           500: '#8b5e3c',
           600: '#6b4423',
         },
+        // アプリ共通カラー（ハードコード撲滅用）
+        wood: {
+          900: '#3d3028',  // テキスト：本文ダーク
+          600: '#7a6555',  // テキスト：サブ・ラベル
+          200: '#e8dcc8',  // ボーダー：カード枠
+          100: '#f7f2e4',  // 背景：クリーム
+        },
       },
       fontFamily: {
         maru: ['var(--font-maru)', '"Hiragino Maru Gothic Pro"', 'sans-serif'],

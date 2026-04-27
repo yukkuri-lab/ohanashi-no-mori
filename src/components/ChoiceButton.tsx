@@ -32,15 +32,21 @@ export default function ChoiceButton({ text, number, onClick, state, animationDe
       ? 'w-8 h-8 rounded-full bg-[#e8dcc8] text-[#7a6555] flex items-center justify-center text-sm font-black flex-shrink-0'
       : 'text-2xl w-8 text-center flex-shrink-0 select-none'
 
+  const ariaLabel =
+    state === 'correct'   ? `${text}（せいかい）` :
+    state === 'incorrect' ? `${text}（まちがい）` :
+    text
+
   return (
     <button
       className={`${baseClass} ${stateClass[state]} animate-fadeInUp`}
       style={{ animationDelay: `${animationDelay}ms` }}
       onClick={state === 'idle' ? onClick : undefined}
       disabled={state !== 'idle'}
-      aria-pressed={state === 'correct' || state === 'incorrect'}
+      aria-label={ariaLabel}
+      aria-disabled={state !== 'idle'}
     >
-      <span className={badgeClass}>{badge}</span>
+      <span className={badgeClass} aria-hidden="true">{badge}</span>
       <span style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>{text}</span>
     </button>
   )

@@ -39,21 +39,23 @@ export default function TitleScreen({ onStart }: Props) {
       </div>
 
       {/* ── 透明なタップボタン（画像の「はじめる」の上に重ねる） ── */}
+      {/* top/height は画像内のボタン位置に合わせて調整 */}
       <button
         onClick={() => { unlockAudio(); onStart() }}
         aria-label="はじめる"
-        className="absolute pointer-events-auto active:opacity-60 transition-opacity"
+        className="absolute pointer-events-auto active:opacity-40 transition-opacity"
         style={{
-          top: '47%',
+          top: '44%',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '54%',
-          maxWidth: '280px',
-          height: '64px',
+          width: '64%',
+          maxWidth: '320px',
+          height: '80px',          /* 大きめのタップ領域 */
           backgroundColor: 'transparent',
           border: 'none',
-          borderRadius: '18px',
+          borderRadius: '20px',
           cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
         }}
       />
     </div>

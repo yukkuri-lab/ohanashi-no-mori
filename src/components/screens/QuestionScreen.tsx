@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import ChoiceButton from '@/components/ChoiceButton'
 import { Question, Character, StoryPage } from '@/data/stories'
 import { recordAnswer } from '@/lib/storage'
@@ -144,10 +145,11 @@ export default function QuestionScreen({
             <div className="rounded-2xl overflow-hidden border border-[#e8dcc8] shadow-md animate-fadeInUp">
               {/* 絵 */}
               {referencePage.imageSrc ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={referencePage.imageSrc}
                   alt={referencePage.imageLabel}
+                  width={800}
+                  height={260}
                   className="w-full object-cover"
                   style={{ maxHeight: '130px' }}
                 />
@@ -177,10 +179,11 @@ export default function QuestionScreen({
                 style={{ backgroundColor: character.color + '28' }}
               >
                 {character.imageSrc ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={character.imageSrc}
                     alt={character.name}
+                    width={64}
+                    height={64}
                     className="w-full h-full object-contain p-1"
                     style={{ mixBlendMode: 'multiply' }}
                   />

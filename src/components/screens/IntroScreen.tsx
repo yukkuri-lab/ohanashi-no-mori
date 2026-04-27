@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { Character } from '@/data/stories'
 import { speak, stopSpeaking, unlockAudio } from '@/lib/speech'
 
@@ -67,11 +68,13 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
           style={{ backgroundColor: character.color + '28' }}
         >
           {character.imageSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={character.imageSrc}
               alt={character.name}
-              className="w-full h-full object-contain p-1" style={{ mixBlendMode: 'multiply' }}
+              width={96}
+              height={96}
+              className="w-full h-full object-contain p-1"
+              style={{ mixBlendMode: 'multiply' }}
             />
           ) : (
             <span className="text-6xl">{character.emoji}</span>

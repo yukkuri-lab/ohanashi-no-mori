@@ -1,5 +1,6 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import Image from 'next/image'
 import { speak, stopSpeaking, isIOSSafari } from '@/lib/speech'
 import { StoryPage } from '@/data/stories'
 
@@ -62,6 +63,8 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
   const [recState,  setRecState]  = useState<RecordState>('idle')
   const [audioURL,  setAudioURL]  = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [micError,  setMicError]  = useState<string | null>(null)
+  const [speakError, setSpeakError] = useState(false)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef   = useRef<Blob[]>([])
   const playbackRef      = useRef<HTMLAudioElement | null>(null)
@@ -69,7 +72,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
   const speakTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const sentences = splitSentences(page.text)
+  const sentences = useMemo(() => splitSentences(page.text), [page.text])
 
   function clearAll() {
     if (speakTimerRef.current)    clearTimeout(speakTimerRef.current)
@@ -92,6 +95,13 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
     }, 30)
   }
 
+  function handleSpeakError() {
+    setSpeakError(true)
+    setIsReading(false)
+    setReadingIndex(-1)
+    setTimeout(() => setSpeakError(false), 3000)
+  }
+
   function speakFrom(chunks: SentenceChunk[], index: number) {
     if (index >= chunks.length) {
       setIsReading(false)
@@ -100,7 +110,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       return
     }
     setReadingIndex(index)
-    speak(chunks[index].text, () => speakFrom(chunks, index + 1))
+    speak(chunks[index].text, () => speakFrom(chunks, index + 1), handleSpeakError)
   }
 
   function speakWhole() {
@@ -109,7 +119,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       setIsReading(false)
       setReadingIndex(-1)
       startAutoAdvance()
-    })
+    }, handleSpeakError)
   }
 
   // 画面表示時に自動読み上げ開始
@@ -209,7 +219,8 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       mr.start()
       setRecState('recording')
     } catch {
-      alert('マイクが使えませんでした。設定を確認してください。')
+      setMicError('マイクがつかえませんでした')
+      setTimeout(() => setMicError(null), 3000)
     }
   }
 
@@ -260,10 +271,11 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
         {/* 絵 */}
         <div className="rounded-2xl overflow-hidden shadow-md border border-[#e8dcc8] flex-shrink-0">
           {page.imageSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={page.imageSrc}
               alt={page.imageLabel}
+              width={800}
+              height={280}
               className="w-full object-cover"
               style={{ maxHeight: 'min(28vw, 140px)' }}
             />
@@ -302,6 +314,15 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
             ))}
           </p>
         </div>
+
+        {/* エラーメッセージ */}
+        {(speakError || micError) && (
+          <div className="flex-shrink-0 bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-center">
+            <p className="text-sm font-bold text-red-500">
+              {micError ?? '🔇 よみあげに しっぱいしました。もういちど おしてね'}
+            </p>
+          </div>
+        )}
 
         {/* ── ボタン行：よみあげ ＋ マイク ── */}
         <div className="flex gap-2 flex-shrink-0">
