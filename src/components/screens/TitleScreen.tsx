@@ -44,7 +44,7 @@ export default function TitleScreen({ onStart }: Props) {
         aria-label="はじめる"
         className="absolute pointer-events-auto active:opacity-60 transition-opacity"
         style={{
-          top: '54%',
+          top: '47%',
           left: '50%',
           transform: 'translateX(-50%)',
           width: '54%',
