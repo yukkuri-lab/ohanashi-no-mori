@@ -7,20 +7,22 @@ interface Props {
   onStart: () => void
 }
 
+// 2色のみ：明るい黄緑 ↔ 濃い緑（参考画像に合わせる）
+const YG = '#bcd428'   // bright yellow-green
+const DG = '#1e5820'   // dark forest green
+
 export default function TitleScreen({ onStart }: Props) {
-  useEffect(() => {
-    recordOpen()
-  }, [])
+  useEffect(() => { recordOpen() }, [])
 
   return (
     <div
       className="h-screen-safe relative overflow-hidden flex flex-col"
       style={{ backgroundColor: '#f7f2e4' }}
     >
-      {/* ── メインコンテンツ（上58%） ── */}
+      {/* ── テキスト＋ボタン ── */}
       <div
         className="relative z-10 flex flex-col items-center justify-center select-none"
-        style={{ height: '58%', padding: '0 32px' }}
+        style={{ height: '45%', padding: '0 32px', paddingTop: '5vh' }}
       >
         <h1
           className="font-black text-[#111] text-center leading-tight mb-3"
@@ -28,16 +30,13 @@ export default function TitleScreen({ onStart }: Props) {
         >
           おはなしの森
         </h1>
-
-        <p className="text-[#888] text-center mb-10" style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1rem)' }}>
+        <p className="text-[#888] text-center mb-10"
+           style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1rem)' }}>
           ふしぎなおはなしがまってるよ
         </p>
-
         <button
           onClick={() => { unlockAudio(); onStart() }}
-          className="font-bold text-white rounded-[14px]
-                     active:translate-y-1
-                     transition-all duration-150"
+          className="font-bold text-white rounded-[14px] active:translate-y-1 transition-all duration-150"
           style={{
             fontSize: 'clamp(1.1rem, 3vw, 1.3rem)',
             backgroundColor: '#3c7840',
@@ -50,8 +49,8 @@ export default function TitleScreen({ onStart }: Props) {
         </button>
       </div>
 
-      {/* ── 波形の森（下42%） ── */}
-      <div className="absolute bottom-0 left-0 w-full" style={{ height: '46%' }}>
+      {/* ── 波形の森 ── */}
+      <div className="absolute bottom-0 left-0 w-full" style={{ height: '62%' }}>
         <svg
           viewBox="0 0 1000 420"
           preserveAspectRatio="none"
@@ -59,70 +58,68 @@ export default function TitleScreen({ onStart }: Props) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            {/* 葉テクスチャ（濃い面用） */}
-            <pattern id="ldark" x="0" y="0" width="44" height="44" patternUnits="userSpaceOnUse">
-              <ellipse cx="11" cy="22" rx="9"  ry="3.5" fill="rgba(0,0,0,0.13)" transform="rotate(-40 11 22)"/>
-              <ellipse cx="30" cy="11" rx="8"  ry="3"   fill="rgba(0,0,0,0.10)" transform="rotate(25 30 11)"/>
-              <ellipse cx="33" cy="34" rx="9"  ry="3.5" fill="rgba(0,0,0,0.11)" transform="rotate(-18 33 34)"/>
-              <ellipse cx="18" cy="40" rx="7"  ry="2.8" fill="rgba(0,0,0,0.08)" transform="rotate(35 18 40)"/>
+            {/* 点描テクスチャ（黄緑面用） */}
+            <pattern id="dotYG" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+              <circle cx="1.8" cy="1.8" r="1.1" fill="rgba(0,60,0,0.30)"/>
+              <circle cx="5.3" cy="5.3" r="0.8" fill="rgba(0,60,0,0.18)"/>
+              <circle cx="5.3" cy="1.8" r="0.5" fill="rgba(0,60,0,0.12)"/>
+              <circle cx="1.8" cy="5.3" r="0.6" fill="rgba(0,60,0,0.14)"/>
             </pattern>
-            {/* 葉テクスチャ（明るい面用） */}
-            <pattern id="llight" x="6" y="6" width="44" height="44" patternUnits="userSpaceOnUse">
-              <ellipse cx="14" cy="20" rx="10" ry="4"   fill="rgba(0,0,0,0.09)" transform="rotate(-42 14 20)"/>
-              <ellipse cx="32" cy="32" rx="8"  ry="3"   fill="rgba(0,0,0,0.07)" transform="rotate(20 32 32)"/>
-              <ellipse cx="26" cy="7"  rx="8"  ry="3"   fill="rgba(0,0,0,0.08)" transform="rotate(-26 26 7)"/>
-              <ellipse cx="5"  cy="37" rx="8"  ry="3"   fill="rgba(0,0,0,0.06)" transform="rotate(38 5 37)"/>
+            {/* 点描テクスチャ（濃い緑面用） */}
+            <pattern id="dotDG" x="2" y="2" width="7" height="7" patternUnits="userSpaceOnUse">
+              <circle cx="1.8" cy="1.8" r="0.9" fill="rgba(0,0,0,0.25)"/>
+              <circle cx="5.3" cy="5.3" r="0.7" fill="rgba(0,0,0,0.15)"/>
+              <circle cx="5.3" cy="1.8" r="0.4" fill="rgba(0,0,0,0.10)"/>
+              <circle cx="1.8" cy="5.3" r="0.5" fill="rgba(0,0,0,0.12)"/>
             </pattern>
           </defs>
 
-          {/* ── Wave 1: 最背面・最暗 ── */}
+          {/*
+            描画順（後 → 前）:
+            1. YG（背面）: 左右に2つの丘 → 上部に黄緑の山2つ見える
+            2. DG: YGの谷を埋める → 山の間に緑
+            3. YG: 中間バンド
+            4. DG（前面）: 最前面のバンド
+          */}
+
+          {/* ── Layer 1: YG（背面）左右に2つの丘 ── */}
           <path
-            d="M-10,42 C200,-2 480,12 720,50 C880,74 980,68 1010,66 L1010,420 L-10,420 Z"
-            fill="#1b521b"
+            d="M-10,55 C60,15 180,8 330,60 C460,105 540,100 680,8 C830,8 940,28 1010,55 L1010,420 L-10,420 Z"
+            fill={YG}
           />
           <path
-            d="M-10,42 C200,-2 480,12 720,50 C880,74 980,68 1010,66 L1010,420 L-10,420 Z"
-            fill="url(#ldark)"
+            d="M-10,55 C60,15 180,8 330,60 C460,105 540,100 680,8 C830,8 940,28 1010,55 L1010,420 L-10,420 Z"
+            fill="url(#dotYG)"
           />
 
-          {/* ── Wave 2 ── */}
+          {/* ── Layer 2: DG（谷を埋め・中央の丘） ── */}
           <path
-            d="M-10,98 C220,56 490,68 730,104 C900,126 985,122 1010,120 L1010,420 L-10,420 Z"
-            fill="#286828"
+            d="M-10,95 C80,72 220,98 370,90 C480,84 560,72 700,98 C840,115 960,100 1010,95 L1010,420 L-10,420 Z"
+            fill={DG}
           />
           <path
-            d="M-10,98 C220,56 490,68 730,104 C900,126 985,122 1010,120 L1010,420 L-10,420 Z"
-            fill="url(#ldark)"
-          />
-
-          {/* ── Wave 3 ── */}
-          <path
-            d="M-10,158 C210,122 490,130 740,162 C906,182 990,178 1010,176 L1010,420 L-10,420 Z"
-            fill="#388038"
-          />
-          <path
-            d="M-10,158 C210,122 490,130 740,162 C906,182 990,178 1010,176 L1010,420 L-10,420 Z"
-            fill="url(#llight)"
+            d="M-10,95 C80,72 220,98 370,90 C480,84 560,72 700,98 C840,115 960,100 1010,95 L1010,420 L-10,420 Z"
+            fill="url(#dotDG)"
           />
 
-          {/* ── Wave 4: 黄緑 ── */}
+          {/* ── Layer 3: YG（中間バンド） ── */}
           <path
-            d="M-10,218 C230,186 500,193 740,218 C906,234 990,232 1010,230 L1010,420 L-10,420 Z"
-            fill="#7ab420"
+            d="M-10,175 C130,148 320,178 530,162 C700,150 860,168 1010,162 L1010,420 L-10,420 Z"
+            fill={YG}
           />
           <path
-            d="M-10,218 C230,186 500,193 740,218 C906,234 990,232 1010,230 L1010,420 L-10,420 Z"
-            fill="url(#llight)"
+            d="M-10,175 C130,148 320,178 530,162 C700,150 860,168 1010,162 L1010,420 L-10,420 Z"
+            fill="url(#dotYG)"
           />
 
-          {/* ── Wave 5: 最前面・最明 ── */}
+          {/* ── Layer 4: DG（前面バンド） ── */}
           <path
-            d="M-10,274 C240,248 500,252 740,272 C906,284 990,282 1010,281 L1010,420 L-10,420 Z"
-            fill="#a8c828"
+            d="M-10,262 C160,240 380,258 600,245 C800,233 940,248 1010,245 L1010,420 L-10,420 Z"
+            fill={DG}
           />
           <path
-            d="M-10,274 C240,248 500,252 740,272 C906,284 990,282 1010,281 L1010,420 L-10,420 Z"
-            fill="url(#llight)"
+            d="M-10,262 C160,240 380,258 600,245 C800,233 940,248 1010,245 L1010,420 L-10,420 Z"
+            fill="url(#dotDG)"
           />
         </svg>
       </div>
