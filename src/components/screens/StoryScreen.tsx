@@ -13,7 +13,7 @@ interface Props {
 }
 
 // 読み上げ完了後、この秒数待って自動で次へ進む
-const AUTO_ADVANCE_DELAY = 1800 // ms
+const AUTO_ADVANCE_DELAY = 1200 // ms（1800→1200: 心地よいテンポに調整）
 
 interface SentenceChunk {
   prefix: string  // 直前の改行（spanの外に出してハイライトを汚さない）
@@ -132,7 +132,7 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
         const s = splitSentences(page.text)
         speakFrom(s, 0)
       }
-    }, 600)
+    }, 400) // 600→400ms: ページ表示後すぐ読み始める
 
     return () => {
       clearAll()
