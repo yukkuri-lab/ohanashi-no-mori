@@ -100,14 +100,17 @@ export function isSpeaking(): boolean {
  * オーディオブロック解除 — ボタンを押した瞬間（ユーザージェスチャー内）に呼ぶ
  * iOS では <audio>.play() をジェスチャー内で一度呼ぶことで以後の再生が可能になる
  */
+let _audioUnlocked = false
+
 export function unlockAudio(): void {
+  if (_audioUnlocked) return  // ⑦ 1回成功したら以降は何もしない
   if (typeof window === 'undefined') return
   const el = getAudio()
   if (!el) return
   // ⑧ 無音WAVをジェスチャー内で再生 → iOS オーディオをアンロック（成否をログ）
   el.src = SILENT_WAV
   el.play()
-    .then(() => { /* iOS audio unlock 成功 */ })
+    .then(() => { _audioUnlocked = true })
     .catch((err) => console.warn('[speech] iOS audio unlock failed:', err))
 }
 

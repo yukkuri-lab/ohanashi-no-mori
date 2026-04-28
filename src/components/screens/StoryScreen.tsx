@@ -298,11 +298,16 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
 
         {/* 本文テキスト */}
         <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-[#e8dcc8] flex-1 min-h-0 overflow-y-auto max-h-[55vh]">
-          <p className="story-text text-[0.95rem] font-bold text-[#3d3028] leading-relaxed">
+          {/* ⑧ aria-live でスクリーンリーダーにも「いま読んでいる部分」を伝える */}
+          <p
+            className="story-text text-[0.95rem] font-bold text-[#3d3028] leading-relaxed"
+            aria-label={isReading && readingIndex >= 0 ? `読み上げ中: ${sentences[readingIndex]?.text ?? ''}` : undefined}
+          >
             {sentences.map((chunk, i) => (
               <span key={i}>
                 {chunk.prefix}
                 <span
+                  aria-current={isReading && readingIndex === i ? 'true' : undefined}
                   style={{
                     backgroundColor:
                       isReading && (readingIndex === i || readingIndex === -2)

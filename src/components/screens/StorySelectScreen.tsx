@@ -72,19 +72,21 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
       </div>
 
       {/* ストーリーカード一覧 */}
-      <div className="flex flex-col gap-4 animate-fadeInUp">
+      {/* ⑩ 親ではなく各カードに animate-fadeInUp を付けて stagger アニメーションを実現 */}
+      <div className="flex flex-col gap-4">
         {stories.map((story, i) => {
           const theme = THEME[story.id] ?? DEFAULT_THEME
           return (
             <button
               key={story.id}
               onClick={() => { unlockAudio(); onSelect(story.id) }}
-              className="w-full text-left rounded-3xl shadow-md
+              className="w-full text-left rounded-3xl shadow-md animate-fadeInUp
                          active:scale-[0.97] transition-transform duration-150 overflow-hidden"
               style={{
-                background:   theme.bg,
-                border:       `2px solid ${theme.border}`,
-                animationDelay: `${i * 120}ms`,
+                background:        theme.bg,
+                border:            `2px solid ${theme.border}`,
+                animationDelay:    `${i * 80}ms`,  // 120→80ms: もう少し早く流れる
+                animationFillMode: 'both',
               }}
             >
               <div className="flex items-center gap-4 px-5 py-5">

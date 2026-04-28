@@ -32,7 +32,9 @@ export default function QuestionScreen({
 
   const t1 = useRef<ReturnType<typeof setTimeout> | null>(null)
   const t2 = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const t3 = useRef<ReturnType<typeof setTimeout> | null>(null)  // ⑤ 選択肢読み上げ前の間
+  const t3 = useRef<ReturnType<typeof setTimeout> | null>(null)  // 選択肢読み上げ前の間
+  const t4 = useRef<ReturnType<typeof setTimeout> | null>(null)  // ④ 正解後フィードバック前
+  const t5 = useRef<ReturnType<typeof setTimeout> | null>(null)  // ④ 次問題へ進む前
 
   useEffect(() => {
     setShowBubble(false)
@@ -68,7 +70,9 @@ export default function QuestionScreen({
     return () => {
       t1.current && clearTimeout(t1.current)
       t2.current && clearTimeout(t2.current)
-      t3.current && clearTimeout(t3.current)  // ⑤ 確実にキャンセル
+      t3.current && clearTimeout(t3.current)
+      t4.current && clearTimeout(t4.current)  // ④ 正解後タイマーもキャンセル
+      t5.current && clearTimeout(t5.current)
       stopSpeaking()
     }
   }, [question.id, question.speech])
@@ -96,12 +100,13 @@ export default function QuestionScreen({
     else         playIncorrect()
 
     stopSpeaking()
-    setTimeout(() => {
+    // ④ 全タイマーを ref で追跡してアンマウント時に確実キャンセル
+    t4.current = setTimeout(() => {
       if (correct) {
         speak(cheer, () => {
-          setTimeout(() => {
+          t4.current = setTimeout(() => {
             speak(question.correctFeedback, () => {
-              setTimeout(() => onNext(true), 500)
+              t5.current = setTimeout(() => onNext(true), 500)
             })
           }, 300)
         })

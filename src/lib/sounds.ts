@@ -3,13 +3,28 @@
 // 音声ファイル不要。ボタン押下（ユーザージェスチャー）内で呼ぶこと。
 // =============================================
 
+// ⑨ Safari / 古い iOS 向けに型安全な webkitAudioContext 宣言
+declare global {
+  interface Window { webkitAudioContext?: typeof AudioContext }
+}
+
 let _ctx: AudioContext | null = null
 
 function getCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
+
+  // ⑤ closed 状態のコンテキストは再作成（バックグラウンド復帰後などに発生）
+  if (_ctx?.state === 'closed') _ctx = null
+
   if (!_ctx) {
-    _ctx = new (window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+    const AudioCtx = window.AudioContext ?? window.webkitAudioContext
+    if (!AudioCtx) return null
+    _ctx = new AudioCtx()
+  }
+
+  // suspended 状態なら resume してから返す
+  if (_ctx.state === 'suspended') {
+    _ctx.resume().catch(() => {})
   }
   return _ctx
 }
@@ -18,7 +33,7 @@ function getCtx(): AudioContext | null {
 export function playCorrect(): void {
   const ctx = getCtx()
   if (!ctx) return
-  ctx.resume().catch(() => {})
+  // resume は getCtx() 内で処理済み
 
   // 「ピン」= 880Hz (A5) → 「ポーン」= 1108Hz (C#6)
   const notes = [
@@ -49,7 +64,7 @@ export function playCorrect(): void {
 export function playIncorrect(): void {
   const ctx = getCtx()
   if (!ctx) return
-  ctx.resume().catch(() => {})
+  // resume は getCtx() 内で処理済み
 
   // 「ブッ」を2回（0ms と 220ms）
   const bursts = [0, 0.22]

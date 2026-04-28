@@ -74,6 +74,11 @@ export async function GET(req: NextRequest) {
   if (!text.trim()) {
     return new Response('text is required', { status: 400 })
   }
+  // ① 文字数制限（悪意あるリクエストによる API 料金爆発を防ぐ）
+  const MAX_TEXT_LENGTH = 500
+  if (text.length > MAX_TEXT_LENGTH) {
+    return new Response(`text too long (max ${MAX_TEXT_LENGTH} chars)`, { status: 400 })
+  }
 
   const apiKey = process.env.GOOGLE_TTS_API_KEY
   if (!apiKey) {

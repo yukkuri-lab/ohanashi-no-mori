@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Zen_Maru_Gothic } from 'next/font/google'
 import './globals.css'
-import VoicePreloader from './VoicePreloader'
+// ⑥ VoicePreloader は preloadVoice() が空実装のため削除
 
 const zenMaru = Zen_Maru_Gothic({
   weight: ['400', '700'],
@@ -40,7 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <body className={`${zenMaru.variable} font-maru antialiased`}>
-        <VoicePreloader />
         {children}
       </body>
     </html>
