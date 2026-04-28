@@ -143,7 +143,10 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       setReadingIndex(-1)
       setAutoProgress(null)
       setRecState('idle')
-      setAudioURL(null)
+      setAudioURL(prev => {
+        if (prev) URL.revokeObjectURL(prev)  // ① Blob URL を解放してメモリリーク防止
+        return null
+      })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page.text])
@@ -211,7 +214,10 @@ export default function StoryScreen({ page, pageIndex, totalPages, onNext, isLas
       mr.onstop = () => {
         const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
         const url  = URL.createObjectURL(blob)
-        setAudioURL(url)
+        setAudioURL(prev => {
+          if (prev) URL.revokeObjectURL(prev)  // 前の録音 URL を解放
+          return url
+        })
         setRecState('recorded')
         stream.getTracks().forEach(t => t.stop())
       }

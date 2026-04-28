@@ -32,6 +32,7 @@ export default function QuestionScreen({
 
   const t1 = useRef<ReturnType<typeof setTimeout> | null>(null)
   const t2 = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const t3 = useRef<ReturnType<typeof setTimeout> | null>(null)  // ⑤ 選択肢読み上げ前の間
 
   useEffect(() => {
     setShowBubble(false)
@@ -41,17 +42,18 @@ export default function QuestionScreen({
     setIsCorrect(null)
 
     const nums = ['１', '２', '３', '４', '５']
+    // ⑥ 選択肢を「。」で区切り → TTS が各選択肢の間に自然な間を入れる
     const choicesText = question.choices
       .map((c, i) => `${nums[i]}、${c.text.replace(/\n/g, '')}`)
-      .join('、') + '、どれかな？'
+      .join('。') + '。どれかな？'
 
     // アリさんが歩いてくる → 吹き出し → 質問を読む → 選択肢を読む → ロック解除
     t1.current = setTimeout(() => {
       setShowBubble(true)
       speak(question.speech, () => {
-        setTimeout(() => {
+        // ⑤ この setTimeout も ref で追跡してアンマウント時に確実にキャンセル
+        t3.current = setTimeout(() => {
           speak(choicesText, () => {
-            // 選択肢読み上げ完了 → ロック解除
             setChoicesLocked(false)
           })
         }, 400)
@@ -66,6 +68,7 @@ export default function QuestionScreen({
     return () => {
       t1.current && clearTimeout(t1.current)
       t2.current && clearTimeout(t2.current)
+      t3.current && clearTimeout(t3.current)  // ⑤ 確実にキャンセル
       stopSpeaking()
     }
   }, [question.id, question.speech])

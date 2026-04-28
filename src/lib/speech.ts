@@ -21,8 +21,10 @@ function getAudio(): HTMLAudioElement | null {
   return _audioEl
 }
 
-// ページ再表示時に再生が止まっていたら再開
-if (typeof document !== 'undefined') {
+// ④ ページ再表示時に再生が止まっていたら再開（重複登録防止フラグ付き）
+let _visibilityListenerAdded = false
+if (typeof document !== 'undefined' && !_visibilityListenerAdded) {
+  _visibilityListenerAdded = true
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
       const el = getAudio()
@@ -102,9 +104,11 @@ export function unlockAudio(): void {
   if (typeof window === 'undefined') return
   const el = getAudio()
   if (!el) return
-  // 無音WAVをジェスチャー内で再生 → iOS オーディオをアンロック
+  // ⑧ 無音WAVをジェスチャー内で再生 → iOS オーディオをアンロック（成否をログ）
   el.src = SILENT_WAV
-  el.play().catch(() => {})
+  el.play()
+    .then(() => { /* iOS audio unlock 成功 */ })
+    .catch((err) => console.warn('[speech] iOS audio unlock failed:', err))
 }
 
 /** VoicePreloader から呼ばれる（互換性のため残す） */

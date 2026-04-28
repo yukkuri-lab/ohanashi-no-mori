@@ -11,16 +11,30 @@ export interface AppRecord {
   completedStories: string[] // 最後まで終えたお話のIDリスト
 }
 
-function load(): AppRecord {
-  if (typeof window === 'undefined') {
-    return { openCount: 0, totalAnswered: 0, totalCorrect: 0, completedStories: [] }
+const FALLBACK: AppRecord = { openCount: 0, totalAnswered: 0, totalCorrect: 0, completedStories: [] }
+
+// ⑦ パース後に型を検証して不完全なデータを安全に補完する
+function validateRecord(data: unknown): AppRecord {
+  if (typeof data !== 'object' || data === null) return { ...FALLBACK }
+  const r = data as Record<string, unknown>
+  return {
+    openCount:        typeof r.openCount === 'number'        ? r.openCount        : 0,
+    totalAnswered:    typeof r.totalAnswered === 'number'    ? r.totalAnswered    : 0,
+    totalCorrect:     typeof r.totalCorrect === 'number'     ? r.totalCorrect     : 0,
+    completedStories: Array.isArray(r.completedStories)
+      ? r.completedStories.filter((s): s is string => typeof s === 'string')
+      : [],
   }
+}
+
+function load(): AppRecord {
+  if (typeof window === 'undefined') return { ...FALLBACK }
   try {
     const raw = localStorage.getItem(KEY)
-    if (!raw) return { openCount: 0, totalAnswered: 0, totalCorrect: 0, completedStories: [] }
-    return JSON.parse(raw) as AppRecord
+    if (!raw) return { ...FALLBACK }
+    return validateRecord(JSON.parse(raw))
   } catch {
-    return { openCount: 0, totalAnswered: 0, totalCorrect: 0, completedStories: [] }
+    return { ...FALLBACK }
   }
 }
 

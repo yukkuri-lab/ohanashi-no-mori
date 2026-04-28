@@ -1191,3 +1191,18 @@ export const stories: Story[] = [
     ],
   },
 ]
+
+
+// ② 開発時のみ：correctId が choices に存在するか全問チェック
+if (process.env.NODE_ENV === 'development') {
+  for (const story of stories) {
+    for (const q of story.questions) {
+      const ids = q.choices.map(c => c.id)
+      if (!ids.includes(q.correctId)) {
+        console.error(
+          `[stories] ❌ 正解IDエラー: story="${story.id}" question="${q.id}" correctId="${q.correctId}" が choices に存在しません`
+        )
+      }
+    }
+  }
+}

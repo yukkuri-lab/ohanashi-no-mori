@@ -20,36 +20,42 @@ type Phase = 0 | 1 | 2 | 3 | 4
 
 export default function IntroScreen({ storyTitle, character, onNext }: Props) {
   const [phase, setPhase] = useState<Phase>(0)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // ③ タイマーIDを配列で管理 → 全部まとめて clearTimeout できる
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
-  function clearTimer() {
-    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null }
+  function addTimer(id: ReturnType<typeof setTimeout>) {
+    timersRef.current.push(id)
+    return id
+  }
+  function clearAllTimers() {
+    timersRef.current.forEach(clearTimeout)
+    timersRef.current = []
   }
 
   useEffect(() => {
     // アリさんが歩いてくる（1.8s アニメ終了後）→ 挨拶
-    timerRef.current = setTimeout(() => {
+    addTimer(setTimeout(() => {
       setPhase(1)
       // 挨拶セリフ読み上げ → 終わったら「きょうのおはなしは…」へ
       speak(character.introMessage, () => {
-        timerRef.current = setTimeout(() => {
+        addTimer(setTimeout(() => {
           setPhase(2)
           // 「きょうのおはなしは　なんだろう？」読み上げ → タイトル登場
           speak('きょうのおはなしは　なんだろう？', () => {
-            timerRef.current = setTimeout(() => {
+            addTimer(setTimeout(() => {
               setPhase(3)
               // タイトルを読み上げ → ボタン登場
               speak(storyTitle, () => {
-                timerRef.current = setTimeout(() => setPhase(4), 400)
+                addTimer(setTimeout(() => setPhase(4), 400))
               })
-            }, 600)
+            }, 600))
           })
-        }, 300)
+        }, 300))
       })
-    }, 1900)
+    }, 1900))
 
     return () => {
-      clearTimer()
+      clearAllTimers()
       stopSpeaking()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +116,7 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
             {phase >= 2 && (
               <p className="text-xl font-bold text-[#3d3028] leading-relaxed">
                 きょうのおはなしは
-                {phase === 2 && <DotsAnimation />}
+                {phase === 2 && <DotsAnimation visible={phase === 2} />}
                 {phase >= 3 && '…'}
               </p>
             )}
@@ -148,14 +154,15 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
   )
 }
 
-// 「…」がひとつずつ増えるドットアニメーション
-function DotsAnimation() {
+// ⑩ 「…」がひとつずつ増えるドットアニメーション（visible=false で即停止）
+function DotsAnimation({ visible }: { visible: boolean }) {
   const [dots, setDots] = useState('.')
   useEffect(() => {
+    if (!visible) { setDots('.'); return }
     const id = setInterval(() => {
       setDots(d => d.length >= 3 ? '.' : d + '.')
     }, 400)
     return () => clearInterval(id)
-  }, [])
+  }, [visible])
   return <span className="inline-block w-8 text-left">{dots}</span>
 }
