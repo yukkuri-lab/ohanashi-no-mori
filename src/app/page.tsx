@@ -13,20 +13,23 @@ import { stopSpeaking } from '@/lib/speech'
 // アプリ全体の画面状態
 type Screen = 'title' | 'select' | 'intro' | 'story' | 'question' | 'ending'
 
-export default function App() {
-  const [screen, setScreen]                 = useState<Screen>('title')
-  const [selectedStoryId, setSelectedStoryId] = useState<string>(stories[0].id)
-  const [storyPageIndex, setStoryPageIndex] = useState(0)
-  const [questionIndex, setQuestionIndex]   = useState(0)
-  const [correctCount, setCorrectCount]     = useState(0)
+// おはなし画面のモード
+type StoryMode = 'listen' | 'record'
 
-  // 選択中のストーリー（毎レンダリングで find() が走らないよう useMemo）
+export default function App() {
+  const [screen,          setScreen]          = useState<Screen>('title')
+  const [selectedStoryId, setSelectedStoryId] = useState<string>(stories[0].id)
+  const [storyPageIndex,  setStoryPageIndex]  = useState(0)
+  const [questionIndex,   setQuestionIndex]   = useState(0)
+  const [correctCount,    setCorrectCount]    = useState(0)
+  const [storyMode,       setStoryMode]       = useState<StoryMode>('listen')
+  const [bonusStars,      setBonusStars]      = useState(0)
+
   const story = useMemo(
     () => stories.find(s => s.id === selectedStoryId) ?? stories[0],
     [selectedStoryId]
   )
 
-  // 画面遷移時に読み上げを止める
   const go = useCallback((next: Screen) => {
     stopSpeaking()
     setScreen(next)
@@ -41,6 +44,8 @@ export default function App() {
     setStoryPageIndex(0)
     setQuestionIndex(0)
     setCorrectCount(0)
+    setStoryMode('listen')
+    setBonusStars(0)
     go('intro')
   }
 
@@ -50,11 +55,20 @@ export default function App() {
     go('story')
   }
 
-  // お話ページ → 次のページ or 質問へ
+  // お話ページ → 前のページ
+  function handleStoryPrev() {
+    if (storyPageIndex > 0) setStoryPageIndex(p => p - 1)
+  }
+
+  // お話ページ → 次のページ
+  // listen モード: 最終ページ後 → クイズへ
+  // record モード: 最終ページ後 → エンディングへ（クイズはスキップ）
   function handleStoryNext() {
     const nextPage = storyPageIndex + 1
     if (nextPage < story.pages.length) {
       setStoryPageIndex(nextPage)
+    } else if (storyMode === 'record') {
+      go('ending')
     } else {
       setQuestionIndex(0)
       setCorrectCount(0)
@@ -62,7 +76,7 @@ export default function App() {
     }
   }
 
-  // 質問 → 次の質問 or おしまい画面
+  // 質問 → 次の質問 or エンディング
   function handleQuestionNext(isCorrect: boolean) {
     if (isCorrect) setCorrectCount(c => c + 1)
     const nextQ = questionIndex + 1
@@ -73,20 +87,32 @@ export default function App() {
     }
   }
 
-  // おしまい → もういちど（おはなし選択に戻る）
-  function handleRestart() {
+  // エンディング → じぶんのこえで よんでみる（record モード）
+  function handleRecordMode() {
     setStoryPageIndex(0)
-    setQuestionIndex(0)
-    setCorrectCount(0)
-    go('select')
+    setStoryMode('record')
+    setBonusStars(0)
+    go('story')
   }
 
-  // おしまい → 同じおはなしをページ1から読み直す
+  // エンディング → もう一度きく（listen モード）
   function handleReadAgain() {
     setStoryPageIndex(0)
     setQuestionIndex(0)
     setCorrectCount(0)
+    setStoryMode('listen')
+    setBonusStars(0)
     go('story')
+  }
+
+  // エンディング → おはなし選択に戻る
+  function handleRestart() {
+    setStoryPageIndex(0)
+    setQuestionIndex(0)
+    setCorrectCount(0)
+    setStoryMode('listen')
+    setBonusStars(0)
+    go('select')
   }
 
   function handleQuit() { handleRestart() }
@@ -115,12 +141,15 @@ export default function App() {
 
       {screen === 'story' && (
         <StoryScreen
-          key={`${selectedStoryId}-${storyPageIndex}`}
+          key={`${selectedStoryId}-${storyPageIndex}-${storyMode}`}
           page={story.pages[storyPageIndex]}
           pageIndex={storyPageIndex}
           totalPages={story.pages.length}
           isLastPage={storyPageIndex === story.pages.length - 1}
+          mode={storyMode}
+          onPrev={storyPageIndex > 0 ? handleStoryPrev : undefined}
           onNext={handleStoryNext}
+          onBonusStar={() => setBonusStars(b => b + 1)}
         />
       )}
 
@@ -132,7 +161,7 @@ export default function App() {
           totalQuestions={story.questions.length}
           character={story.character}
           pages={story.pages}
-          onNext={(isCorrect) => handleQuestionNext(isCorrect)}
+          onNext={handleQuestionNext}
         />
       )}
 
@@ -142,6 +171,9 @@ export default function App() {
           character={story.character}
           correctCount={correctCount}
           totalQuestions={story.questions.length}
+          bonusStars={bonusStars}
+          totalPages={story.pages.length}
+          onRecordMode={handleRecordMode}
           onReadAgain={handleReadAgain}
           onRestart={handleRestart}
           onQuit={handleQuit}

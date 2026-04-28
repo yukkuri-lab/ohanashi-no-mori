@@ -5,7 +5,7 @@ import ChoiceButton from '@/components/ChoiceButton'
 import { Question, Character, StoryPage } from '@/data/stories'
 import { recordAnswer } from '@/lib/storage'
 import { speak, stopSpeaking } from '@/lib/speech'
-import { playCorrect, playIncorrect } from '@/lib/sounds'
+import { playIncorrect } from '@/lib/sounds'
 
 interface Props {
   question: Question
@@ -87,28 +87,14 @@ export default function QuestionScreen({
     const correctText = question.choices.find(c => c.id === question.correctId)?.text ?? ''
     const incorrectFull = `${question.incorrectFeedback}正解は「${correctText}」だよ！`
 
-    const cheers = [
-      'やったー！せいかい！',
-      'ピンポーン！せいかい！',
-      'すごい！せいかい！',
-      'その通り！せいかい！',
-      'よくわかったね！せいかい！',
-    ]
-    const cheer = cheers[Math.floor(Math.random() * cheers.length)]
-
-    if (correct) playCorrect()
-    else         playIncorrect()
+    if (!correct) playIncorrect()
 
     stopSpeaking()
-    // ④ 全タイマーを ref で追跡してアンマウント時に確実キャンセル
     t4.current = setTimeout(() => {
       if (correct) {
-        speak(cheer, () => {
-          t4.current = setTimeout(() => {
-            speak(question.correctFeedback, () => {
-              t5.current = setTimeout(() => onNext(true), 500)
-            })
-          }, 300)
+        // せいかい：フィードバックだけ読む（チャイム・チアなし）
+        speak(question.correctFeedback, () => {
+          t5.current = setTimeout(() => onNext(true), 500)
         })
       } else {
         speak(incorrectFull)
@@ -129,16 +115,17 @@ export default function QuestionScreen({
   return (
     <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
 
-      {/* ── 進捗バー ── */}
+      {/* ── ヘッダー + 進捗バー ── */}
       <div className="flex-shrink-0 px-5 pt-safe pt-3 pb-2">
         <div className="flex items-center gap-3 max-w-lg mx-auto">
+          <span className="text-xl flex-shrink-0">✏️</span>
           <div className="flex-1 h-2 bg-[#e8dcc8] rounded-full overflow-hidden">
             <div
               className="h-full bg-forest-400 rounded-full transition-all duration-500"
               style={{ width: `${(questionIndex / totalQuestions) * 100}%` }}
             />
           </div>
-          <span className="text-sm text-[#7a6555] font-bold whitespace-nowrap">
+          <span className="text-sm text-[#7a6555] font-bold whitespace-nowrap bg-white/60 px-3 py-1 rounded-full border border-[#e8dcc8]">
             {questionIndex + 1} / {totalQuestions}
           </span>
         </div>
@@ -225,8 +212,7 @@ export default function QuestionScreen({
                 >
                   {isCorrect === null ? (
                     <>
-                      <p className="text-base font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap"
-                         style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>
+                      <p className="ja-bubble text-base font-bold text-[#3d3028] whitespace-pre-wrap">
                         {question.speech}
                       </p>
                       {choicesLocked && selectedId === null && (

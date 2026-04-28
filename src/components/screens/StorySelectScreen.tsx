@@ -72,24 +72,24 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
       </div>
 
       {/* ストーリーカード一覧 */}
-      {/* ⑩ 親ではなく各カードに animate-fadeInUp を付けて stagger アニメーションを実現 */}
-      <div className="flex flex-col gap-4">
+      {/* カードに個別に animate-fadeInUp を付けて stagger アニメーションを実現 */}
+      <div className="w-full flex flex-col gap-4 pb-8">
         {stories.map((story, i) => {
           const theme = THEME[story.id] ?? DEFAULT_THEME
           return (
             <button
               key={story.id}
               onClick={() => { unlockAudio(); onSelect(story.id) }}
-              className="w-full text-left rounded-3xl shadow-md animate-fadeInUp
+              className="w-full block text-left rounded-3xl shadow-md animate-fadeInUp
                          active:scale-[0.97] transition-transform duration-150 overflow-hidden"
               style={{
                 background:        theme.bg,
                 border:            `2px solid ${theme.border}`,
-                animationDelay:    `${i * 80}ms`,  // 120→80ms: もう少し早く流れる
+                animationDelay:    `${i * 100}ms`,
                 animationFillMode: 'both',
               }}
             >
-              <div className="flex items-center gap-4 px-5 py-5">
+              <div className="flex flex-row flex-nowrap items-center gap-4 px-5 py-5">
                 {/* キャラクターアイコン */}
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center
@@ -100,11 +100,11 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                 </div>
 
                 {/* テキスト */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-xl font-bold text-[#3d3028] leading-snug mb-1">
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <p className="text-xl font-bold text-[#3d3028] leading-snug mb-1 break-words">
                     {story.title}
                   </p>
-                  <p className="text-sm text-[#7a6555]">
+                  <p className="text-sm text-[#7a6555] truncate">
                     {story.character.name}と いっしょに よもう
                   </p>
                 </div>

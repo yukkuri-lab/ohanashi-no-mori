@@ -63,5 +63,13 @@ body {
 
 .story-text {
   white-space: pre-wrap;
-  line-height: 1.8;
+  line-height: 1.9;          /* 日本語は 1.8–2.0 が読みやすい */
+  overflow-wrap: break-word; /* 長い単語・URLの折り返し保証 */
+}
+
+/* ─── 日本語全般の行間 ─────────────────────── */
+/* 吹き出し・キャラクターセリフなど story-text 以外でも適用 */
+.ja-bubble {
+  line-height: 1.85;
+  overflow-wrap: break-word;
 }

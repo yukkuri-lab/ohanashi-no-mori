@@ -11,16 +11,14 @@ interface Props {
 }
 
 // フェーズ定義
-// 0: アリさん歩いてくる
-// 1: 挨拶の吹き出し＋読み上げ
-// 2: 「きょうのおはなしは…」ドット点滅＋読み上げ
-// 3: タイトル登場（どーん）
-// 4: ボタン登場
-type Phase = 0 | 1 | 2 | 3 | 4
+// 0: キャラクター歩いてくる
+// 1: 吹き出し＋introMessage読み上げ
+// 2: タイトル登場（どーん）
+// 3: ボタン登場
+type Phase = 0 | 1 | 2 | 3
 
 export default function IntroScreen({ storyTitle, character, onNext }: Props) {
   const [phase, setPhase] = useState<Phase>(0)
-  // ③ タイマーIDを配列で管理 → 全部まとめて clearTimeout できる
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   function addTimer(id: ReturnType<typeof setTimeout>) {
@@ -33,22 +31,16 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
   }
 
   useEffect(() => {
-    // アリさんが歩いてくる（1.8s アニメ終了後）→ 挨拶
+    // キャラクターが歩いてくる（1.8s アニメ終了後）→ 吹き出し
     addTimer(setTimeout(() => {
       setPhase(1)
-      // 挨拶セリフ読み上げ → 終わったら「きょうのおはなしは…」へ
+      // introMessage を読み上げ → 終わったらタイトル登場
       speak(character.introMessage, () => {
         addTimer(setTimeout(() => {
           setPhase(2)
-          // 「きょうのおはなしは　なんだろう？」読み上げ → タイトル登場
-          speak('きょうのおはなしは　なんだろう？', () => {
-            addTimer(setTimeout(() => {
-              setPhase(3)
-              // タイトルを読み上げ → ボタン登場
-              speak(storyTitle, () => {
-                addTimer(setTimeout(() => setPhase(4), 400))
-              })
-            }, 600))
+          // タイトルを読み上げ → ボタン登場
+          speak(storyTitle, () => {
+            addTimer(setTimeout(() => setPhase(3), 400))
           })
         }, 300))
       })
@@ -66,7 +58,7 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
       className="min-h-screen-safe flex flex-col items-center justify-center px-5 gap-6 overflow-hidden"
       style={{ backgroundColor: '#faf6ea' }}
     >
-      {/* ── キャラクター：右から歩いてくる ── */}
+      {/* ── キャラクター ── */}
       <div className="flex flex-col items-center gap-1 animate-walkInFromRight">
         <div
           className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden
@@ -89,10 +81,10 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
         <span className="text-sm text-[#7a6555] font-bold">{character.name}</span>
       </div>
 
-      {/* ── 吹き出し ── */}
+      {/* ── 吹き出し（introMessage のみ） ── */}
       {phase >= 1 && (
         <div className="animate-popIn w-full max-w-xs relative">
-          {/* 三角 */}
+          {/* 上向き三角 */}
           <div
             className="absolute -top-3 left-1/2 -translate-x-1/2 w-0 h-0"
             style={{
@@ -108,27 +100,17 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
               border: `2px solid ${character.color}33`,
             }}
           >
-            {phase === 1 && (
-              <p className="text-xl font-bold text-[#3d3028] leading-relaxed whitespace-pre-wrap">
-                {character.introMessage}
-              </p>
-            )}
-            {phase >= 2 && (
-              <p className="text-xl font-bold text-[#3d3028] leading-relaxed">
-                きょうのおはなしは
-                {phase === 2 && <DotsAnimation visible={phase === 2} />}
-                {phase >= 3 && '…'}
-              </p>
-            )}
+            <p className="ja-bubble text-xl font-bold text-[#3d3028] whitespace-pre-wrap">
+              {character.introMessage}
+            </p>
           </div>
         </div>
       )}
 
       {/* ── タイトル（どーん） ── */}
-      {phase >= 3 && (
+      {phase >= 2 && (
         <div className="animate-titleReveal text-center w-full max-w-xs">
           <div className="bg-white rounded-2xl px-6 py-5 shadow-md border-2 border-[#c8e6c9]">
-            <p className="text-xs text-[#7a6555] mb-2 tracking-wide">きょうの おはなし</p>
             <h2 className="text-3xl font-bold text-forest-600 tracking-wide leading-snug">
               {storyTitle}
             </h2>
@@ -136,8 +118,8 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
         </div>
       )}
 
-      {/* ── ボタン ── */}
-      {phase >= 4 && (
+      {/* ── はじめるボタン ── */}
+      {phase >= 3 && (
         <button
           onClick={() => { unlockAudio(); onNext() }}
           className="animate-slideUp w-full max-w-xs
@@ -152,17 +134,4 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
       )}
     </div>
   )
-}
-
-// ⑩ 「…」がひとつずつ増えるドットアニメーション（visible=false で即停止）
-function DotsAnimation({ visible }: { visible: boolean }) {
-  const [dots, setDots] = useState('.')
-  useEffect(() => {
-    if (!visible) { setDots('.'); return }
-    const id = setInterval(() => {
-      setDots(d => d.length >= 3 ? '.' : d + '.')
-    }, 400)
-    return () => clearInterval(id)
-  }, [visible])
-  return <span className="inline-block w-8 text-left">{dots}</span>
 }

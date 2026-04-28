@@ -18,7 +18,7 @@ export default function ChoiceButton({ text, number, onClick, state, animationDe
     idle:      'bg-white border-[#e8dcc8] text-[#3d3028] active:scale-95 active:bg-[#f0f7f2] cursor-pointer',
     correct:   'bg-[#d9edde] border-[#4d9e6e] text-[#224f35] cursor-default',
     incorrect: 'bg-[#fdecea] border-[#e07b7b] text-[#7a2a2a] cursor-default opacity-80',
-    disabled:  'bg-[#f5f0e8] border-[#e8dcc8] text-[#bba898] cursor-default opacity-60',
+    disabled:  'bg-[#f5f0e8] border-[#e8dcc8] text-[#7a6555] cursor-default opacity-70',
   }
 
   // 未回答：番号　/ 正解：⭕　/ 不正解：✕
@@ -47,7 +47,7 @@ export default function ChoiceButton({ text, number, onClick, state, animationDe
       aria-disabled={state !== 'idle'}
     >
       <span className={badgeClass} aria-hidden="true">{badge}</span>
-      <span style={{ wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>{text}</span>
+      <span style={{ overflowWrap: 'break-word', minWidth: 0 }}>{text}</span>
     </button>
   )
 }
