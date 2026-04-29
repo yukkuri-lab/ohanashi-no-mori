@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { speak, stopSpeaking, isIOSSafari } from '@/lib/speech'
 import { playPageTurn } from '@/lib/sounds'
 import { StoryPage } from '@/data/stories'
+import RubyText from '@/components/RubyText'
 
 interface Props {
   page: StoryPage
@@ -80,6 +81,7 @@ export default function StoryScreen({
 
   const [isReading,    setIsReading]    = useState(false)
   const [readingIndex, setReadingIndex] = useState(-1)
+  const [showRuby,     setShowRuby]     = useState(false)
 
   // 録音関連（record モードのみ使用）
   const [recState,     setRecState]     = useState<RecordState>('idle')
@@ -298,9 +300,22 @@ export default function StoryScreen({
             }
           </span>
         </div>
-        <span className="text-sm text-[#bba898] font-bold bg-white/60 px-3 py-1 rounded-full border border-[#e8dcc8]">
-          {pageIndex + 1} / {totalPages}
-        </span>
+        <div className="flex items-center gap-2">
+          {/* ふりがなトグル */}
+          <button
+            onClick={() => setShowRuby(v => !v)}
+            className={`text-xs font-bold px-2.5 py-1 rounded-full border transition-all duration-150 active:scale-95
+              ${showRuby
+                ? 'bg-amber-100 border-amber-400 text-amber-700'
+                : 'bg-white/60 border-[#e8dcc8] text-[#bba898]'
+              }`}
+          >
+            ふりがな
+          </button>
+          <span className="text-sm text-[#bba898] font-bold bg-white/60 px-3 py-1 rounded-full border border-[#e8dcc8]">
+            {pageIndex + 1} / {totalPages}
+          </span>
+        </div>
       </div>
 
       {/* ── コンテンツエリア ── */}
@@ -350,7 +365,7 @@ export default function StoryScreen({
                     transition: 'background-color 0.2s ease',
                   }}
                 >
-                  {chunk.text}
+                  <RubyText text={chunk.text} showRuby={showRuby} />
                 </span>
               </span>
             ))}

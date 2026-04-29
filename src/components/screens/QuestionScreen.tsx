@@ -280,11 +280,23 @@ export default function QuestionScreen({
                 )
               })}
 
-              {/* アンロック時 */}
+              {/* アンロック時：えらんでみよう + もういちど きく */}
               {!choicesLocked && selectedId === null && (
-                <p className="text-center text-xs font-bold text-[#4d9e6e] animate-popIn">
-                  👆 えらんでみよう！
-                </p>
+                <div className="flex items-center justify-between gap-3 animate-popIn">
+                  <p className="text-xs font-bold text-[#4d9e6e]">
+                    👆 えらんでみよう！
+                  </p>
+                  <button
+                    onClick={() => speak(question.speech)}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-full
+                               text-xs font-bold text-[#7a6555]
+                               bg-white border border-[#e8dcc8]
+                               active:scale-95 transition-all duration-150"
+                  >
+                    <span>🔈</span>
+                    <span>もういちど きく</span>
+                  </button>
+                </div>
               )}
 
             </div>

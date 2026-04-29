@@ -1,6 +1,8 @@
 'use client'
+import { useState } from 'react'
 import Image from 'next/image'
 import { Story } from '@/data/stories'
+import { getRecord } from '@/lib/storage'
 import { unlockAudio } from '@/lib/speech'
 
 interface Props {
@@ -28,6 +30,12 @@ const PALETTE = [
 ]
 
 export default function StorySelectScreen({ stories, onSelect }: Props) {
+  // マウント時に localStorage から完了済みお話を取得（SSR safe）
+  const [completedStories] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return []
+    return getRecord().completedStories
+  })
+
   return (
     <div
       className="min-h-screen-safe flex flex-col px-5 pt-safe"
@@ -42,10 +50,11 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
       </div>
 
       {/* ストーリーカード一覧 */}
-      {/* カードに個別に animate-fadeInUp を付けて stagger アニメーションを実現 */}
       <div className="w-full flex flex-col gap-4 pb-8">
         {stories.map((story, i) => {
-          const theme = PALETTE[i % PALETTE.length]
+          const theme     = PALETTE[i % PALETTE.length]
+          const completed = completedStories.includes(story.id)
+
           return (
             <button
               key={story.id}
@@ -61,22 +70,33 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
             >
               <div className="flex flex-row flex-nowrap items-center gap-4 px-5 py-5">
                 {/* キャラクターアイコン */}
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center
-                             text-4xl flex-shrink-0 shadow-sm border-2 border-white overflow-hidden"
-                  style={{ backgroundColor: '#f7f7f7' }}
-                >
-                  {story.character.imageSrc ? (
-                    <Image
-                      src={story.character.imageSrc}
-                      alt={story.character.name}
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-contain p-1"
-                      style={{}}
-                    />
-                  ) : (
-                    <span className="text-4xl">{story.character.emoji}</span>
+                <div className="relative flex-shrink-0">
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center
+                               text-4xl shadow-sm border-2 border-white overflow-hidden"
+                    style={{ backgroundColor: '#f7f7f7' }}
+                  >
+                    {story.character.imageSrc ? (
+                      <Image
+                        src={story.character.imageSrc}
+                        alt={story.character.name}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-contain p-1"
+                      />
+                    ) : (
+                      <span className="text-4xl">{story.character.emoji}</span>
+                    )}
+                  </div>
+                  {/* 完了スタンプ */}
+                  {completed && (
+                    <div
+                      className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full
+                                 flex items-center justify-center text-xs
+                                 bg-amber-400 border-2 border-white shadow-sm"
+                    >
+                      ⭐
+                    </div>
                   )}
                 </div>
 
@@ -85,9 +105,15 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                   <p className="text-xl font-bold text-[#3d3028] leading-snug mb-1 break-words">
                     {story.title}
                   </p>
-                  <p className="text-sm text-[#7a6555] truncate">
-                    {story.character.name}と いっしょに よもう
-                  </p>
+                  {completed ? (
+                    <p className="text-xs font-bold text-amber-600">
+                      ⭐ よんだよ！　もういちど よむ？
+                    </p>
+                  ) : (
+                    <p className="text-sm text-[#7a6555] truncate">
+                      {story.character.name}と いっしょに よもう
+                    </p>
+                  )}
                 </div>
 
                 {/* 矢印 */}

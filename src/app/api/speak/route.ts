@@ -6,13 +6,13 @@
 
 import { NextRequest } from 'next/server'
 
-const VOICE_NAME    = 'ja-JP-Neural2-B' // Neural2: 安定して動作する自然な日本語音声
-const SPEAKING_RATE = 0.95              // 子ども向けにわずかにゆっくり
+const VOICE_NAME    = 'ja-JP-Neural2-C' // Neural2-C: 温かみのある自然な女性の日本語音声
+const SPEAKING_RATE = 0.93              // 子ども向けにわずかにゆっくり
 
 /**
  * テキストを SSML に変換する
  * - 句読点の後にポーズを挿入して自然なリズムを作る
- * - 「台詞」部分をわずかに強調してドラマチックに読む
+ * - 「台詞」部分はピッチを上げて生き生きと読む（速度を落とすと間延びするため）
  */
 function toSSML(text: string): string {
   // XML特殊文字をエスケープ
@@ -23,19 +23,19 @@ function toSSML(text: string): string {
 
   let ssml = escaped
     // 文末の句点 → 長めのポーズ
-    .replace(/。/g, '。<break time="450ms"/>')
+    .replace(/。/g, '。<break time="400ms"/>')
     // 読点 → 短いポーズ
-    .replace(/、/g, '、<break time="200ms"/>')
+    .replace(/、/g, '、<break time="180ms"/>')
     // 感嘆符・疑問符 → 適度なポーズ
-    .replace(/！/g, '！<break time="350ms"/>')
-    .replace(/？/g, '？<break time="400ms"/>')
+    .replace(/！/g, '！<break time="300ms"/>')
+    .replace(/？/g, '？<break time="380ms"/>')
     // 三点リーダー → 間（ま）
     .replace(/…/g, '<break time="500ms"/>')
     .replace(/・・・/g, '<break time="500ms"/>')
 
-  // 「台詞」を少しテンポを落として丁寧に読む
+  // 「台詞」をピッチを少し上げて生き生きと読む（速度は変えない）
   ssml = ssml.replace(/「([^」]*)」/g, (_, inner) =>
-    `「<prosody rate="95%">${inner}</prosody>」`
+    `「<prosody pitch="+1.5st">${inner}</prosody>」`
   )
 
   return `<speak>${ssml}</speak>`
