@@ -8,55 +8,24 @@ interface Props {
   onSelect: (storyId: string) => void
 }
 
-// おはなしごとのテーマカラー
-const THEME: Record<string, { bg: string; border: string; badge: string }> = {
-  'omusubi-kororin': {
-    bg:     'linear-gradient(135deg, #fff8e6 0%, #fdecc8 100%)',
-    border: '#e8c97a',
-    badge:  '#f0a030',
+// 3色ローテーション：あたたかいきいろ・やさしいみどり・やわらかいそら
+const PALETTE = [
+  {
+    bg:     'linear-gradient(135deg, #fffcf0 0%, #fef3cc 100%)',
+    border: '#e8cc70',
+    badge:  '#c49a20',
   },
-  fukinotou: {
-    bg:     'linear-gradient(135deg, #f0faf0 0%, #d4edda 100%)',
-    border: '#7dc89a',
+  {
+    bg:     'linear-gradient(135deg, #f2faf4 0%, #d8edde 100%)',
+    border: '#7cc890',
     badge:  '#3a9e5f',
   },
-  'tanpopo-no-chie': {
-    bg:     'linear-gradient(135deg, #fffde7 0%, #fff9c4 100%)',
-    border: '#f9d342',
-    badge:  '#c8a000',
-  },
-  swimmy: {
-    bg:     'linear-gradient(135deg, #e8f4fd 0%, #c9e8f8 100%)',
-    border: '#5b9fd4',
-    badge:  '#2e7ab5',
-  },
-  millie: {
-    bg:     'linear-gradient(135deg, #f5eeff 0%, #e8d5f8 100%)',
-    border: '#b07ed4',
-    badge:  '#7b3fa8',
-  },
-  otegami: {
-    bg:     'linear-gradient(135deg, #fff8ee 0%, #fde8c8 100%)',
-    border: '#e8a870',
-    badge:  '#c0602a',
-  },
-  'doubutsuen-no-juui': {
-    bg:     'linear-gradient(135deg, #edf8ee 0%, #c8e8ca 100%)',
-    border: '#5aad6a',
-    badge:  '#2d7a40',
-  },
-  'ame-no-uta': {
-    bg:     'linear-gradient(135deg, #eef5ff 0%, #d0e8f8 100%)',
+  {
+    bg:     'linear-gradient(135deg, #f0f7ff 0%, #d8ebf8 100%)',
     border: '#7aaed8',
     badge:  '#3a6ea8',
   },
-}
-
-const DEFAULT_THEME = {
-  bg:     'linear-gradient(135deg, #f5f0ff 0%, #e8e0ff 100%)',
-  border: '#b39ddb',
-  badge:  '#7c56c8',
-}
+]
 
 export default function StorySelectScreen({ stories, onSelect }: Props) {
   return (
@@ -76,7 +45,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
       {/* カードに個別に animate-fadeInUp を付けて stagger アニメーションを実現 */}
       <div className="w-full flex flex-col gap-4 pb-8">
         {stories.map((story, i) => {
-          const theme = THEME[story.id] ?? DEFAULT_THEME
+          const theme = PALETTE[i % PALETTE.length]
           return (
             <button
               key={story.id}
