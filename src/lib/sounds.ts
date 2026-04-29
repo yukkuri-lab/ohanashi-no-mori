@@ -29,6 +29,23 @@ function getCtx(): AudioContext | null {
   return _ctx
 }
 
+/**
+ * iOS Safari 向けの AudioContext 事前解放。
+ * ユーザージェスチャー内（ボタン押下など）で呼ぶことで
+ * TTS コールバック内でも Web Audio が使えるようになる。
+ */
+export function unlockSounds(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  // 無音バッファを即再生 → iOS が AudioContext をアンロック
+  const buf = ctx.createBuffer(1, 1, ctx.sampleRate)
+  const src = ctx.createBufferSource()
+  src.buffer = buf
+  src.connect(ctx.destination)
+  src.start(0)
+  ctx.resume().catch(() => {})
+}
+
 /** ピンポーン 🎵 — 正解音（明るい2音チャイム）*/
 export function playCorrect(): void {
   const ctx = getCtx()

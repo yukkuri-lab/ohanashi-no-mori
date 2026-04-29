@@ -197,14 +197,19 @@ export function isSpeaking(): boolean {
 let _audioUnlocked = false
 
 export function unlockAudio(): void {
-  if (_audioUnlocked) return
   if (typeof window === 'undefined') return
-  const el = getAudio()
-  if (!el) return
-  el.src = SILENT_WAV
-  el.play()
-    .then(() => { _audioUnlocked = true })
-    .catch((err) => console.warn('[speech] iOS audio unlock failed:', err))
+  // <audio> 要素のアンロック
+  if (!_audioUnlocked) {
+    const el = getAudio()
+    if (el) {
+      el.src = SILENT_WAV
+      el.play()
+        .then(() => { _audioUnlocked = true })
+        .catch((err) => console.warn('[speech] iOS audio unlock failed:', err))
+    }
+  }
+  // Web Audio (sounds.ts) も同じユーザージェスチャー内でアンロック
+  import('@/lib/sounds').then(({ unlockSounds }) => unlockSounds()).catch(() => {})
 }
 
 /** VoicePreloader から呼ばれる（互換性のため残す） */
