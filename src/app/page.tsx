@@ -9,6 +9,7 @@ import StoryScreen       from '@/components/screens/StoryScreen'
 import QuestionScreen    from '@/components/screens/QuestionScreen'
 import EndingScreen      from '@/components/screens/EndingScreen'
 import { stopSpeaking } from '@/lib/speech'
+import { recordRead } from '@/lib/storage'
 
 // アプリ全体の画面状態
 type Screen = 'title' | 'select' | 'intro' | 'story' | 'question' | 'ending'
@@ -68,8 +69,10 @@ export default function App() {
     if (nextPage < story.pages.length) {
       setStoryPageIndex(nextPage)
     } else if (storyMode === 'record') {
+      recordRead(story.id)   // 読み返しカウント
       go('ending')
     } else {
+      recordRead(story.id)   // 読み返しカウント
       setQuestionIndex(0)
       setCorrectCount(0)
       go('question')

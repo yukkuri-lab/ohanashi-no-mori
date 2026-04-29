@@ -5,13 +5,14 @@
 const KEY = 'ohanashi-no-mori:records'
 
 export interface AppRecord {
-  openCount: number          // アプリを開いた回数
-  totalAnswered: number      // 解いた問題数（累計）
-  totalCorrect: number       // 正解した問題数（累計）
-  completedStories: string[] // 最後まで終えたお話のIDリスト
+  openCount: number               // アプリを開いた回数
+  totalAnswered: number           // 解いた問題数（累計）
+  totalCorrect: number            // 正解した問題数（累計）
+  completedStories: string[]      // 最後まで終えたお話のIDリスト
+  readCounts: Record<string, number> // お話ごとの読んだ回数
 }
 
-const FALLBACK: AppRecord = { openCount: 0, totalAnswered: 0, totalCorrect: 0, completedStories: [] }
+const FALLBACK: AppRecord = { openCount: 0, totalAnswered: 0, totalCorrect: 0, completedStories: [], readCounts: {} }
 
 // ⑦ パース後に型を検証して不完全なデータを安全に補完する
 function validateRecord(data: unknown): AppRecord {
@@ -24,6 +25,9 @@ function validateRecord(data: unknown): AppRecord {
     completedStories: Array.isArray(r.completedStories)
       ? r.completedStories.filter((s): s is string => typeof s === 'string')
       : [],
+    readCounts: (typeof r.readCounts === 'object' && r.readCounts !== null && !Array.isArray(r.readCounts))
+      ? r.readCounts as Record<string, number>
+      : {},
   }
 }
 
@@ -60,6 +64,13 @@ export function recordAnswer(isCorrect: boolean) {
   const r = load()
   r.totalAnswered += 1
   if (isCorrect) r.totalCorrect += 1
+  save(r)
+}
+
+/** お話のテキストを最後まで読んだときに呼ぶ（読み返しカウント） */
+export function recordRead(storyId: string) {
+  const r = load()
+  r.readCounts[storyId] = (r.readCounts[storyId] ?? 0) + 1
   save(r)
 }
 

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import { speak, stopSpeaking, isIOSSafari } from '@/lib/speech'
 import { playPageTurn } from '@/lib/sounds'
-import { StoryPage } from '@/data/stories'
+import { StoryPage, WordHint } from '@/data/stories'
 import RubyText from '@/components/RubyText'
 
 interface Props {
@@ -82,6 +82,7 @@ export default function StoryScreen({
   const [isReading,    setIsReading]    = useState(false)
   const [readingIndex, setReadingIndex] = useState(-1)
   const [showRuby,     setShowRuby]     = useState(false)
+  const [activeHint,   setActiveHint]   = useState<WordHint | null>(null)
 
   // 録音関連（record モードのみ使用）
   const [recState,     setRecState]     = useState<RecordState>('idle')
@@ -287,7 +288,7 @@ export default function StoryScreen({
   const lastPageLabel = isRecordMode ? 'よみおわった！ 🎉' : 'しつもんへ ✏️'
 
   return (
-    <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
+    <div className="h-screen-safe flex flex-col relative" style={{ backgroundColor: '#faf6ea' }}>
 
       {/* ── ヘッダー ── */}
       <div className="flex-shrink-0 flex items-center justify-between px-5 pt-safe pt-3 pb-2">
@@ -371,6 +372,24 @@ export default function StoryScreen({
             ))}
           </p>
         </div>
+
+        {/* ことばのふくろ：ヒントチップ */}
+        {page.wordHints && page.wordHints.length > 0 && (
+          <div className="flex-shrink-0 flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] font-bold text-[#9a8070] whitespace-nowrap">💬 ことば</span>
+            {page.wordHints.map((hint, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveHint(hint)}
+                className="px-2.5 py-1 rounded-full text-xs font-bold
+                           bg-amber-50 border border-amber-300 text-amber-800
+                           active:scale-95 transition-all duration-150"
+              >
+                {hint.word}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* エラーメッセージ */}
         {(speakError || micError) && (
@@ -513,6 +532,47 @@ export default function StoryScreen({
         }
 
       </div>
+
+      {/* ── ことばのふくろ モーダル ── */}
+      {activeHint && (
+        <div
+          className="absolute inset-0 z-50 flex items-end justify-center"
+          style={{ backgroundColor: 'rgba(0,0,0,0.35)' }}
+          onClick={() => setActiveHint(null)}
+        >
+          <div
+            className="w-full max-w-lg mx-auto bg-white rounded-t-3xl px-6 pt-5 pb-safe animate-fadeInUp"
+            style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 28px)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* ハンドルバー */}
+            <div className="w-10 h-1 bg-[#e8dcc8] rounded-full mx-auto mb-4" />
+
+            {/* ことばラベル */}
+            <div className="flex items-baseline gap-3 mb-3">
+              <span className="text-3xl font-black text-[#3d3028]">{activeHint.word}</span>
+              <span className="text-base font-bold text-[#9a8070]">【{activeHint.reading}】</span>
+            </div>
+
+            {/* 説明文 */}
+            <p className="story-text text-base font-bold text-[#4a3a2a] leading-relaxed mb-4">
+              {activeHint.explanation}
+            </p>
+
+            {/* 閉じるボタン */}
+            <button
+              onClick={() => setActiveHint(null)}
+              className="w-full py-3 rounded-full text-base font-bold text-white
+                         bg-gradient-to-br from-forest-400 to-forest-600
+                         shadow-[0_3px_0_#224f35]
+                         active:translate-y-0.5 active:shadow-[0_1px_0_#224f35]
+                         transition-all duration-150"
+            >
+              とじる
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── フッター ── */}
       <div

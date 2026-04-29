@@ -30,10 +30,11 @@ const PALETTE = [
 ]
 
 export default function StorySelectScreen({ stories, onSelect }: Props) {
-  // マウント時に localStorage から完了済みお話を取得（SSR safe）
-  const [completedStories] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return []
-    return getRecord().completedStories
+  // マウント時に localStorage からデータ取得（SSR safe）
+  const [{ completedStories, readCounts }] = useState(() => {
+    if (typeof window === 'undefined') return { completedStories: [] as string[], readCounts: {} as Record<string, number> }
+    const r = getRecord()
+    return { completedStories: r.completedStories, readCounts: r.readCounts }
   })
 
   return (
@@ -113,6 +114,19 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                     <p className="text-sm text-[#7a6555] truncate">
                       {story.character.name}と いっしょに よもう
                     </p>
+                  )}
+                  {/* 読み返しカウント スタンプ */}
+                  {(readCounts[story.id] ?? 0) > 0 && (
+                    <div className="flex items-center gap-0.5 mt-1">
+                      {Array.from({ length: Math.min(readCounts[story.id], 5) }).map((_, k) => (
+                        <span key={k} className="text-sm leading-none">📖</span>
+                      ))}
+                      {readCounts[story.id] > 5 && (
+                        <span className="text-[10px] font-bold text-[#7a6555] ml-0.5">
+                          ×{readCounts[story.id]}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
 
