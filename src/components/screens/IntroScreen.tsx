@@ -63,7 +63,7 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
         <div
           className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden
                      border-4 border-white shadow-md"
-          style={{ backgroundColor: '#ffffff' }}
+          style={{ backgroundColor: '#f7f7f7' }}
         >
           {character.imageSrc ? (
             <Image
@@ -72,7 +72,7 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
               width={96}
               height={96}
               className="w-full h-full object-contain p-1"
-              style={{ filter: 'brightness(1.25)' }}
+              style={{}}
             />
           ) : (
             <span className="text-6xl">{character.emoji}</span>

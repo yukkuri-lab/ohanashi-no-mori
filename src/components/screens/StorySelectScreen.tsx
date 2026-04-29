@@ -64,7 +64,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center
                              text-4xl flex-shrink-0 shadow-sm border-2 border-white overflow-hidden"
-                  style={{ backgroundColor: '#ffffff' }}
+                  style={{ backgroundColor: '#f7f7f7' }}
                 >
                   {story.character.imageSrc ? (
                     <Image
@@ -73,7 +73,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                       width={64}
                       height={64}
                       className="w-full h-full object-contain p-1"
-                      style={{ filter: 'brightness(1.25)' }}
+                      style={{}}
                     />
                   ) : (
                     <span className="text-4xl">{story.character.emoji}</span>

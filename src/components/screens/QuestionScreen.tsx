@@ -171,7 +171,7 @@ export default function QuestionScreen({
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden
                            border-4 border-white shadow-md"
-                style={{ backgroundColor: '#ffffff' }}
+                style={{ backgroundColor: '#f7f7f7' }}
               >
                 {character.imageSrc ? (
                   <Image
@@ -180,7 +180,7 @@ export default function QuestionScreen({
                     width={64}
                     height={64}
                     className="w-full h-full object-contain p-1"
-                    style={{ filter: 'brightness(1.25)' }}
+                    style={{}}
                   />
                 ) : (
                   <span className="text-4xl">{character.emoji}</span>
