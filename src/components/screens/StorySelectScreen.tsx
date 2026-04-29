@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { Story } from '@/data/stories'
 import { unlockAudio } from '@/lib/speech'
 
@@ -93,10 +94,21 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                 {/* キャラクターアイコン */}
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center
-                             text-4xl flex-shrink-0 shadow-sm border-2 border-white"
+                             text-4xl flex-shrink-0 shadow-sm border-2 border-white overflow-hidden"
                   style={{ backgroundColor: '#ffffff' }}
                 >
-                  {story.character.emoji}
+                  {story.character.imageSrc ? (
+                    <Image
+                      src={story.character.imageSrc}
+                      alt={story.character.name}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain p-1"
+                      style={{ mixBlendMode: 'multiply' }}
+                    />
+                  ) : (
+                    <span className="text-4xl">{story.character.emoji}</span>
+                  )}
                 </div>
 
                 {/* テキスト */}
