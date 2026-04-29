@@ -94,7 +94,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center
                              text-4xl flex-shrink-0 shadow-sm border-2 border-white"
-                  style={{ backgroundColor: '#ffffff88' }}
+                  style={{ backgroundColor: '#ffffff' }}
                 >
                   {story.character.emoji}
                 </div>

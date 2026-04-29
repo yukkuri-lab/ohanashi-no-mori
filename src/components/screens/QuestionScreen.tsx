@@ -171,7 +171,7 @@ export default function QuestionScreen({
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden
                            border-4 border-white shadow-md"
-                style={{ backgroundColor: character.color + '28' }}
+                style={{ backgroundColor: '#ffffff' }}
               >
                 {character.imageSrc ? (
                   <Image

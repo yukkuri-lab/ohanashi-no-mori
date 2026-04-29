@@ -63,7 +63,7 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
         <div
           className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden
                      border-4 border-white shadow-md"
-          style={{ backgroundColor: character.color + '28' }}
+          style={{ backgroundColor: '#ffffff' }}
         >
           {character.imageSrc ? (
             <Image
