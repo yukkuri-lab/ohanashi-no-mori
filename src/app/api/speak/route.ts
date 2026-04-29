@@ -7,7 +7,7 @@
 import { NextRequest } from 'next/server'
 
 const VOICE_NAME    = 'ja-JP-Neural2-B' // Neural2: 安定して動作する自然な日本語音声
-const SPEAKING_RATE = 1.0               // 読み上げ速度
+const SPEAKING_RATE = 0.95              // 子ども向けにわずかにゆっくり
 
 /**
  * テキストを SSML に変換する
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: { text },   // プレーンテキスト（安定動作）
+          input: { ssml: toSSML(text) },  // SSML で抑揚・ポーズを適用
           voice: {
             languageCode: 'ja-JP',
             name: VOICE_NAME,
