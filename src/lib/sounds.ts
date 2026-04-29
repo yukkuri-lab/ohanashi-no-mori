@@ -35,15 +35,22 @@ function getCtx(): AudioContext | null {
  * TTS コールバック内でも Web Audio が使えるようになる。
  */
 export function unlockSounds(): void {
+  // Web Audio (不正解音など) のアンロック
   const ctx = getCtx()
-  if (!ctx) return
-  // 無音バッファを即再生 → iOS が AudioContext をアンロック
-  const buf = ctx.createBuffer(1, 1, ctx.sampleRate)
-  const src = ctx.createBufferSource()
-  src.buffer = buf
-  src.connect(ctx.destination)
-  src.start(0)
-  ctx.resume().catch(() => {})
+  if (ctx) {
+    const buf = ctx.createBuffer(1, 1, ctx.sampleRate)
+    const src = ctx.createBufferSource()
+    src.buffer = buf
+    src.connect(ctx.destination)
+    src.start(0)
+    ctx.resume().catch(() => {})
+  }
+  // ページめくりMP3も事前ロード（iOS で TTS コールバックから再生できるよう）
+  if (typeof window !== 'undefined' && !_pageTurnAudio) {
+    _pageTurnAudio = new Audio('/page-turn.mp3')
+    _pageTurnAudio.volume = 0.6
+    _pageTurnAudio.load()
+  }
 }
 
 /** ピンポーン 🎵 — 正解音（明るい2音チャイム）*/
@@ -77,57 +84,22 @@ export function playCorrect(): void {
   })
 }
 
-/** サラッ 📄 — ページめくり音（紙がこすれる短いノイズ）*/
+/** サラッ 📄 — ページめくり音（MP3ファイル再生）*/
+let _pageTurnAudio: HTMLAudioElement | null = null
+
 export function playPageTurn(): void {
-  const ctx = getCtx()
-  if (!ctx) return
-
-  const t = ctx.currentTime
-
-  // ① 高周波ノイズ：紙がこすれる「サラッ」
-  const dur1 = 0.13
-  const buf1 = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur1), ctx.sampleRate)
-  const d1 = buf1.getChannelData(0)
-  for (let i = 0; i < d1.length; i++) d1[i] = Math.random() * 2 - 1
-
-  const src1 = ctx.createBufferSource()
-  src1.buffer = buf1
-
-  const f1 = ctx.createBiquadFilter()
-  f1.type = 'bandpass'
-  f1.frequency.value = 4500
-  f1.Q.value = 0.7
-
-  const g1 = ctx.createGain()
-  g1.gain.setValueAtTime(0, t)
-  g1.gain.linearRampToValueAtTime(0.18, t + 0.008)
-  g1.gain.exponentialRampToValueAtTime(0.001, t + dur1)
-
-  src1.connect(f1); f1.connect(g1); g1.connect(ctx.destination)
-  src1.start(t); src1.stop(t + dur1)
-
-  // ② 中低音ノイズ：ページが落ち着く「トン」（少し遅れて）
-  const dur2 = 0.07
-  const buf2 = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur2), ctx.sampleRate)
-  const d2 = buf2.getChannelData(0)
-  for (let i = 0; i < d2.length; i++) d2[i] = Math.random() * 2 - 1
-
-  const src2 = ctx.createBufferSource()
-  src2.buffer = buf2
-
-  const f2 = ctx.createBiquadFilter()
-  f2.type = 'bandpass'
-  f2.frequency.value = 900
-  f2.Q.value = 1.8
-
-  const g2 = ctx.createGain()
-  const t2 = t + 0.05
-  g2.gain.setValueAtTime(0, t2)
-  g2.gain.linearRampToValueAtTime(0.09, t2 + 0.01)
-  g2.gain.exponentialRampToValueAtTime(0.001, t2 + dur2)
-
-  src2.connect(f2); f2.connect(g2); g2.connect(ctx.destination)
-  src2.start(t2); src2.stop(t2 + dur2)
+  if (typeof window === 'undefined') return
+  try {
+    // 再生中なら最初から再生しなおす
+    if (!_pageTurnAudio) {
+      _pageTurnAudio = new Audio('/page-turn.mp3')
+      _pageTurnAudio.volume = 0.6
+    }
+    _pageTurnAudio.currentTime = 0
+    _pageTurnAudio.play().catch(() => {})
+  } catch {
+    // 再生失敗は無視
+  }
 }
 
 /** ブブッ 🔔 — 不正解音（低い2回バズ）*/
