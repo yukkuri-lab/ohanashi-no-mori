@@ -35,6 +35,8 @@ export default function QuestionScreen({
   const t3 = useRef<ReturnType<typeof setTimeout> | null>(null)  // 選択肢読み上げ前の間
   const t4 = useRef<ReturnType<typeof setTimeout> | null>(null)  // ④ 正解後フィードバック前
   const t5 = useRef<ReturnType<typeof setTimeout> | null>(null)  // ④ 次問題へ進む前
+  const choicesRef = useRef<HTMLDivElement | null>(null)  // 選択肢エリア（スクロール用）
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null)  // スクロールコンテナ
 
   useEffect(() => {
     setShowBubble(false)
@@ -76,6 +78,19 @@ export default function QuestionScreen({
       stopSpeaking()
     }
   }, [question.id, question.speech])
+
+  // 選択肢が表示されたらゆっくりスクロール
+  useEffect(() => {
+    if (!showChoices) return
+    const target = choicesRef.current
+    const container = scrollAreaRef.current
+    if (!target || !container) return
+    // 少し待ってからスクロール（アニメーション開始後）
+    const id = setTimeout(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 300)
+    return () => clearTimeout(id)
+  }, [showChoices])
 
   function handleSelect(choiceId: string) {
     if (selectedId !== null || choicesLocked) return   // ロック中は無視
@@ -132,7 +147,7 @@ export default function QuestionScreen({
       </div>
 
       {/* ── スクロールエリア ── */}
-      <div className="flex-1 scroll-area">
+      <div ref={scrollAreaRef} className="flex-1 scroll-area">
         <div className="max-w-lg mx-auto px-5 pb-6 flex flex-col gap-5">
 
           {/* 関連する場面（絵＋文しょう） */}
@@ -242,7 +257,7 @@ export default function QuestionScreen({
 
           {/* 選択肢 */}
           {showChoices && (
-            <div className="flex flex-col gap-3 animate-fadeInUp">
+            <div ref={choicesRef} className="flex flex-col gap-3 animate-fadeInUp">
 
               {question.choices.map((choice, i) => {
                 let state: 'idle' | 'correct' | 'incorrect' | 'disabled' = 'idle'
