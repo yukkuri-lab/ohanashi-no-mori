@@ -48,7 +48,7 @@ export function unlockSounds(): void {
   // ページめくりMP3も事前ロード（iOS で TTS コールバックから再生できるよう）
   if (typeof window !== 'undefined' && !_pageTurnAudio) {
     _pageTurnAudio = new Audio('/page-turn.mp3')
-    _pageTurnAudio.volume = 0.6
+    _pageTurnAudio.volume = 0.3
     _pageTurnAudio.load()
   }
 }
@@ -93,7 +93,7 @@ export function playPageTurn(): void {
     // 再生中なら最初から再生しなおす
     if (!_pageTurnAudio) {
       _pageTurnAudio = new Audio('/page-turn.mp3')
-      _pageTurnAudio.volume = 0.6
+      _pageTurnAudio.volume = 0.3
     }
     _pageTurnAudio.currentTime = 0
     _pageTurnAudio.play().catch(() => {})
