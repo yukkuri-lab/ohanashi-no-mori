@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import { speak, stopSpeaking, isIOSSafari } from '@/lib/speech'
+import { playPageTurn } from '@/lib/sounds'
 import { StoryPage } from '@/data/stories'
 
 interface Props {
@@ -15,8 +16,8 @@ interface Props {
   onBonusStar?: () => void
 }
 
-// 読み上げ完了後、この秒数待って自動で次へ進む（listen モードのみ）
-const AUTO_ADVANCE_DELAY = 1200 // ms
+// 読み上げ完了後、ページめくり音が鳴り終わる頃にページが変わる
+const AUTO_ADVANCE_DELAY = 350 // ms（音の長さ 約200ms + 余韻）
 
 interface SentenceChunk {
   prefix: string
@@ -69,7 +70,6 @@ export default function StoryScreen({
 
   const [isReading,    setIsReading]    = useState(false)
   const [readingIndex, setReadingIndex] = useState(-1)
-  const [autoProgress, setAutoProgress] = useState<number | null>(null)
 
   // 録音関連（record モードのみ使用）
   const [recState,     setRecState]     = useState<RecordState>('idle')
@@ -83,29 +83,23 @@ export default function StoryScreen({
   const audioChunksRef   = useRef<Blob[]>([])
   const playbackRef      = useRef<HTMLAudioElement | null>(null)
   const speakTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const advanceTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const sentences = useMemo(() => splitSentences(page.text), [page.text])
 
   function clearAll() {
-    if (speakTimerRef.current)    clearTimeout(speakTimerRef.current)
-    if (progressTimerRef.current) clearInterval(progressTimerRef.current)
-    speakTimerRef.current = progressTimerRef.current = null
+    if (speakTimerRef.current)   clearTimeout(speakTimerRef.current)
+    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current)
+    speakTimerRef.current = advanceTimerRef.current = null
   }
 
   function startAutoAdvance() {
-    setAutoProgress(0)
-    const start = Date.now()
-    progressTimerRef.current = setInterval(() => {
-      const progress = Math.min(((Date.now() - start) / AUTO_ADVANCE_DELAY) * 100, 100)
-      setAutoProgress(progress)
-      if (progress >= 100) {
-        clearInterval(progressTimerRef.current!)
-        progressTimerRef.current = null
-        setAutoProgress(null)
-        onNext()
-      }
-    }, 30)
+    // 読み終わったら即ページめくり音 → 少し待ってページ遷移
+    playPageTurn()
+    advanceTimerRef.current = setTimeout(() => {
+      advanceTimerRef.current = null
+      onNext()
+    }, AUTO_ADVANCE_DELAY)
   }
 
   function handleSpeakError() {
@@ -156,7 +150,6 @@ export default function StoryScreen({
       stopPlayback()
       setIsReading(false)
       setReadingIndex(-1)
-      setAutoProgress(null)
       setRecState('idle')
       setAudioURL(prev => {
         if (prev) URL.revokeObjectURL(prev)
@@ -168,7 +161,6 @@ export default function StoryScreen({
 
   function handleSpeak() {
     clearAll()
-    setAutoProgress(null)
     if (isReading) {
       stopSpeaking()
       setIsReading(false)
@@ -191,7 +183,6 @@ export default function StoryScreen({
     stopPlayback()
     setIsReading(false)
     setReadingIndex(-1)
-    setAutoProgress(null)
     onPrev?.()
   }
 
@@ -202,7 +193,7 @@ export default function StoryScreen({
     stopPlayback()
     setIsReading(false)
     setReadingIndex(-1)
-    setAutoProgress(null)
+    playPageTurn()
     onNext()
   }
 
@@ -503,16 +494,6 @@ export default function StoryScreen({
         className="flex-shrink-0 px-4 pt-3 bg-[#faf6ea] border-t border-[#ede5d5]"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}
       >
-        {/* auto-advance インジケーター（3ボタンの上に細いバー） */}
-        {autoProgress !== null && (
-          <div className="h-1 bg-[#e8dcc8] rounded-full overflow-hidden mb-2">
-            <div
-              className="h-full bg-forest-400 rounded-full transition-none"
-              style={{ width: `${autoProgress}%` }}
-            />
-          </div>
-        )}
-
         {isRecordMode ? (
           /* record モード：従来の大きい「つぎへ」ボタン */
           <button

@@ -51,7 +51,7 @@ export const stories: Story[] = [
     character: {
       name: 'アリさん',
       emoji: '🐜',
-      imageSrc: '/ant.png',
+      imageSrc: '/ant.jpeg',
       color: '#c17a3a',
       introMessage: 'ねえ、この おはなし\nしってる？',
       endingMessage1: 'いっしょに おはなしを\nみつけられたね',
@@ -151,6 +151,7 @@ export const stories: Story[] = [
     character: {
       name: 'チョウさん',
       emoji: '🦋',
+      imageSrc: '/butterfly.jpeg',
       color: '#5b9e6e',
       introMessage: 'はるの おはなし\nしってる？',
       endingMessage1: 'はるが きたね！\nよく きいてたね',
@@ -291,6 +292,7 @@ export const stories: Story[] = [
     character: {
       name: 'テントウさん',
       emoji: '🐞',
+      imageSrc: '/ladybug.jpeg',
       color: '#e05555',
       introMessage: 'たんぽぽって\nすごいんだよ！',
       endingMessage1: 'たんぽぽのちえ\nわかったね！',
@@ -427,6 +429,7 @@ export const stories: Story[] = [
     character: {
       name: 'クラゲさん',
       emoji: '🪼',
+      imageSrc: '/jellyfish.jpeg',
       color: '#4a7fb5',
       introMessage: 'うみの おはなし\nしってる？',
       endingMessage1: 'スイミーって\nすごいね！',
@@ -619,6 +622,7 @@ export const stories: Story[] = [
     character: {
       name: 'ことりさん',
       emoji: '🐦',
+      imageSrc: '/bird.jpeg',
       color: '#9b59b6',
       introMessage: 'すてきな ぼうしの\nおはなしだよ！',
       endingMessage1: 'ミリーの ぼうし、\nすてきだったね！',
@@ -766,6 +770,7 @@ export const stories: Story[] = [
     character: {
       name: 'かたつむりさん',
       emoji: '🐌',
+      imageSrc: '/snail.jpeg',
       color: '#c07a30',
       introMessage: 'こんにちは！\nかたつむりさんだよ！\nがまくんと かえるくんの\nお話を 読んでみよう！',
       endingMessage1: 'がまくん、よかったね！\nすてきなお手紙だったね！',
@@ -931,6 +936,7 @@ export const stories: Story[] = [
     title: 'どうぶつ園のじゅうい',
     character: {
       name: 'くまさん',
+      imageSrc: '/bear.jpeg',
       emoji: '🐻',
       color: '#3a9a50',
       introMessage: 'こんにちは！\nくまさんだよ！\nどうぶつ園のじゅういさんの\nおしごとを読んでみよう！',
@@ -1113,6 +1119,7 @@ export const stories: Story[] = [
     title: 'あめのうた',
     character: {
       name: 'かえるさん',
+      imageSrc: '/frog.jpeg',
       emoji: '🐸',
       color: '#4a90d9',
       introMessage: 'こんにちは！\nかえるさんだよ！\nいっしょに あめのうたを よもう！',
