@@ -25,10 +25,20 @@ interface SentenceChunk {
 }
 
 function splitSentences(text: string): SentenceChunk[] {
-  const parts = text.split('。')
+  // 。の直後の閉じ括弧（」』）も同じチャンクに含める
+  // 例: 「すまない。」 → 1チャンク（分割されない）
+  const parts: string[] = []
+  let last = 0
+  const re = /。[」』]?/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(text)) !== null) {
+    parts.push(text.slice(last, m.index + m[0].length))
+    last = m.index + m[0].length
+  }
+  if (last < text.length) parts.push(text.slice(last))
+
   const chunks: SentenceChunk[] = []
-  for (let i = 0; i < parts.length; i++) {
-    const raw = i < parts.length - 1 ? parts[i] + '。' : parts[i]
+  for (const raw of parts) {
     const firstNonNL = raw.search(/[^\n]/)
     const prefix  = firstNonNL > 0 ? raw.slice(0, firstNonNL) : ''
     const content = firstNonNL >= 0 ? raw.slice(firstNonNL) : raw
