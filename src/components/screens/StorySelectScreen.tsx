@@ -73,7 +73,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                       width={64}
                       height={64}
                       className="w-full h-full object-contain p-1"
-                      style={{ mixBlendMode: 'multiply' }}
+                      style={{ filter: 'brightness(1.25)' }}
                     />
                   ) : (
                     <span className="text-4xl">{story.character.emoji}</span>

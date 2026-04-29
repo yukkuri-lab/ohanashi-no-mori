@@ -72,7 +72,7 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
               width={96}
               height={96}
               className="w-full h-full object-contain p-1"
-              style={{ mixBlendMode: 'multiply' }}
+              style={{ filter: 'brightness(1.25)' }}
             />
           ) : (
             <span className="text-6xl">{character.emoji}</span>
