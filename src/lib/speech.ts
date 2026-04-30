@@ -146,6 +146,8 @@ export function speak(text: string, onEnd?: () => void, onError?: () => void): v
   }
 
   // タイムアウト → フォールバック
+  // ※ ネットワーク取得・デコードに失敗した場合のみ発動させる
+  //    再生が始まったら clearTimeout して、あとは onended を待つ
   const timeoutId = setTimeout(() => {
     console.warn('[speech] Google TTS timeout – falling back to Web Speech API')
     el.src = ''
@@ -155,6 +157,8 @@ export function speak(text: string, onEnd?: () => void, onError?: () => void): v
   const url = `${SPEAK_URL}&text=${encodeURIComponent(text)}`
   el.src = url
   el.onended = safeEnd
+  // 再生開始できたらタイムアウトをキャンセル（長い音声でも途中で止まらなくなる）
+  el.onplaying = () => clearTimeout(timeoutId)
   el.onerror = () => {
     console.warn('[speech] Google TTS audio error – falling back to Web Speech API')
     fallback()

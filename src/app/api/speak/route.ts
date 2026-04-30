@@ -53,7 +53,7 @@ function toSSML(text: string): string {
 
   // ─── Step 4: 句読点・改行にポーズを挿入 ───
   ssml = ssml
-    .replace(/\n/g, '<break time="650ms"/>')   // 段落・場面転換
+    .replace(/\n/g, '<break time="500ms"/>')   // 段落・場面転換
     .replace(/。/g, '。<break time="450ms"/>')  // 文末（やや長め）
     .replace(/、/g, '、<break time="200ms"/>')  // 読点
     .replace(/！/g, '！<break time="280ms"/>')  // 感嘆
