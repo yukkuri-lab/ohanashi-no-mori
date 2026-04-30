@@ -233,7 +233,16 @@ export default function StoryScreen({
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mr = new MediaRecorder(stream)
+
+      // iOS Safari は audio/webm 非対応 → audio/mp4 を優先
+      // ブラウザが実際に使う mimeType を後で blob 生成に使う
+      const preferredMime =
+        MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
+        MediaRecorder.isTypeSupported('audio/mp4')  ? 'audio/mp4'  : ''
+
+      const mr = preferredMime
+        ? new MediaRecorder(stream, { mimeType: preferredMime })
+        : new MediaRecorder(stream)
       mediaRecorderRef.current = mr
       audioChunksRef.current = []
 
@@ -241,7 +250,8 @@ export default function StoryScreen({
         if (e.data.size > 0) audioChunksRef.current.push(e.data)
       }
       mr.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        // mr.mimeType = 実際に録音されたフォーマット（iOS: mp4, Chrome: webm など）
+        const blob = new Blob(audioChunksRef.current, { type: mr.mimeType || 'audio/mp4' })
         const url  = URL.createObjectURL(blob)
         setAudioURL(prev => {
           if (prev) URL.revokeObjectURL(prev)
