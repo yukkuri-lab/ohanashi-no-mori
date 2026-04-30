@@ -10,25 +10,6 @@ interface Props {
   onSelect: (storyId: string) => void
 }
 
-// 3色ローテーション：あたたかいきいろ・やさしいみどり・やわらかいそら
-const PALETTE = [
-  {
-    bg:     'linear-gradient(135deg, #fffcf0 0%, #fef3cc 100%)',
-    border: '#e8cc70',
-    badge:  '#c49a20',
-  },
-  {
-    bg:     'linear-gradient(135deg, #f2faf4 0%, #d8edde 100%)',
-    border: '#7cc890',
-    badge:  '#3a9e5f',
-  },
-  {
-    bg:     'linear-gradient(135deg, #f0f7ff 0%, #d8ebf8 100%)',
-    border: '#7aaed8',
-    badge:  '#3a6ea8',
-  },
-]
-
 export default function StorySelectScreen({ stories, onSelect }: Props) {
   // マウント時に localStorage からデータ取得（SSR safe）
   const [{ completedStories, readCounts }] = useState(() => {
@@ -53,18 +34,17 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
       {/* ストーリーカード一覧 */}
       <div className="w-full flex flex-col gap-4 pb-8">
         {stories.map((story, i) => {
-          const theme     = PALETTE[i % PALETTE.length]
           const completed = completedStories.includes(story.id)
 
           return (
             <button
               key={story.id}
               onClick={() => { unlockAudio(); onSelect(story.id) }}
-              className="w-full block text-left rounded-3xl shadow-md animate-fadeInUp
+              className="w-full block text-left rounded-3xl shadow-sm animate-fadeInUp
                          active:scale-[0.97] transition-transform duration-150 overflow-hidden"
               style={{
-                background:        theme.bg,
-                border:            `2px solid ${theme.border}`,
+                background:        '#ffffff',
+                border:            '1.5px solid #D9D2C5',
                 animationDelay:    `${i * 100}ms`,
                 animationFillMode: 'both',
               }}
@@ -75,7 +55,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center
                                text-4xl shadow-sm border-2 border-white overflow-hidden"
-                    style={{ backgroundColor: '#f7f7f7' }}
+                    style={{ backgroundColor: '#F3EDE3' }}
                   >
                     {story.character.imageSrc ? (
                       <Image
@@ -134,7 +114,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center
                              text-white text-lg font-bold flex-shrink-0"
-                  style={{ backgroundColor: theme.badge }}
+                  style={{ backgroundColor: '#468541' }}
                 >
                   ▶
                 </div>
