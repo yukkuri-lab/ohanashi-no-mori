@@ -1,5 +1,20 @@
 /** @type {import('next').NextConfig} */
+
+// ビルド日時を NEXT_PUBLIC_BUILD_TIME として埋め込む（JST で表示）
+const buildTime = new Date().toLocaleString('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year:   '2-digit',
+  month:  '2-digit',
+  day:    '2-digit',
+  hour:   '2-digit',
+  minute: '2-digit',
+  hour12: false,
+})
+
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_BUILD_TIME: buildTime,
+  },
   // ② ビルド最適化
   compress: true,                        // gzip 圧縮を有効化
   productionBrowserSourceMaps: false,    // 本番でソースマップを出力しない（バンドル軽量化）
