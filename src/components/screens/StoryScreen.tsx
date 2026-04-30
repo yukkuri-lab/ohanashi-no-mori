@@ -51,33 +51,6 @@ function splitSentences(text: string): SentenceChunk[] {
   return chunks.length > 0 ? chunks : [{ prefix: '', text }]
 }
 
-function EarIcon({ size = 28, color = '#468541' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* 耳の外形 */}
-      <path
-        d="M32 5C40 5 46 12 46 21C46 30 41 37 35 41C31 44 28 43 26 40C24 37 24 33 26 30C28 27 31 29 31 33C31 37 28 40 26 40"
-        stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* 耳の内部（ヘリックス） */}
-      <path
-        d="M33 13C37 16 37 22 33 26"
-        stroke={color} strokeWidth="2.5" strokeLinecap="round"
-      />
-      {/* 音波（近） */}
-      <path
-        d="M13 19C15 22 15 26 13 29"
-        stroke={color} strokeWidth="2.5" strokeLinecap="round"
-      />
-      {/* 音波（遠） */}
-      <path
-        d="M8 15C11 19 11 29 8 33"
-        stroke={color} strokeWidth="2.5" strokeLinecap="round"
-      />
-    </svg>
-  )
-}
-
 function MicIcon({ size = 36 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
@@ -497,20 +470,19 @@ export default function StoryScreen({
               <button
                 onClick={handleSpeak}
                 className={`
-                  w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1
+                  w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-0.5
                   border-2 transition-all duration-200 active:scale-95 flex-shrink-0
                   ${isReading
-                    ? 'bg-forest-100 border-forest-400'
-                    : 'bg-forest-50 border-forest-300'
+                    ? 'bg-forest-100 border-forest-400 text-forest-700'
+                    : 'bg-forest-50 border-forest-300 text-forest-600'
                   }
                 `}
                 aria-label={isReading ? '読み上げをとめる' : 'お手本を聞く'}
               >
-                {isReading
-                  ? <span className="text-xl animate-bounce">⏸</span>
-                  : <EarIcon size={26} color="#468541" />
-                }
-                <span className="text-[9px] font-bold text-[#468541] leading-none">
+                <span className={`text-xl ${isReading ? 'animate-bounce' : ''}`}>
+                  {isReading ? '🔊' : '🔈'}
+                </span>
+                <span className="text-[9px] font-bold text-[#9a7030] leading-none">
                   {isReading ? 'とめる' : 'きく'}
                 </span>
               </button>
@@ -650,25 +622,22 @@ export default function StoryScreen({
               <span className="text-[10px] font-bold leading-none">もどる</span>
             </button>
 
-            {/* ⏸/耳 本読みを止める／よむ */}
+            {/* ⏸/▶ 本読みを止める／よむ */}
             <button
               onClick={handleSpeak}
               className={`
                 flex-1 py-3 rounded-2xl flex flex-col items-center justify-center gap-1
                 border-2 transition-all duration-200 active:scale-95
                 ${isReading
-                  ? 'bg-forest-100 border-forest-400'
-                  : 'bg-forest-50 border-forest-300'
+                  ? 'bg-forest-100 border-forest-400 text-forest-700'
+                  : 'bg-forest-50 border-forest-300 text-forest-600'
                 }
               `}
               aria-label={isReading ? '読み上げをとめる' : '読み上げをはじめる'}
             >
-              {isReading
-                ? <span className="text-xl">⏸</span>
-                : <EarIcon size={28} color="#468541" />
-              }
-              <span className="text-xs font-bold text-[#468541] leading-none">
-                {isReading ? 'とめる' : 'きく'}
+              <span className="text-xl">{isReading ? '⏸' : '▶'}</span>
+              <span className="text-xs font-bold leading-none">
+                {isReading ? 'とめる' : 'よむ'}
               </span>
             </button>
 
