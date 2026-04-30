@@ -47,21 +47,34 @@ export default function QuestionScreen({
 
     const nums = ['１', '２', '３', '４', '５']
     // ⑥ 選択肢を「。」で区切り → TTS が各選択肢の間に自然な間を入れる
+    // ・（中黒）は読み飛ばし・停止の原因になるため「と」に置換
     const choicesText = question.choices
-      .map((c, i) => `${nums[i]}、${c.text.replace(/\n/g, '')}`)
+      .map((c, i) => `${nums[i]}、${c.text.replace(/\n/g, '').replace(/・/g, 'と')}`)
       .join('。') + '。どれかな？'
+
+    // TTS失敗でもロック解除する（選択肢が永久にグレーにならないように）
+    const unlock = () => setChoicesLocked(false)
+
+    // フォールバック：最長でも15秒後には必ずロック解除
+    const safetyTimer = setTimeout(unlock, 15000)
 
     // アリさんが歩いてくる → 吹き出し → 質問を読む → 選択肢を読む → ロック解除
     t1.current = setTimeout(() => {
       setShowBubble(true)
-      speak(question.speech, () => {
-        // ⑤ この setTimeout も ref で追跡してアンマウント時に確実にキャンセル
-        t3.current = setTimeout(() => {
-          speak(choicesText, () => {
-            setChoicesLocked(false)
-          })
-        }, 400)
-      })
+      speak(
+        question.speech,
+        () => {
+          t3.current = setTimeout(() => {
+            speak(choicesText, unlock, unlock)   // 成功・失敗どちらでも unlock
+          }, 400)
+        },
+        () => {
+          // 質問読み上げ失敗時も選択肢を読もうとする
+          t3.current = setTimeout(() => {
+            speak(choicesText, unlock, unlock)
+          }, 400)
+        },
+      )
     }, 1900)
 
     // 選択肢を画面に表示（ロック状態で）
@@ -70,10 +83,11 @@ export default function QuestionScreen({
     }, 2800)
 
     return () => {
+      clearTimeout(safetyTimer)
       t1.current && clearTimeout(t1.current)
       t2.current && clearTimeout(t2.current)
       t3.current && clearTimeout(t3.current)
-      t4.current && clearTimeout(t4.current)  // ④ 正解後タイマーもキャンセル
+      t4.current && clearTimeout(t4.current)
       t5.current && clearTimeout(t5.current)
       stopSpeaking()
     }
@@ -107,12 +121,12 @@ export default function QuestionScreen({
     stopSpeaking()
     t4.current = setTimeout(() => {
       if (correct) {
-        // せいかい：フィードバックだけ読む（チャイム・チアなし）
-        speak(question.correctFeedback, () => {
-          t5.current = setTimeout(() => onNext(true), 500)
-        })
+        // せいかい：フィードバックだけ読む（TTS失敗でも次へ進む）
+        const goNext = () => { t5.current = setTimeout(() => onNext(true), 500) }
+        speak(question.correctFeedback, goNext, goNext)
       } else {
-        speak(incorrectFull)
+        // 不正解テキストの ・ を「と」に変換してから読む
+        speak(incorrectFull.replace(/・/g, 'と'))
       }
     }, 200)
   }
