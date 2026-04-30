@@ -1330,9 +1330,9 @@ export const stories: Story[] = [
         text: 'あめは だれと いっしょに うたいますか？',
         speech: 'あめは だれと いっしょに うたうか おぼえてる？',
         choices: [
-          { id: 'a', text: 'やね・土・川・花' },
-          { id: 'b', text: 'やね・土 だけ' },
-          { id: 'c', text: '川・花 だけ' },
+          { id: 'a', text: 'やね、土、川、花' },
+          { id: 'b', text: 'やねと土 だけ' },
+          { id: 'c', text: '川と花 だけ' },
         ],
         correctId: 'a',
         correctFeedback: 'せいかい！やね、土、川、花　みんなと いっしょに うたうんだね！',
