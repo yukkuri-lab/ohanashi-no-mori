@@ -83,31 +83,9 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
 
                 {/* テキスト */}
                 <div className="flex-1 min-w-0 overflow-hidden">
-                  <p className="text-xl font-bold text-[#1A1A1A] leading-snug mb-1 break-words">
+                  <p className="text-xl font-bold text-[#1A1A1A] leading-snug break-words">
                     {story.title}
                   </p>
-                  {completed ? (
-                    <p className="text-xs font-bold text-[#888888]">
-                      ⭐ よんだよ！　もういちど よむ？
-                    </p>
-                  ) : (
-                    <p className="text-sm text-[#888888] truncate">
-                      {story.character.name}と いっしょに よもう
-                    </p>
-                  )}
-                  {/* 読み返しカウント スタンプ */}
-                  {(readCounts[story.id] ?? 0) > 0 && (
-                    <div className="flex items-center gap-0.5 mt-1">
-                      {Array.from({ length: Math.min(readCounts[story.id], 5) }).map((_, k) => (
-                        <span key={k} className="text-sm leading-none">📖</span>
-                      ))}
-                      {readCounts[story.id] > 5 && (
-                        <span className="text-[10px] font-bold text-[#888888] ml-0.5">
-                          ×{readCounts[story.id]}
-                        </span>
-                      )}
-                    </div>
-                  )}
                 </div>
 
                 {/* 矢印 */}
