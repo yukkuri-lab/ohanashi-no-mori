@@ -15,6 +15,7 @@ interface Props {
   isLastPage: boolean
   mode?: 'listen' | 'record'
   onBonusStar?: () => void
+  onRecorded?: (blob: Blob) => void  // ページ録音完了時に呼ばれる
 }
 
 // 読み上げ完了後、ページめくり音が鳴り終わる頃にページが変わる
@@ -76,6 +77,7 @@ export default function StoryScreen({
   isLastPage,
   mode = 'listen',
   onBonusStar,
+  onRecorded,
 }: Props) {
   const isRecordMode = mode === 'record'
 
@@ -259,6 +261,7 @@ export default function StoryScreen({
         })
         setRecState('recorded')
         stream.getTracks().forEach(t => t.stop())
+        onRecorded?.(blob)  // ページ録音を親コンポーネントへ渡す
       }
 
       mr.start()

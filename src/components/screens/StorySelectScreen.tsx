@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Story } from '@/data/stories'
-import { getRecord } from '@/lib/storage'
 import { unlockAudio } from '@/lib/speech'
+import { getStoriesWithRecordings, loadAllPageRecordings } from '@/lib/recordings'
 
 interface Props {
   stories: Story[]
@@ -11,12 +11,43 @@ interface Props {
 }
 
 export default function StorySelectScreen({ stories, onSelect }: Props) {
-  // マウント時に localStorage からデータ取得（SSR safe）
-  const [{ completedStories, readCounts }] = useState(() => {
-    if (typeof window === 'undefined') return { completedStories: [] as string[], readCounts: {} as Record<string, number> }
-    const r = getRecord()
-    return { completedStories: r.completedStories, readCounts: r.readCounts }
-  })
+  const [recordedIds, setRecordedIds] = useState<Set<string>>(new Set())
+  const [playingId,   setPlayingId]   = useState<string | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  // IndexedDB から録音済みストーリー一覧を取得
+  useEffect(() => {
+    getStoriesWithRecordings().then(ids => setRecordedIds(ids))
+  }, [])
+
+  function stopPlayback() {
+    audioRef.current?.pause()
+    audioRef.current = null
+    setPlayingId(null)
+  }
+
+  async function togglePlayback(story: Story, e: React.MouseEvent) {
+    e.stopPropagation()
+    if (playingId === story.id) { stopPlayback(); return }
+    stopPlayback()
+
+    const blobs = await loadAllPageRecordings(story.id, story.pages.length)
+    const valid  = blobs.filter(Boolean) as Blob[]
+    if (valid.length === 0) return
+
+    setPlayingId(story.id)
+    let i = 0
+    const playNext = () => {
+      if (i >= valid.length) { setPlayingId(null); return }
+      const url   = URL.createObjectURL(valid[i++])
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.onended = () => { URL.revokeObjectURL(url); playNext() }
+      audio.onerror = () => { URL.revokeObjectURL(url); playNext() }
+      audio.play().catch(() => { URL.revokeObjectURL(url); setPlayingId(null) })
+    }
+    playNext()
+  }
 
   return (
     <div
@@ -34,8 +65,6 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
       {/* ストーリーカード一覧 */}
       <div className="w-full flex flex-col gap-4 pb-8">
         {stories.map((story, i) => {
-          const completed = completedStories.includes(story.id)
-
           return (
             <button
               key={story.id}
@@ -69,15 +98,20 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                       <span className="text-4xl">{story.character.emoji}</span>
                     )}
                   </div>
-                  {/* 完了スタンプ */}
-                  {completed && (
-                    <div
+                  {/* 録音済みバッジ（タップで再生） */}
+                  {recordedIds.has(story.id) && (
+                    <button
+                      onClick={(e) => togglePlayback(story, e)}
                       className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full
-                                 flex items-center justify-center text-xs
-                                 bg-amber-400 border-2 border-white shadow-sm"
+                                 flex items-center justify-center
+                                 bg-forest-500 border-2 border-white shadow-sm
+                                 active:scale-90 transition-transform"
+                      aria-label={playingId === story.id ? '再生をとめる' : 'じぶんのこえをきく'}
                     >
-                      ⭐
-                    </div>
+                      <span className="text-[10px] leading-none">
+                        {playingId === story.id ? '⏹' : '🎙'}
+                      </span>
+                    </button>
                   )}
                 </div>
 

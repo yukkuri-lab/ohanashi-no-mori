@@ -10,6 +10,7 @@ import QuestionScreen    from '@/components/screens/QuestionScreen'
 import EndingScreen      from '@/components/screens/EndingScreen'
 import { stopSpeaking } from '@/lib/speech'
 import { recordRead } from '@/lib/storage'
+import { savePageRecording } from '@/lib/recordings'
 
 // アプリ全体の画面状態
 type Screen = 'title' | 'select' | 'intro' | 'story' | 'question' | 'ending'
@@ -153,6 +154,7 @@ export default function App() {
           onPrev={storyPageIndex > 0 ? handleStoryPrev : undefined}
           onNext={handleStoryNext}
           onBonusStar={() => setBonusStars(b => b + 1)}
+          onRecorded={(blob) => savePageRecording(selectedStoryId, storyPageIndex, blob)}
         />
       )}
 
