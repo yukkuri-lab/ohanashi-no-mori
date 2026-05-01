@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Story } from '@/data/stories'
 import { unlockAudio } from '@/lib/speech'
+import { getRecord } from '@/lib/storage'
 import { getStoriesWithRecordings, loadAllPageRecordings } from '@/lib/recordings'
 
 interface Props {
@@ -11,11 +12,17 @@ interface Props {
 }
 
 export default function StorySelectScreen({ stories, onSelect }: Props) {
-  const [recordedIds, setRecordedIds] = useState<Set<string>>(new Set())
-  const [playingId,   setPlayingId]   = useState<string | null>(null)
+  const [readCounts,   setReadCounts]   = useState<Record<string, number>>({})
+  const [recordedIds,  setRecordedIds]  = useState<Set<string>>(new Set())
+  const [playingId,    setPlayingId]    = useState<string | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
+    // 読んだ回数（localStorage）
+    if (typeof window !== 'undefined') {
+      setReadCounts(getRecord().readCounts ?? {})
+    }
+    // 録音済み一覧（IndexedDB）
     getStoriesWithRecordings().then(ids => setRecordedIds(ids))
   }, [])
 
@@ -55,7 +62,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
   return (
     <div
       className="min-h-screen-safe flex flex-col pt-safe"
-      style={{ backgroundColor: '#eddfc8' }}  /* 本棚の背景：あたたかいベージュ */
+      style={{ backgroundColor: '#eddfc8' }}
     >
       {/* ヘッダー */}
       <div className="pt-6 pb-5 text-center animate-fadeInUp flex-shrink-0">
@@ -75,66 +82,97 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
           >
             {/* 本の行 */}
             <div className="flex gap-4 px-5 pt-5 pb-0 items-end">
-              {row.map((story, storyIdx) => {
+              {row.map((story) => {
                 const hasRecording = recordedIds.has(story.id)
-                const isPlaying   = playingId === story.id
+                const isPlaying    = playingId === story.id
+                const count        = readCounts[story.id] ?? 0
 
                 return (
-                  <div key={story.id} className="flex-1 relative">
+                  <div
+                    key={story.id}
+                    className="flex-1 flex flex-col rounded-t-xl overflow-hidden"
+                    style={{
+                      backgroundColor: '#ffffff',
+                      boxShadow: '2px 0 8px rgba(0,0,0,0.15), -1px 0 3px rgba(0,0,0,0.06)',
+                    }}
+                  >
+                    {/* ── 上部：絵（約35%） ── */}
                     <button
                       onClick={() => { unlockAudio(); onSelect(story.id) }}
-                      className="w-full relative rounded-t-xl overflow-hidden
-                                 active:scale-95 transition-transform duration-150 block"
-                      style={{
-                        backgroundColor: '#d4b896',
-                        boxShadow: '2px 0 6px rgba(0,0,0,0.18), -1px 0 3px rgba(0,0,0,0.08)',
-                      }}
+                      className="w-full relative flex-shrink-0 active:opacity-80 transition-opacity"
+                      style={{ height: '90px' }}
+                      aria-label={story.title}
                     >
-                      {/* 3:4 アスペクト比 */}
-                      <div style={{ paddingBottom: '133.33%' }} />
-
-                      {/* カバーコンテンツ：1ページ目の絵を表紙に */}
-                      <div className="absolute inset-0">
-                        {story.pages[0]?.imageSrc ? (
-                          <Image
-                            src={story.pages[0].imageSrc}
-                            alt={story.title}
-                            width={300}
-                            height={400}
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-5xl">{story.character.emoji}</span>
-                          </div>
-                        )}
-                        {/* 下部グラデーション＋タイトル */}
+                      {story.pages[0]?.imageSrc ? (
+                        <Image
+                          src={story.pages[0].imageSrc}
+                          alt={story.title}
+                          width={300}
+                          height={200}
+                          className="absolute inset-0 w-full h-full object-cover object-top"
+                        />
+                      ) : (
                         <div
-                          className="absolute bottom-0 left-0 right-0 px-2 pt-8 pb-2"
-                          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)' }}
+                          className="w-full h-full flex items-center justify-center"
+                          style={{ backgroundColor: '#F3EDE3' }}
                         >
-                          <p className="text-xs font-bold text-white leading-snug break-words text-center drop-shadow">
-                            {story.title}
-                          </p>
+                          <span className="text-4xl">{story.character.emoji}</span>
                         </div>
-                      </div>
+                      )}
                     </button>
 
-                    {/* 🎙 録音済みバッジ */}
-                    {hasRecording && (
-                      <button
-                        onClick={(e) => togglePlayback(story, e)}
-                        className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full
-                                   flex items-center justify-center
-                                   bg-forest-500 border-2 border-white shadow-md
-                                   active:scale-90 transition-transform"
-                        aria-label={isPlaying ? '再生をとめる' : 'じぶんのこえをきく'}
-                      >
-                        <span className="text-[10px] leading-none">
-                          {isPlaying ? '⏹' : '🎙'}
-                        </span>
-                      </button>
-                    )}
+                    {/* ── 中央：タイトル ── */}
+                    <button
+                      onClick={() => { unlockAudio(); onSelect(story.id) }}
+                      className="flex-1 flex items-center justify-center px-2 py-3
+                                 active:opacity-80 transition-opacity"
+                      style={{ backgroundColor: '#ffffff', minHeight: '60px' }}
+                    >
+                      <p className="text-sm font-bold text-[#1A1A1A] text-center leading-snug break-words">
+                        {story.title}
+                      </p>
+                    </button>
+
+                    {/* ── 下部：読んだ回数 ＋ 🎙ボタン ── */}
+                    <div
+                      className="flex items-center justify-between px-2 py-2 flex-shrink-0"
+                      style={{
+                        backgroundColor: '#faf6ea',
+                        borderTop: '1px solid #e8dcc8',
+                        minHeight: '36px',
+                      }}
+                    >
+                      {/* 読んだ回数 */}
+                      <span className="text-[10px] font-bold text-[#9a8070]">
+                        {count > 0 ? `📖 ${count}かい` : '　'}
+                      </span>
+
+                      {/* 🎙 じぶんのこえをきく */}
+                      {hasRecording ? (
+                        <button
+                          onClick={(e) => togglePlayback(story, e)}
+                          className="flex items-center gap-0.5 px-1.5 py-1 rounded-full
+                                     active:scale-90 transition-transform"
+                          style={{
+                            backgroundColor: isPlaying ? '#468541' : '#e8f5e9',
+                            border: '1px solid #468541',
+                          }}
+                          aria-label={isPlaying ? '再生をとめる' : 'じぶんのこえをきく'}
+                        >
+                          <span className="text-[10px] leading-none">
+                            {isPlaying ? '⏹' : '🎙'}
+                          </span>
+                          <span
+                            className="text-[9px] font-bold leading-none"
+                            style={{ color: isPlaying ? '#ffffff' : '#468541' }}
+                          >
+                            {isPlaying ? 'とめる' : 'きく'}
+                          </span>
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-[#d9d2c5]">🎙</span>
+                      )}
+                    </div>
                   </div>
                 )
               })}
