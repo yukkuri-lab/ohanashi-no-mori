@@ -5,17 +5,6 @@ import { Story } from '@/data/stories'
 import { unlockAudio } from '@/lib/speech'
 import { getStoriesWithRecordings, loadAllPageRecordings } from '@/lib/recordings'
 
-const COVER_COLORS = [
-  '#E8A87C',
-  '#7BBFB5',
-  '#B39DDB',
-  '#81C784',
-  '#F0B429',
-  '#64B5F6',
-  '#F06292',
-  '#A1887F',
-]
-
 interface Props {
   stories: Story[]
   onSelect: (storyId: string) => void
@@ -87,8 +76,6 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
             {/* 本の行 */}
             <div className="flex gap-4 px-5 pt-5 pb-0 items-end">
               {row.map((story, storyIdx) => {
-                const i           = rowIdx * 2 + storyIdx
-                const coverColor  = COVER_COLORS[i % COVER_COLORS.length]
                 const hasRecording = recordedIds.has(story.id)
                 const isPlaying   = playingId === story.id
 
@@ -99,36 +86,33 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                       className="w-full relative rounded-t-xl overflow-hidden
                                  active:scale-95 transition-transform duration-150 block"
                       style={{
-                        backgroundColor: coverColor,
+                        backgroundColor: '#d4b896',
                         boxShadow: '2px 0 6px rgba(0,0,0,0.18), -1px 0 3px rgba(0,0,0,0.08)',
                       }}
                     >
                       {/* 3:4 アスペクト比 */}
                       <div style={{ paddingBottom: '133.33%' }} />
 
-                      {/* カバーコンテンツ */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-3">
+                      {/* カバーコンテンツ：1ページ目の絵を表紙に */}
+                      <div className="absolute inset-0">
+                        {story.pages[0]?.imageSrc ? (
+                          <Image
+                            src={story.pages[0].imageSrc}
+                            alt={story.title}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-5xl">{story.character.emoji}</span>
+                          </div>
+                        )}
+                        {/* 下部グラデーション＋タイトル */}
                         <div
-                          className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden"
-                          style={{ backgroundColor: 'rgba(255,255,255,0.4)' }}
+                          className="absolute bottom-0 left-0 right-0 px-2 pt-8 pb-2"
+                          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)' }}
                         >
-                          {story.character.imageSrc ? (
-                            <Image
-                              src={story.character.imageSrc}
-                              alt={story.character.name}
-                              width={64}
-                              height={64}
-                              className="w-full h-full object-contain p-1"
-                            />
-                          ) : (
-                            <span className="text-3xl">{story.character.emoji}</span>
-                          )}
-                        </div>
-                        <div
-                          className="w-full rounded-lg px-1.5 py-1.5 text-center"
-                          style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
-                        >
-                          <p className="text-xs font-bold text-[#1A1A1A] leading-snug break-words">
+                          <p className="text-xs font-bold text-white leading-snug break-words text-center drop-shadow">
                             {story.title}
                           </p>
                         </div>
