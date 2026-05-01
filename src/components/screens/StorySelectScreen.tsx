@@ -6,17 +6,11 @@ import { unlockAudio } from '@/lib/speech'
 import { getRecord } from '@/lib/storage'
 import { getStoriesWithRecordings, loadAllPageRecordings } from '@/lib/recordings'
 
-// 背表紙（スパイン）の色：物語ごとに異なる
-const SPINE_COLORS = [
-  '#c0714a', // テラコッタ
-  '#4a8fa8', // スレートブルー
-  '#7a5fa8', // パープル
-  '#4a8f6a', // フォレストグリーン
-  '#a87a2a', // ゴールデンブラウン
-  '#4a6fa8', // ネイビー
-  '#a84a6a', // ローズ
-  '#5a7a4a', // オリーブグリーン
-]
+// 背表紙（スパイン）の色：学年ごと
+const GRADE_SPINE_COLOR: Record<1 | 2, string> = {
+  1: '#f0963a', // オレンジ（小1）
+  2: '#3a7ab8', // ブルー（小2）
+}
 
 interface Props {
   stories: Story[]
@@ -98,8 +92,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                 const hasRecording = recordedIds.has(story.id)
                 const isPlaying    = playingId === story.id
                 const count        = readCounts[story.id] ?? 0
-                const globalIdx    = rowIdx * 2 + storyIdx
-                const spineColor   = SPINE_COLORS[globalIdx % SPINE_COLORS.length]
+                const spineColor   = GRADE_SPINE_COLOR[story.grade]
 
                 return (
                   <div

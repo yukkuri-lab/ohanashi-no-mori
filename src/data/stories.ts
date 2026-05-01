@@ -45,6 +45,7 @@ export interface Character {
 export interface Story {
   id: string
   title: string
+  grade: 1 | 2          // 対象学年（小1・小2）
   character: Character
   pages: StoryPage[]
   questions: Question[]
@@ -55,6 +56,7 @@ export const stories: Story[] = [
   {
     id: 'omusubi-kororin',
     title: 'おむすびころりん',
+    grade: 1,
     character: {
       name: 'アリさん',
       emoji: '🐜',
@@ -171,6 +173,7 @@ export const stories: Story[] = [
   {
     id: 'fukinotou',
     title: 'ふきのとう',
+    grade: 2,
     character: {
       name: 'チョウさん',
       emoji: '🦋',
@@ -357,6 +360,7 @@ export const stories: Story[] = [
   {
     id: 'tanpopo-no-chie',
     title: 'たんぽぽのちえ',
+    grade: 2,
     character: {
       name: 'テントウさん',
       emoji: '🐞',
@@ -512,6 +516,7 @@ export const stories: Story[] = [
   {
     id: 'swimmy',
     title: 'スイミー',
+    grade: 2,
     character: {
       name: 'クラゲさん',
       emoji: '🪼',
@@ -722,6 +727,7 @@ export const stories: Story[] = [
   {
     id: 'millie',
     title: 'ミリーのすてきなぼうし',
+    grade: 2,
     character: {
       name: 'ことりさん',
       emoji: '🐦',
@@ -886,6 +892,7 @@ export const stories: Story[] = [
   {
     id: 'otegami',
     title: 'お手紙',
+    grade: 2,
     character: {
       name: 'かたつむりさん',
       emoji: '🐌',
@@ -1076,6 +1083,7 @@ export const stories: Story[] = [
   {
     id: 'doubutsuen-no-juui',
     title: 'どうぶつ園のじゅうい',
+    grade: 2,
     character: {
       name: 'くまさん',
       imageSrc: '/bear.jpeg',
@@ -1276,6 +1284,7 @@ export const stories: Story[] = [
   {
     id: 'ame-no-uta',
     title: 'あめのうた',
+    grade: 1,
     character: {
       name: 'かえるさん',
       imageSrc: '/frog.jpeg',
