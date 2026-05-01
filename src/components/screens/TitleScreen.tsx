@@ -56,7 +56,7 @@ export default function TitleScreen({ onStart }: Props) {
         className="absolute bottom-2 right-3 pointer-events-none select-none"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <span className="text-[9px] font-mono text-black/20 tracking-tight">
+        <span suppressHydrationWarning className="text-[9px] font-mono text-black/20 tracking-tight">
           {process.env.NEXT_PUBLIC_BUILD_TIME}
         </span>
       </div>
