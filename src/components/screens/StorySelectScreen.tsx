@@ -99,8 +99,9 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                           <Image
                             src={story.pages[0].imageSrc}
                             alt={story.title}
-                            fill
-                            className="object-cover"
+                            width={300}
+                            height={400}
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
