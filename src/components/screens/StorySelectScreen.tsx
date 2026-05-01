@@ -6,6 +6,18 @@ import { unlockAudio } from '@/lib/speech'
 import { getRecord } from '@/lib/storage'
 import { getStoriesWithRecordings, loadAllPageRecordings } from '@/lib/recordings'
 
+// 背表紙（スパイン）の色：物語ごとに異なる
+const SPINE_COLORS = [
+  '#c0714a', // テラコッタ
+  '#4a8fa8', // スレートブルー
+  '#7a5fa8', // パープル
+  '#4a8f6a', // フォレストグリーン
+  '#a87a2a', // ゴールデンブラウン
+  '#4a6fa8', // ネイビー
+  '#a84a6a', // ローズ
+  '#5a7a4a', // オリーブグリーン
+]
+
 interface Props {
   stories: Story[]
   onSelect: (storyId: string) => void
@@ -82,25 +94,32 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
           >
             {/* 本の行 */}
             <div className="flex gap-4 px-5 pt-5 pb-0 items-end">
-              {row.map((story) => {
+              {row.map((story, storyIdx) => {
                 const hasRecording = recordedIds.has(story.id)
                 const isPlaying    = playingId === story.id
                 const count        = readCounts[story.id] ?? 0
+                const globalIdx    = rowIdx * 2 + storyIdx
+                const spineColor   = SPINE_COLORS[globalIdx % SPINE_COLORS.length]
 
                 return (
                   <div
                     key={story.id}
-                    className="flex-1 flex flex-col rounded-t-xl overflow-hidden"
+                    className="flex-1 flex flex-col overflow-hidden"
                     style={{
                       backgroundColor: '#ffffff',
-                      boxShadow: '2px 0 8px rgba(0,0,0,0.15), -1px 0 3px rgba(0,0,0,0.06)',
+                      borderRadius: '0 6px 6px 0',       // 右側だけ角丸
+                      borderLeft: `10px solid ${spineColor}`,  // 背表紙
+                      boxShadow: [
+                        '4px 6px 12px rgba(0,0,0,0.28)',  // 接地シャドウ
+                        'inset -2px 0 4px rgba(0,0,0,0.06)', // 右端：ページ感
+                      ].join(', '),
                     }}
                   >
                     {/* ── 上部：絵（約35%） ── */}
                     <button
                       onClick={() => { unlockAudio(); onSelect(story.id) }}
-                      className="w-full relative flex-shrink-0 active:opacity-80 transition-opacity"
-                      style={{ height: '90px' }}
+                      className="w-full relative flex-shrink-0 active:opacity-80 transition-opacity overflow-hidden"
+                      style={{ height: '90px', borderRadius: '0 6px 0 0' }}
                       aria-label={story.title}
                     >
                       {story.pages[0]?.imageSrc ? (
