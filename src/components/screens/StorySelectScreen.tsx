@@ -5,16 +5,15 @@ import { Story } from '@/data/stories'
 import { unlockAudio } from '@/lib/speech'
 import { getStoriesWithRecordings, loadAllPageRecordings } from '@/lib/recordings'
 
-// 絵本カバーの色（物語ごとに異なる）
 const COVER_COLORS = [
-  '#E8A87C', // あたたかいオレンジ
-  '#7BBFB5', // やさしいターコイズ
-  '#B39DDB', // やわらかいむらさき
-  '#81C784', // みずみずしいみどり
-  '#F0B429', // あたたかいきいろ
-  '#64B5F6', // さわやかなそら
-  '#F06292', // やさしいピンク
-  '#A1887F', // あたたかいブラウン
+  '#E8A87C',
+  '#7BBFB5',
+  '#B39DDB',
+  '#81C784',
+  '#F0B429',
+  '#64B5F6',
+  '#F06292',
+  '#A1887F',
 ]
 
 interface Props {
@@ -58,105 +57,117 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
     playNext()
   }
 
+  // 2冊ずつ行に分ける
+  const rows: Story[][] = []
+  for (let i = 0; i < stories.length; i += 2) {
+    rows.push(stories.slice(i, i + 2))
+  }
+
   return (
     <div
       className="min-h-screen-safe flex flex-col pt-safe"
-      style={{ backgroundColor: '#faf6ea' }}
+      style={{ backgroundColor: '#eddfc8' }}  /* 本棚の背景：あたたかいベージュ */
     >
       {/* ヘッダー */}
       <div className="pt-6 pb-5 text-center animate-fadeInUp flex-shrink-0">
         <div className="text-4xl mb-1">📚</div>
-        <h2 className="text-2xl font-bold text-forest-600 tracking-wide">
+        <h2 className="text-2xl font-bold text-[#5a3e1b] tracking-wide">
           おはなしを えらんでね
         </h2>
       </div>
 
-      {/* 本棚 */}
-      <div className="flex-1 px-5 pb-10">
-        <div className="grid grid-cols-2 gap-x-5 gap-y-7">
-          {stories.map((story, i) => {
-            const coverColor  = COVER_COLORS[i % COVER_COLORS.length]
-            const hasRecording = recordedIds.has(story.id)
-            const isPlaying   = playingId === story.id
+      {/* 本棚：2冊×行 */}
+      <div className="flex-1 pb-10 flex flex-col gap-0">
+        {rows.map((row, rowIdx) => (
+          <div
+            key={rowIdx}
+            className="flex flex-col animate-fadeInUp"
+            style={{ animationDelay: `${rowIdx * 120}ms`, animationFillMode: 'both' }}
+          >
+            {/* 本の行 */}
+            <div className="flex gap-4 px-5 pt-5 pb-0 items-end">
+              {row.map((story, storyIdx) => {
+                const i           = rowIdx * 2 + storyIdx
+                const coverColor  = COVER_COLORS[i % COVER_COLORS.length]
+                const hasRecording = recordedIds.has(story.id)
+                const isPlaying   = playingId === story.id
 
-            return (
-              <div
-                key={story.id}
-                className="flex flex-col animate-fadeInUp"
-                style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
-              >
-                {/* 絵本カバー */}
-                <div className="relative">
-                  <button
-                    onClick={() => { unlockAudio(); onSelect(story.id) }}
-                    className="w-full relative rounded-t-2xl overflow-hidden shadow-md
-                               active:scale-95 transition-transform duration-150 block"
-                    style={{ backgroundColor: coverColor }}
-                  >
-                    {/* アスペクト比 3:4 の空間確保 */}
-                    <div style={{ paddingBottom: '133.33%' }} />
-
-                    {/* カバー内コンテンツ */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-3">
-                      {/* キャラクター */}
-                      <div
-                        className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.35)' }}
-                      >
-                        {story.character.imageSrc ? (
-                          <Image
-                            src={story.character.imageSrc}
-                            alt={story.character.name}
-                            width={80}
-                            height={80}
-                            className="w-full h-full object-contain p-1"
-                          />
-                        ) : (
-                          <span className="text-4xl">{story.character.emoji}</span>
-                        )}
-                      </div>
-
-                      {/* タイトル帯 */}
-                      <div
-                        className="w-full rounded-xl px-2 py-2 text-center"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.82)' }}
-                      >
-                        <p className="text-sm font-bold text-[#1A1A1A] leading-snug break-words">
-                          {story.title}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* 🎙 録音済みバッジ（右上） */}
-                  {hasRecording && (
+                return (
+                  <div key={story.id} className="flex-1 relative">
                     <button
-                      onClick={(e) => togglePlayback(story, e)}
-                      className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full
-                                 flex items-center justify-center
-                                 bg-forest-500 border-2 border-white shadow-md
-                                 active:scale-90 transition-transform"
-                      aria-label={isPlaying ? '再生をとめる' : 'じぶんのこえをきく'}
+                      onClick={() => { unlockAudio(); onSelect(story.id) }}
+                      className="w-full relative rounded-t-xl overflow-hidden
+                                 active:scale-95 transition-transform duration-150 block"
+                      style={{
+                        backgroundColor: coverColor,
+                        boxShadow: '2px 0 6px rgba(0,0,0,0.18), -1px 0 3px rgba(0,0,0,0.08)',
+                      }}
                     >
-                      <span className="text-[11px] leading-none">
-                        {isPlaying ? '⏹' : '🎙'}
-                      </span>
-                    </button>
-                  )}
-                </div>
+                      {/* 3:4 アスペクト比 */}
+                      <div style={{ paddingBottom: '133.33%' }} />
 
-                {/* 棚板 */}
-                <div
-                  className="h-3.5 rounded-b-md"
-                  style={{
-                    backgroundColor: '#b5854a',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.18)',
-                  }}
-                />
-              </div>
-            )
-          })}
-        </div>
+                      {/* カバーコンテンツ */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-3">
+                        <div
+                          className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden"
+                          style={{ backgroundColor: 'rgba(255,255,255,0.4)' }}
+                        >
+                          {story.character.imageSrc ? (
+                            <Image
+                              src={story.character.imageSrc}
+                              alt={story.character.name}
+                              width={64}
+                              height={64}
+                              className="w-full h-full object-contain p-1"
+                            />
+                          ) : (
+                            <span className="text-3xl">{story.character.emoji}</span>
+                          )}
+                        </div>
+                        <div
+                          className="w-full rounded-lg px-1.5 py-1.5 text-center"
+                          style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
+                        >
+                          <p className="text-xs font-bold text-[#1A1A1A] leading-snug break-words">
+                            {story.title}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* 🎙 録音済みバッジ */}
+                    {hasRecording && (
+                      <button
+                        onClick={(e) => togglePlayback(story, e)}
+                        className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full
+                                   flex items-center justify-center
+                                   bg-forest-500 border-2 border-white shadow-md
+                                   active:scale-90 transition-transform"
+                        aria-label={isPlaying ? '再生をとめる' : 'じぶんのこえをきく'}
+                      >
+                        <span className="text-[10px] leading-none">
+                          {isPlaying ? '⏹' : '🎙'}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+
+              {/* 奇数冊のとき空きスペース */}
+              {row.length < 2 && <div className="flex-1" />}
+            </div>
+
+            {/* 棚板：行全体に広がる */}
+            <div
+              style={{
+                height: '18px',
+                backgroundColor: '#9c6b30',
+                boxShadow: '0 6px 10px rgba(0,0,0,0.25)',
+              }}
+            />
+          </div>
+        ))}
       </div>
     </div>
   )
