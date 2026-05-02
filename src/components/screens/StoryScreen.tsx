@@ -52,22 +52,25 @@ function splitSentences(text: string): SentenceChunk[] {
 }
 
 function RetryIcon({ size = 40 }: { size?: number }) {
+  // 中心(24,24) 半径14 の円上の2点
+  // 上右(33,13) ≈ 40°、下左(19,37) ≈ 201°（時計回り・頂点から）
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {/* 上の半円弧 → 右向き矢印 */}
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+      {/* 上の弧：下左 → 上右（左・上を通る200°弧） */}
       <path
-        d="M12 4 C16.418 4 20 7.582 20 12"
-        stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" fill="none"
+        d="M 19 37 A 14 14 0 1 1 33 13"
+        stroke="#e05555" strokeWidth="4" strokeLinecap="round" fill="none"
       />
-      {/* 上矢印ヘッド */}
-      <polyline points="17,1.5 20,4.5 17,7.5" stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      {/* 下の半円弧 → 左向き矢印 */}
+      {/* 上右の矢印ヘッド（右下方向） */}
+      <polygon points="33,13 27,11 30,7" fill="#e05555"/>
+
+      {/* 下の弧：上右 → 下左（右・下を通る200°弧） */}
       <path
-        d="M12 20 C7.582 20 4 16.418 4 12"
-        stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" fill="none"
+        d="M 33 13 A 14 14 0 1 1 19 37"
+        stroke="#e05555" strokeWidth="4" strokeLinecap="round" fill="none"
       />
-      {/* 下矢印ヘッド */}
-      <polyline points="7,22.5 4,19.5 7,16.5" stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      {/* 下左の矢印ヘッド（左上方向） */}
+      <polygon points="19,37 26,36 24,42" fill="#e05555"/>
     </svg>
   )
 }
