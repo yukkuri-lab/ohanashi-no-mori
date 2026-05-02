@@ -307,7 +307,7 @@ export default function QuestionScreen({
                                bg-white border border-[#e8dcc8]
                                active:scale-95 transition-all duration-150"
                   >
-                    <span>🔈</span>
+                    <span>👂</span>
                     <span>もういちど きく</span>
                   </button>
                 </div>

@@ -146,7 +146,7 @@ export default function EndingScreen({
                      active:translate-y-1 active:shadow-[0_2px_0_#224f35]
                      transition-all duration-150 flex items-center justify-center gap-2"
         >
-          <span>📖</span>
+          <span>👂</span>
           <span>もう一度 きく</span>
         </button>
 
