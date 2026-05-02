@@ -42,7 +42,7 @@ export default function EndingScreen({
 
       {/* ── スクロールエリア ── */}
       <div className="flex-1 scroll-area">
-        <div className="max-w-lg mx-auto px-5 pt-8 pb-4 flex flex-col items-center gap-5 animate-fadeInUp">
+        <div className="max-w-lg mx-auto px-5 pt-4 pb-2 flex flex-col items-center gap-3 animate-fadeInUp">
 
           {/* キャラクター */}
           <div className="animate-popIn">
@@ -50,32 +50,32 @@ export default function EndingScreen({
               <Image
                 src={character.imageSrc}
                 alt={character.name}
-                width={112}
-                height={112}
-                className="w-28 h-28 object-contain mx-auto animate-floatY"
+                width={80}
+                height={80}
+                className="w-20 h-20 object-contain mx-auto animate-floatY"
                 style={{ mixBlendMode: 'multiply' }}
               />
             ) : (
-              <div className="text-7xl text-center animate-floatY">{character.emoji}</div>
+              <div className="text-5xl text-center animate-floatY">{character.emoji}</div>
             )}
           </div>
 
           {/* メッセージ */}
           <div className="text-center">
-            <p className="text-xl font-bold text-[#3d3028] leading-loose mb-1 whitespace-pre-wrap">
+            <p className="text-base font-bold text-[#3d3028] leading-relaxed mb-0.5 whitespace-pre-wrap">
               {character.endingMessage1}
             </p>
-            <p className="text-lg text-forest-600 font-bold">{character.endingMessage2}</p>
+            <p className="text-sm text-forest-600 font-bold">{character.endingMessage2}</p>
           </div>
 
           {/* ── スコアカード：もんだい ── */}
-          <div className="bg-white rounded-3xl px-8 py-6 shadow-md border-2 border-[#c8e6c9] text-center w-full">
-            <p className="text-xs font-bold text-[#7a6555] mb-2 tracking-widest">もんだい せいかい</p>
-            <p className="text-6xl font-black text-forest-600 leading-none">
+          <div className="bg-white rounded-2xl px-6 py-3 shadow-md border-2 border-[#c8e6c9] text-center w-full">
+            <p className="text-xs font-bold text-[#7a6555] mb-1 tracking-widest">もんだい せいかい</p>
+            <p className="text-4xl font-black text-forest-600 leading-none">
               {correctCount}
-              <span className="text-2xl font-bold text-[#afd4ba] ml-2">/ {totalQuestions}</span>
+              <span className="text-xl font-bold text-[#afd4ba] ml-2">/ {totalQuestions}</span>
             </p>
-            <div className="flex justify-center gap-3 mt-4 text-4xl">
+            <div className="flex justify-center gap-3 mt-2 text-3xl">
               {Array.from({ length: 3 }, (_, i) => (
                 <span
                   key={i}
@@ -90,14 +90,14 @@ export default function EndingScreen({
 
           {/* ── ボーナス⭐カード（読み上げ後に表示） ── */}
           {hasBonusStars ? (
-            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-3xl px-8 py-5
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl px-5 py-3
                             shadow-md border-2 border-amber-300 text-center w-full animate-popIn">
-              <p className="text-xs font-bold text-amber-700 mb-3 tracking-widest">よみあげ ボーナス ⭐</p>
-              <div className="flex justify-center gap-2 flex-wrap">
+              <p className="text-xs font-bold text-amber-700 mb-1.5 tracking-widest">よみあげ ボーナス ⭐</p>
+              <div className="flex justify-center gap-1.5 flex-wrap">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <span
                     key={i}
-                    className={`text-4xl transition-all duration-500 ${
+                    className={`text-2xl transition-all duration-500 ${
                       i < bonusStars ? 'opacity-100 scale-110' : 'opacity-20 grayscale'
                     }`}
                     style={{ transitionDelay: `${i * 120}ms` }}
@@ -106,7 +106,7 @@ export default function EndingScreen({
                   </span>
                 ))}
               </div>
-              <p className="text-sm font-bold text-amber-700 mt-3">
+              <p className="text-xs font-bold text-amber-700 mt-1.5">
                 {bonusStars === totalPages
                   ? '🎉 ぜんぶ じぶんで よめた！ すごい！！'
                   : `${bonusStars}ページ じょうずに よめたね！`}
@@ -119,8 +119,8 @@ export default function EndingScreen({
 
       {/* ── フッター：ボタン ── */}
       <div
-        className="flex-shrink-0 px-5 pt-3 bg-[#faf6ea] border-t border-[#ede5d5] flex flex-col gap-3"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}
+        className="flex-shrink-0 px-5 pt-2 bg-[#faf6ea] border-t border-[#ede5d5] flex flex-col gap-2"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
       >
         {/* 🎙️ じぶんのこえで よんでみよう（メインCTA） */}
         <button
@@ -133,7 +133,8 @@ export default function EndingScreen({
             alt="じぶんのこえでよんでみよう！"
             width={600}
             height={120}
-            className="w-full h-auto rounded-full"
+            className="w-full rounded-full"
+            style={{ height: '60px', objectFit: 'cover' }}
           />
         </button>
 
@@ -148,7 +149,8 @@ export default function EndingScreen({
             alt="もういちど きく"
             width={600}
             height={120}
-            className="w-full h-auto rounded-full"
+            className="w-full rounded-full"
+            style={{ height: '52px', objectFit: 'cover' }}
           />
         </button>
 
@@ -156,7 +158,7 @@ export default function EndingScreen({
         <div className="flex gap-2">
           <button
             onClick={() => { unlockAudio(); onRestart() }}
-            className="flex-1 py-3 rounded-full text-base font-bold
+            className="flex-1 py-2 rounded-full text-sm font-bold
                        text-[#3a8058] bg-white border-2 border-[#7db994]
                        active:bg-[#f0f7f2] active:scale-95
                        transition-all duration-150"
@@ -165,7 +167,7 @@ export default function EndingScreen({
           </button>
           <button
             onClick={onQuit}
-            className="flex-1 py-3 rounded-full text-base font-bold text-[#9a8070]
+            className="flex-1 py-2 rounded-full text-sm font-bold text-[#9a8070]
                        bg-white border-2 border-[#e8dcc8]
                        active:bg-gray-50 active:scale-95
                        transition-all duration-150"
