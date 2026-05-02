@@ -41,8 +41,8 @@ export default function EndingScreen({
     <div className="h-screen-safe flex flex-col" style={{ backgroundColor: '#faf6ea' }}>
 
       {/* ── スクロールエリア ── */}
-      <div className="flex-1 scroll-area flex items-center">
-        <div className="w-full max-w-lg mx-auto px-5 py-4 flex flex-col items-center gap-3 animate-fadeInUp">
+      <div className="flex-1 scroll-area">
+        <div className="min-h-full max-w-lg mx-auto px-5 py-4 flex flex-col items-center justify-center gap-3 animate-fadeInUp">
 
           {/* キャラクター */}
           <div className="animate-popIn">

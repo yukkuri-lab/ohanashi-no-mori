@@ -57,6 +57,7 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  height: 100%;
 }
 
 /* ─── お話テキスト ───────────────────────────── */
