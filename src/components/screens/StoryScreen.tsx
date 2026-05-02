@@ -51,6 +51,25 @@ function splitSentences(text: string): SentenceChunk[] {
   return chunks.length > 0 ? chunks : [{ prefix: '', text }]
 }
 
+function RetryIcon({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+      {/* 上の弧（右向き矢印） */}
+      <path
+        d="M34 10 A14 14 0 0 1 38 24"
+        stroke="#e05555" strokeWidth="5" strokeLinecap="round" fill="none"
+      />
+      <polygon points="34,5 40,13 27,12" fill="#e05555"/>
+      {/* 下の弧（左向き矢印） */}
+      <path
+        d="M14 38 A14 14 0 0 1 10 24"
+        stroke="#e05555" strokeWidth="5" strokeLinecap="round" fill="none"
+      />
+      <polygon points="14,43 8,35 21,36" fill="#e05555"/>
+    </svg>
+  )
+}
+
 function MicIcon({ size = 36 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
@@ -438,7 +457,7 @@ export default function StoryScreen({
                 {recState === 'recording' ? (
                   <span className="w-6 h-6 rounded-sm bg-red-500 block" />
                 ) : recState === 'recorded' ? (
-                  <span className="text-3xl">🔄</span>
+                  <RetryIcon size={44} />
                 ) : (
                   <MicIcon size={40} />
                 )}
