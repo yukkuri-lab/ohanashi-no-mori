@@ -297,7 +297,7 @@ export default function QuestionScreen({
               {/* アンロック時：えらんでみよう + もういちど きく */}
               {!choicesLocked && selectedId === null && (
                 <div className="flex items-center justify-between gap-3 animate-popIn">
-                  <p className="text-xs font-bold text-[#4d9e6e]">
+                  <p className="text-sm font-bold text-[#4d9e6e]">
                     👆 えらんでみよう！
                   </p>
                   <button
@@ -310,7 +310,7 @@ export default function QuestionScreen({
                       alt="もういちど きく"
                       width={240}
                       height={48}
-                      className="h-9 w-auto rounded-full"
+                      className="h-11 w-auto rounded-full"
                     />
                   </button>
                 </div>
