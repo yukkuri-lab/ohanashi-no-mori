@@ -54,14 +54,14 @@ function splitSentences(text: string): SentenceChunk[] {
 function MicIcon({ size = 36 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* マイク本体：やさしいみどり */}
-      <rect x="18" y="4" width="12" height="22" rx="6" fill="#7db994"/>
-      {/* アーチ：すこし濃いみどり */}
-      <path d="M10 24a14 14 0 0 0 28 0" stroke="#3a8058" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+      {/* マイク本体：あかい */}
+      <rect x="18" y="4" width="12" height="22" rx="6" fill="#e05555"/>
+      {/* アーチ：すこし濃いあか */}
+      <path d="M10 24a14 14 0 0 0 28 0" stroke="#b83232" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
       {/* スタンド縦線 */}
-      <line x1="24" y1="38" x2="24" y2="44" stroke="#3a8058" strokeWidth="3.5" strokeLinecap="round"/>
+      <line x1="24" y1="38" x2="24" y2="44" stroke="#b83232" strokeWidth="3.5" strokeLinecap="round"/>
       {/* スタンド横線 */}
-      <line x1="16" y1="44" x2="32" y2="44" stroke="#4d9e6e" strokeWidth="3.5" strokeLinecap="round"/>
+      <line x1="16" y1="44" x2="32" y2="44" stroke="#c94444" strokeWidth="3.5" strokeLinecap="round"/>
     </svg>
   )
 }
@@ -429,8 +429,8 @@ export default function StoryScreen({
                   ${recState === 'recording'
                     ? 'bg-red-100 border-red-400 animate-pulse border-4'
                     : recState === 'recorded'
-                    ? 'bg-forest-50 border-forest-400 border-4'
-                    : 'bg-white border-forest-400 border-4 active:bg-forest-50'
+                    ? 'bg-red-50 border-red-300 border-4'
+                    : 'bg-white border-red-400 border-4 active:bg-red-50'
                   }
                 `}
                 aria-label={recState === 'recording' ? '録音をやめる' : recState === 'recorded' ? 'もう一度録音' : '録音開始'}
