@@ -42,7 +42,7 @@ export default function EndingScreen({
 
       {/* ── スクロールエリア ── */}
       <div className="flex-1 scroll-area">
-        <div className="min-h-full max-w-lg mx-auto px-5 py-4 flex flex-col items-center justify-center gap-3 animate-fadeInUp">
+        <div className="max-w-lg mx-auto px-5 pt-5 pb-4 flex flex-col items-center gap-3 animate-fadeInUp">
 
           {/* キャラクター */}
           <div className="animate-popIn">
