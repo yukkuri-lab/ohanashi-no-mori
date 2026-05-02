@@ -133,8 +133,7 @@ export default function EndingScreen({
             alt="じぶんのこえでよんでみよう！"
             width={600}
             height={120}
-            className="w-full rounded-full"
-            style={{ height: '60px', objectFit: 'cover' }}
+            className="w-full h-auto rounded-full"
           />
         </button>
 
@@ -149,8 +148,7 @@ export default function EndingScreen({
             alt="もういちど きく"
             width={600}
             height={120}
-            className="w-full rounded-full"
-            style={{ height: '52px', objectFit: 'cover' }}
+            className="w-full h-auto rounded-full"
           />
         </button>
 
