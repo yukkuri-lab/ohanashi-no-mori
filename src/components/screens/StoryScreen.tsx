@@ -53,19 +53,21 @@ function splitSentences(text: string): SentenceChunk[] {
 
 function RetryIcon({ size = 40 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* 上の弧（右向き矢印） */}
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* 上の半円弧 → 右向き矢印 */}
       <path
-        d="M34 10 A14 14 0 0 1 38 24"
-        stroke="#e05555" strokeWidth="5" strokeLinecap="round" fill="none"
+        d="M12 4 C16.418 4 20 7.582 20 12"
+        stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" fill="none"
       />
-      <polygon points="34,5 40,13 27,12" fill="#e05555"/>
-      {/* 下の弧（左向き矢印） */}
+      {/* 上矢印ヘッド */}
+      <polyline points="17,1.5 20,4.5 17,7.5" stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      {/* 下の半円弧 → 左向き矢印 */}
       <path
-        d="M14 38 A14 14 0 0 1 10 24"
-        stroke="#e05555" strokeWidth="5" strokeLinecap="round" fill="none"
+        d="M12 20 C7.582 20 4 16.418 4 12"
+        stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" fill="none"
       />
-      <polygon points="14,43 8,35 21,36" fill="#e05555"/>
+      {/* 下矢印ヘッド */}
+      <polyline points="7,22.5 4,19.5 7,16.5" stroke="#e05555" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
     </svg>
   )
 }
