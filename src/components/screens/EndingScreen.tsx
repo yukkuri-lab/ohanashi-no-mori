@@ -139,15 +139,16 @@ export default function EndingScreen({
         {/* もう一度きく（サブボタン） */}
         <button
           onClick={() => { unlockAudio(); onReadAgain() }}
-          className="w-full py-4 rounded-full text-xl font-bold tracking-widest
-                     text-white
-                     bg-gradient-to-br from-forest-400 to-forest-600
-                     shadow-[0_4px_0_#224f35]
-                     active:translate-y-1 active:shadow-[0_2px_0_#224f35]
-                     transition-all duration-150 flex items-center justify-center gap-2"
+          className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
+          aria-label="もう一度きく"
         >
-          <span>👂</span>
-          <span>もう一度 きく</span>
+          <Image
+            src="/mouichido-kiku.jpeg"
+            alt="もういちど きく"
+            width={600}
+            height={120}
+            className="w-full h-auto rounded-full"
+          />
         </button>
 
         {/* 下段：ほかのおはなし ＋ おわる */}

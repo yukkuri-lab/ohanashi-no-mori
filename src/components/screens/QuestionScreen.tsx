@@ -302,13 +302,16 @@ export default function QuestionScreen({
                   </p>
                   <button
                     onClick={() => speak(question.speech)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full
-                               text-xs font-bold text-[#7a6555]
-                               bg-white border border-[#e8dcc8]
-                               active:scale-95 transition-all duration-150"
+                    className="active:scale-95 active:opacity-80 transition-all duration-150"
+                    aria-label="もういちど きく"
                   >
-                    <span>👂</span>
-                    <span>もういちど きく</span>
+                    <Image
+                      src="/mouichido-kiku.jpeg"
+                      alt="もういちど きく"
+                      width={240}
+                      height={48}
+                      className="h-9 w-auto rounded-full"
+                    />
                   </button>
                 </div>
               )}
