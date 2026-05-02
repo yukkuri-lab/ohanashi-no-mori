@@ -106,6 +106,17 @@ export default function QuestionScreen({
     return () => clearTimeout(id)
   }, [showChoices])
 
+  // ロック解除（もういちどきくボタンが出る）タイミングで一番下へスクロール
+  useEffect(() => {
+    if (choicesLocked) return
+    const container = scrollAreaRef.current
+    if (!container) return
+    const id = setTimeout(() => {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+    }, 150)
+    return () => clearTimeout(id)
+  }, [choicesLocked])
+
   function handleSelect(choiceId: string) {
     if (selectedId !== null || choicesLocked) return   // ロック中は無視
     const correct = choiceId === question.correctId
