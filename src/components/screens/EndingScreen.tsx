@@ -125,15 +125,16 @@ export default function EndingScreen({
         {/* 🎙️ じぶんのこえで よんでみよう（メインCTA） */}
         <button
           onClick={() => { unlockAudio(); onRecordMode() }}
-          className="w-full py-5 rounded-full text-xl font-bold text-white tracking-widest
-                     bg-gradient-to-br from-amber-400 to-amber-500
-                     shadow-[0_5px_0_#b45309]
-                     active:translate-y-1 active:shadow-[0_2px_0_#b45309]
-                     transition-all duration-150 flex items-center justify-center gap-2"
+          className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
+          aria-label="じぶんのこえでよんでみよう"
         >
-          <span className="text-2xl">🎙️</span>
-          <span>{hasBonusStars ? 'もういちど じぶんで よむ' : 'じぶんのこえで よんでみよう！'}</span>
-          {!hasBonusStars && <span className="text-2xl">⭐</span>}
+          <Image
+            src="/jibun-no-koe.jpeg"
+            alt="じぶんのこえでよんでみよう！"
+            width={600}
+            height={120}
+            className="w-full h-auto rounded-full"
+          />
         </button>
 
         {/* もう一度きく（サブボタン） */}
