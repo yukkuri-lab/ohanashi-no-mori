@@ -66,21 +66,21 @@ export default function QuestionScreen({
         () => {
           t3.current = setTimeout(() => {
             speak(choicesText, unlock, unlock)   // 成功・失敗どちらでも unlock
-          }, 400)
+          }, 200)
         },
         () => {
           // 質問読み上げ失敗時も選択肢を読もうとする
           t3.current = setTimeout(() => {
             speak(choicesText, unlock, unlock)
-          }, 400)
+          }, 200)
         },
       )
-    }, 1900)
+    }, 1000)
 
     // 選択肢を画面に表示（ロック状態で）
     t2.current = setTimeout(() => {
       setShowChoices(true)
-    }, 2800)
+    }, 1800)
 
     return () => {
       clearTimeout(safetyTimer)
