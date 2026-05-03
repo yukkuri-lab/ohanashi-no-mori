@@ -279,7 +279,27 @@ export default function EndingScreen({
                        active:bg-[#f0f7f2] active:scale-95
                        transition-all duration-150"
           >
-            ほかのおはなし 🌿
+            ほかのおはなし&nbsp;
+            <svg width="18" height="18" viewBox="0 0 100 100" fill="none" style={{display:'inline',verticalAlign:'middle'}}>
+              {/* 左手 */}
+              <path d="M18 72 Q10 68 10 58 L10 45 Q10 40 15 40 Q20 40 20 45 L20 55 Q28 50 36 50 L36 78 Q26 78 18 72Z" fill="#3a8058"/>
+              {/* 右手 */}
+              <path d="M82 72 Q90 68 90 58 L90 45 Q90 40 85 40 Q80 40 80 45 L80 55 Q72 50 64 50 L64 78 Q74 78 82 72Z" fill="#3a8058"/>
+              {/* 本（左ページ） */}
+              <path d="M36 22 L36 78 L50 74 L50 18 Z" fill="#3a8058"/>
+              {/* 本（右ページ） */}
+              <path d="M64 22 L64 78 L50 74 L50 18 Z" fill="#3a8058"/>
+              {/* 左ページの線 */}
+              <rect x="38" y="30" width="9" height="3" rx="1.5" fill="white"/>
+              <rect x="38" y="37" width="9" height="3" rx="1.5" fill="white"/>
+              <rect x="38" y="44" width="9" height="3" rx="1.5" fill="white"/>
+              <rect x="38" y="51" width="9" height="3" rx="1.5" fill="white"/>
+              {/* 右ページの線 */}
+              <rect x="53" y="30" width="9" height="3" rx="1.5" fill="white"/>
+              <rect x="53" y="37" width="9" height="3" rx="1.5" fill="white"/>
+              <rect x="53" y="44" width="9" height="3" rx="1.5" fill="white"/>
+              <rect x="53" y="51" width="9" height="3" rx="1.5" fill="white"/>
+            </svg>
           </button>
           <button
             onClick={onQuit}
