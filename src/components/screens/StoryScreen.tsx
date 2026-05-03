@@ -52,25 +52,27 @@ function splitSentences(text: string): SentenceChunk[] {
 }
 
 function RetryIcon({ size = 40 }: { size?: number }) {
-  // 中心(24,24) 半径14 の円上の2点
-  // 上右(33,13) ≈ 40°、下左(19,37) ≈ 201°（時計回り・頂点から）
+  // 中心(24,24) 半径15の円
+  // 弧1: (13,34)→(34,13) 時計回り（上を通る）約170°
+  // 弧2: (35,14)→(14,35) 時計回り（下を通る）約170°
+  // 矢印ヘッドは弧の進行方向に合わせた三角形
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* 上の弧：下左 → 上右（左・上を通る200°弧） */}
+      {/* 弧1: 左下→右上（時計回り・上を通る） */}
       <path
-        d="M 19 37 A 14 14 0 1 1 33 13"
-        stroke="#e05555" strokeWidth="4" strokeLinecap="round" fill="none"
+        d="M 13 34 A 15 15 0 0 1 34 13"
+        stroke="#e05555" strokeWidth="4.5" strokeLinecap="round" fill="none"
       />
-      {/* 上右の矢印ヘッド（右下方向） */}
-      <polygon points="33,13 27,11 30,7" fill="#e05555"/>
+      {/* 右上の矢印ヘッド（進行方向：右下向き） */}
+      <polygon points="34,13 27,12 32,6" fill="#e05555"/>
 
-      {/* 下の弧：上右 → 下左（右・下を通る200°弧） */}
+      {/* 弧2: 右上→左下（時計回り・下を通る） */}
       <path
-        d="M 33 13 A 14 14 0 1 1 19 37"
-        stroke="#e05555" strokeWidth="4" strokeLinecap="round" fill="none"
+        d="M 35 14 A 15 15 0 0 1 14 35"
+        stroke="#e05555" strokeWidth="4.5" strokeLinecap="round" fill="none"
       />
-      {/* 下左の矢印ヘッド（左上方向） */}
-      <polygon points="19,37 26,36 24,42" fill="#e05555"/>
+      {/* 左下の矢印ヘッド（進行方向：左上向き） */}
+      <polygon points="14,35 21,36 16,42" fill="#e05555"/>
     </svg>
   )
 }
@@ -484,7 +486,18 @@ export default function StoryScreen({
                 )}
                 {recState === 'recorded' && (
                   <div>
-                    <p className="text-base font-bold text-green-700">✅ よめたね！</p>
+                    <p className="text-base font-bold text-green-700 flex items-center gap-1.5">
+                      {/* チェックマーク + 影のSVGアイコン */}
+                      <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+                        {/* 影（右下にずらした枠） */}
+                        <rect x="18" y="18" width="70" height="70" rx="12" fill="none" stroke="#1e8a2e" strokeWidth="6"/>
+                        {/* メインの緑四角 */}
+                        <rect x="8" y="8" width="70" height="70" rx="12" fill="#1e8a2e"/>
+                        {/* 白チェック */}
+                        <polyline points="24,43 37,57 62,28" stroke="white" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                      </svg>
+                      よめたね！
+                    </p>
                     <p className="text-xs text-[#9a8070] mt-0.5">🔄 でやりなおし できるよ</p>
                   </div>
                 )}
@@ -503,10 +516,12 @@ export default function StoryScreen({
                 `}
                 aria-label={isReading ? '読み上げをとめる' : 'お手本を聞く'}
               >
-                <span className={`text-xl ${isReading ? 'animate-bounce' : ''}`}>
-                  {isReading ? '🔊' : '🔈'}
-                </span>
-                <span className="text-[9px] font-bold text-[#9a7030] leading-none">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={isReading ? '#2e7d32' : '#4a7a5a'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="none"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                </svg>
+                <span className="text-[10px] font-bold text-[#4a7a5a] leading-none mt-0.5">
                   {isReading ? 'とめる' : 'きく'}
                 </span>
               </button>
@@ -516,18 +531,26 @@ export default function StoryScreen({
             {recState === 'recorded' && audioURL && (
               <button
                 onClick={handlePlayback}
-                className={`
-                  w-full py-3 rounded-2xl text-base font-bold
-                  flex items-center justify-center gap-2
-                  border-2 transition-all duration-200 active:scale-95
-                  ${isPlaying
-                    ? 'bg-blue-100 border-blue-400 text-blue-700'
-                    : 'bg-[#e8f5e9] border-[#66bb6a] text-[#2e7d32]'
-                  }
-                `}
+                className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
+                aria-label={isPlaying ? 'とめる' : 'じぶんのこえをきいてみる'}
               >
-                <span className="text-xl">{isPlaying ? '⏹' : '▶️'}</span>
-                <span>{isPlaying ? 'とめる' : 'じぶんのこえを きいてみる 🎧'}</span>
+                {isPlaying ? (
+                  /* 再生中：とめるボタン */
+                  <div className="w-full py-4 rounded-full text-base font-bold
+                                  flex items-center justify-center gap-2 text-white
+                                  bg-[#4a90c4] shadow-[0_4px_0_#2c5f8a]">
+                    <span className="text-xl">⏹</span>
+                    <span>とめる</span>
+                  </div>
+                ) : (
+                  <Image
+                    src="/jibun-no-koe-kiku.jpeg"
+                    alt="じぶんのこえをきいてみる"
+                    width={600}
+                    height={120}
+                    className="w-full h-auto rounded-full"
+                  />
+                )}
               </button>
             )}
 
@@ -659,7 +682,23 @@ export default function StoryScreen({
               `}
               aria-label={isReading ? '読み上げをとめる' : '読み上げをはじめる'}
             >
-              <span className="text-xl">{isReading ? '⏸' : '▶'}</span>
+              {isReading ? (
+                /* ストップハンド（緑） */
+                <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+                  {/* 手のひら */}
+                  <rect x="10" y="20" width="28" height="20" rx="5" fill="#3a7a55"/>
+                  {/* 人差し指 */}
+                  <rect x="14" y="9" width="6" height="16" rx="3" fill="#3a7a55"/>
+                  {/* 中指 */}
+                  <rect x="21" y="7" width="6" height="17" rx="3" fill="#3a7a55"/>
+                  {/* 薬指 */}
+                  <rect x="28" y="9" width="6" height="15" rx="3" fill="#3a7a55"/>
+                  {/* 親指 */}
+                  <rect x="7" y="22" width="6" height="11" rx="3" fill="#3a7a55"/>
+                </svg>
+              ) : (
+                <span className="text-xl">▶</span>
+              )}
               <span className="text-xs font-bold leading-none">
                 {isReading ? 'とめる' : 'よむ'}
               </span>
