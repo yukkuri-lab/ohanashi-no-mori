@@ -1,9 +1,10 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Character } from '@/data/stories'
 import { recordCompletion } from '@/lib/storage'
 import { unlockAudio } from '@/lib/speech'
+import { loadAllPageRecordings } from '@/lib/recordings'
 
 interface Props {
   storyId: string
@@ -30,9 +31,51 @@ export default function EndingScreen({
   onRestart,
   onQuit,
 }: Props) {
+  const [hasRecordings, setHasRecordings] = useState(false)
+  const [isPlayingBack, setIsPlayingBack] = useState(false)
+  const playbackAudioRef = useRef<HTMLAudioElement | null>(null)
+
   useEffect(() => {
     recordCompletion(storyId)
-  }, [storyId])
+    // 録音データがあればボタンを表示
+    loadAllPageRecordings(storyId, totalPages).then(blobs => {
+      setHasRecordings(blobs.some(b => b !== null))
+    })
+  }, [storyId, totalPages])
+
+  async function handlePlayRecording() {
+    if (isPlayingBack) {
+      // 再生中なら止める
+      playbackAudioRef.current?.pause()
+      if (playbackAudioRef.current) playbackAudioRef.current.src = ''
+      setIsPlayingBack(false)
+      return
+    }
+    const blobs = await loadAllPageRecordings(storyId, totalPages)
+    const pages = blobs.filter((b): b is Blob => b !== null)
+    if (pages.length === 0) return
+
+    setIsPlayingBack(true)
+    const audio = new Audio()
+    audio.setAttribute('playsinline', '')
+    playbackAudioRef.current = audio
+
+    for (const blob of pages) {
+      if (!isPlayingRef.current) break
+      const url = URL.createObjectURL(blob)
+      audio.src = url
+      await new Promise<void>(resolve => {
+        audio.onended = () => { URL.revokeObjectURL(url); resolve() }
+        audio.onerror = () => { URL.revokeObjectURL(url); resolve() }
+        audio.play().catch(() => resolve())
+      })
+    }
+    setIsPlayingBack(false)
+  }
+
+  // isPlayingBack の最新値を async ループ内で参照するための ref
+  const isPlayingRef = useRef(false)
+  useEffect(() => { isPlayingRef.current = isPlayingBack }, [isPlayingBack])
 
   const stars = Math.round((correctCount / totalQuestions) * 3)
   const hasBonusStars = bonusStars > 0
@@ -136,6 +179,38 @@ export default function EndingScreen({
             className="w-full h-auto rounded-full"
           />
         </button>
+
+        {/* 👂 じぶんのこえをきいてみる（録音がある場合のみ） */}
+        {hasRecordings && (
+          <button
+            onClick={() => { unlockAudio(); handlePlayRecording() }}
+            className={`
+              w-full py-4 rounded-full text-xl font-bold text-white tracking-wide
+              flex items-center justify-center gap-2
+              transition-all duration-150 active:scale-95
+              ${isPlayingBack
+                ? 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-[0_4px_0_#b45309]'
+                : 'bg-gradient-to-br from-forest-400 to-forest-600 shadow-[0_4px_0_#224f35]'
+              }
+            `}
+            aria-label="じぶんのこえをきいてみる"
+          >
+            {isPlayingBack ? (
+              <>
+                <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+                  <rect x="10" y="10" width="10" height="28" rx="3" fill="white"/>
+                  <rect x="28" y="10" width="10" height="28" rx="3" fill="white"/>
+                </svg>
+                とめる
+              </>
+            ) : (
+              <>
+                じぶんのこえをきいてみる
+                <span className="text-2xl leading-none">👂</span>
+              </>
+            )}
+          </button>
+        )}
 
         {/* もう一度きく（サブボタン） */}
         <button

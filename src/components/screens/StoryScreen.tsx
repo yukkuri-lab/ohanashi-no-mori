@@ -446,10 +446,27 @@ export default function StoryScreen({
           <div className="flex items-center gap-3 flex-shrink-0 py-1">
             {/* 🔴 録音中インジケーター */}
             <div className="flex-1 flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-300'}`} />
-              <span className={`text-sm font-bold ${isRecording ? 'text-red-600' : 'text-[#9a8070]'}`}>
-                {isRecording ? 'ろくおんちゅう…' : 'マイクがつかえません'}
-              </span>
+              {/* マイクアイコン */}
+              <svg width="36" height="36" viewBox="0 0 100 100" fill="none">
+                {/* マイク本体（カプセル） */}
+                <rect x="35" y="5" width="30" height="50" rx="15" fill="#1a1a1a"/>
+                {/* アーチ */}
+                <path d="M20 48 a30 30 0 0 0 60 0" stroke="#1a1a1a" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                {/* スタンド縦線 */}
+                <line x1="50" y1="78" x2="50" y2="90" stroke="#1a1a1a" strokeWidth="7" strokeLinecap="round"/>
+                {/* スタンド台（三角） */}
+                <polygon points="28,95 50,78 72,95" fill="#1a1a1a"/>
+              </svg>
+              {/* 赤いドット＋テキスト */}
+              <div className="flex items-center gap-1.5">
+                <div className="relative flex-shrink-0">
+                  {isRecording && <div className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-75" />}
+                  <div className={`w-3.5 h-3.5 rounded-full ${isRecording ? 'bg-red-500' : 'bg-gray-300'}`} />
+                </div>
+                <span className={`text-sm font-bold ${isRecording ? 'text-red-600' : 'text-[#9a8070]'}`}>
+                  {isRecording ? 'ろくおんちゅう' : 'マイクがつかえません'}
+                </span>
+              </div>
             </div>
             {/* きく（お手本）ボタン */}
             <button
