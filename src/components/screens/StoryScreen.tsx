@@ -479,16 +479,7 @@ export default function StoryScreen({
                            active:scale-95 active:bg-forest-100 transition-all duration-200 flex-shrink-0"
                 aria-label="録音をとめる"
               >
-                {/* 八角形＋手 */}
-                <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
-                  <polygon points="15,6 33,6 42,15 42,33 33,42 15,42 6,33 6,15"
-                    stroke="#3a7a55" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
-                  <path d="M20 30 L20 20 Q20 18 22 18 Q24 18 24 20 L24 24
-                           Q24 22 26 22 Q28 22 28 24 L28 26
-                           Q28 24 30 24 Q32 24 32 26 L32 30
-                           Q32 34 28 34 L22 34 Q20 34 20 30Z"
-                    stroke="#3a7a55" strokeWidth="1.8" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
-                </svg>
+                <Image src="/record-stop.jpeg" alt="とめる" width={44} height={44} className="w-10 h-10 object-contain" />
                 <span className="text-[10px] font-bold text-forest-600 leading-none">とめる</span>
               </button>
             )}
