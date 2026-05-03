@@ -479,7 +479,7 @@ export default function StoryScreen({
                            active:scale-95 active:bg-forest-100 transition-all duration-200 flex-shrink-0"
                 aria-label="録音をとめる"
               >
-                <Image src="/record-stop.jpeg" alt="とめる" width={44} height={44} className="w-10 h-10 object-contain" />
+                <Image src="/Rokuonstop.jpeg" alt="とめる" width={44} height={44} className="w-10 h-10 object-contain" />
                 <span className="text-[10px] font-bold text-forest-600 leading-none">とめる</span>
               </button>
             )}
