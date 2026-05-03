@@ -578,21 +578,17 @@ export default function StoryScreen({
               aria-label={isReading ? '読み上げをとめる' : '読み上げをはじめる'}
             >
               {isReading ? (
-                /* ストップハンド（緑） */
-                <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
-                  {/* 手のひら */}
-                  <rect x="10" y="20" width="28" height="20" rx="5" fill="#3a7a55"/>
-                  {/* 人差し指 */}
-                  <rect x="14" y="9" width="6" height="16" rx="3" fill="#3a7a55"/>
-                  {/* 中指 */}
-                  <rect x="21" y="7" width="6" height="17" rx="3" fill="#3a7a55"/>
-                  {/* 薬指 */}
-                  <rect x="28" y="9" width="6" height="15" rx="3" fill="#3a7a55"/>
-                  {/* 親指 */}
-                  <rect x="7" y="22" width="6" height="11" rx="3" fill="#3a7a55"/>
+                /* とめる：緑円＋白横線 */
+                <svg width="30" height="30" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="22" fill="#4a9068"/>
+                  <rect x="13" y="21" width="22" height="6" rx="3" fill="white"/>
                 </svg>
               ) : (
-                <span className="text-xl">▶</span>
+                /* よむ：緑円＋白三角 */
+                <svg width="30" height="30" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="22" fill="#4a9068"/>
+                  <polygon points="19,14 37,24 19,34" fill="white"/>
+                </svg>
               )}
               <span className="text-xs font-bold leading-none">
                 {isReading ? 'とめる' : 'よむ'}
