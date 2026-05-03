@@ -14,6 +14,7 @@ interface Props {
   totalQuestions: number
   bonusStars: number
   totalPages: number
+  fromRecordMode: boolean   // 今のセッションがrecordモード完走かどうか
   onReadAgain: () => void
   onRecordMode: () => void
   onRestart: () => void
@@ -28,12 +29,12 @@ export default function EndingScreen({
   totalQuestions,
   bonusStars,
   totalPages,
+  fromRecordMode,
   onReadAgain,
   onRecordMode,
   onRestart,
   onQuit,
 }: Props) {
-  const [hasRecordings, setHasRecordings] = useState(false)
   const [isPlayingBack, setIsPlayingBack] = useState(false)
   const playbackAudioRef = useRef<HTMLAudioElement | null>(null)
   const isPlayingRef = useRef(false)
@@ -41,8 +42,6 @@ export default function EndingScreen({
 
   useEffect(() => {
     recordCompletion(storyId)
-    // index 0 = 全ページ通し録音（page.tsx が保存）
-    loadPageRecording(storyId, 0).then(blob => setHasRecordings(blob !== null))
   }, [storyId])
 
   async function handlePlayRecording() {
@@ -179,7 +178,7 @@ export default function EndingScreen({
         className="flex-shrink-0 px-5 pt-2 bg-[#faf6ea] border-t border-[#ede5d5] flex flex-col gap-2"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
       >
-        {hasRecordings ? (
+        {fromRecordMode ? (
           <>
             {/* 録音あり：① きいてみる（アンバー・トップ） */}
             <button

@@ -225,6 +225,7 @@ export default function App() {
         <EndingScreen
           storyId={story.id}
           storyTitle={story.title}
+          fromRecordMode={storyMode === 'record'}
           character={story.character}
           correctCount={correctCount}
           totalQuestions={story.questions.length}
