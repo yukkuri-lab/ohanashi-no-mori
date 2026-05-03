@@ -184,7 +184,7 @@ export default function EndingScreen({
             <button
               onClick={() => { unlockAudio(); handlePlayRecording() }}
               className={`
-                w-full py-4 rounded-full text-xl font-bold text-white tracking-wide
+                w-full py-3 rounded-full text-lg font-bold text-white tracking-wide
                 flex items-center justify-center gap-2
                 transition-all duration-150 active:scale-95
                 ${isPlayingBack
@@ -213,7 +213,7 @@ export default function EndingScreen({
             {/* 録音あり：② おくる（シェア） */}
             <button
               onClick={() => { unlockAudio(); handleShare() }}
-              className="w-full py-4 rounded-full text-xl font-bold text-white tracking-wide
+              className="w-full py-3 rounded-full text-lg font-bold text-white tracking-wide
                          flex items-center justify-center gap-2
                          bg-gradient-to-br from-forest-400 to-forest-600 shadow-[0_4px_0_#224f35]
                          transition-all duration-150 active:scale-95"
@@ -221,6 +221,26 @@ export default function EndingScreen({
             >
               じょうずによめた！📤 おくる
             </button>
+
+            {/* 録音あり：③ ほかのおはなし ＋ おわる */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => { unlockAudio(); onRestart() }}
+                className="flex-1 py-2 rounded-full text-sm font-bold
+                           text-[#3a8058] bg-white border-2 border-[#7db994]
+                           active:bg-[#f0f7f2] active:scale-95 transition-all duration-150"
+              >
+                ほかのおはなし 🌿
+              </button>
+              <button
+                onClick={onQuit}
+                className="flex-1 py-2 rounded-full text-sm font-bold text-[#9a8070]
+                           bg-white border-2 border-[#e8dcc8]
+                           active:bg-gray-50 active:scale-95 transition-all duration-150"
+              >
+                おわる
+              </button>
+            </div>
           </>
         ) : (
           /* 録音なし：じぶんのこえでよんでみよう（トップ・赤） */
