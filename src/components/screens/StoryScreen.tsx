@@ -14,8 +14,9 @@ interface Props {
   onNext: () => void
   isLastPage: boolean
   mode?: 'listen' | 'record'
+  isRecording?: boolean              // 全ページ通し録音中フラグ（page.tsx が管理）
   onBonusStar?: () => void
-  onRecorded?: (blob: Blob) => void  // ページ録音完了時に呼ばれる
+  onRecorded?: (blob: Blob) => void
 }
 
 // 読み上げ完了後、ページめくり音が鳴り終わる頃にページが変わる
@@ -102,6 +103,7 @@ export default function StoryScreen({
   onNext,
   isLastPage,
   mode = 'listen',
+  isRecording = false,
   onBonusStar,
   onRecorded,
 }: Props) {
@@ -439,157 +441,50 @@ export default function StoryScreen({
           </div>
         )}
 
-        {/* ── ボタン行 ── */}
-        {isRecordMode ? (
-          /* ── record モード：マイク大きく表示 ── */
-          <div className="flex flex-col gap-2 flex-shrink-0">
-
-            {/* 録音ボタン（大きく中央） */}
-            <div className="flex items-center gap-3">
-              {/* マイクボタン */}
-              <button
-                onClick={handleMic}
-                className={`
-                  w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0
-                  shadow-lg border-3 transition-all duration-200 active:scale-95
-                  ${recState === 'recording'
-                    ? 'bg-red-100 border-red-400 animate-pulse border-4'
-                    : recState === 'recorded'
-                    ? 'bg-red-50 border-red-300 border-4'
-                    : 'bg-white border-red-400 border-4 active:bg-red-50'
-                  }
-                `}
-                aria-label={recState === 'recording' ? '録音をやめる' : recState === 'recorded' ? 'もう一度録音' : '録音開始'}
-              >
-                {recState === 'recording' ? (
-                  <span className="w-6 h-6 rounded-sm bg-red-500 block" />
-                ) : recState === 'recorded' ? (
-                  <RetryIcon size={44} />
-                ) : (
-                  <MicIcon size={40} />
-                )}
-              </button>
-
-              {/* 状態メッセージ */}
-              <div className="flex-1">
-                {recState === 'idle' && (
-                  <div>
-                    <p className="text-base font-bold text-[#3d3028]">よんでみよう！</p>
-                    <p className="text-xs text-[#9a8070] mt-0.5">マイクを おして　こえで よもう</p>
-                  </div>
-                )}
-                {recState === 'recording' && (
-                  <div>
-                    <p className="text-base font-bold text-red-600 animate-pulse">🔴 ろくおんちゅう…</p>
-                    <p className="text-xs text-[#9a8070] mt-0.5">よみおわったら　ボタンを おして</p>
-                  </div>
-                )}
-                {recState === 'recorded' && (
-                  <div>
-                    <p className="text-base font-bold text-green-700 flex items-center gap-1.5">
-                      {/* チェックマーク + 影のSVGアイコン */}
-                      <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
-                        {/* 影（右下にずらした枠） */}
-                        <rect x="18" y="18" width="70" height="70" rx="12" fill="none" stroke="#1e8a2e" strokeWidth="6"/>
-                        {/* メインの緑四角 */}
-                        <rect x="8" y="8" width="70" height="70" rx="12" fill="#1e8a2e"/>
-                        {/* 白チェック */}
-                        <polyline points="24,43 37,57 62,28" stroke="white" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                      </svg>
-                      よめたね！
-                    </p>
-                    <p className="text-xs text-[#9a8070] mt-0.5">🔄 でやりなおし できるよ</p>
-                  </div>
-                )}
-              </div>
-
-              {/* ヒント（よみあげ）ボタン */}
-              <button
-                onClick={handleSpeak}
-                className={`
-                  w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-0.5
-                  border-2 transition-all duration-200 active:scale-95 flex-shrink-0
-                  ${isReading
-                    ? 'bg-forest-100 border-forest-400 text-forest-700'
-                    : 'bg-forest-50 border-forest-300 text-forest-600'
-                  }
-                `}
-                aria-label={isReading ? '読み上げをとめる' : 'お手本を聞く'}
-              >
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={isReading ? '#2e7d32' : '#4a7a5a'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        {/* ── recordモード：録音インジケーター ── */}
+        {isRecordMode && (
+          <div className="flex items-center gap-3 flex-shrink-0 py-1">
+            {/* 🔴 録音中インジケーター */}
+            <div className="flex-1 flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-300'}`} />
+              <span className={`text-sm font-bold ${isRecording ? 'text-red-600' : 'text-[#9a8070]'}`}>
+                {isRecording ? 'ろくおんちゅう…' : 'マイクがつかえません'}
+              </span>
+            </div>
+            {/* きく（お手本）ボタン */}
+            <button
+              onClick={handleSpeak}
+              className={`
+                w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-0.5
+                border-2 transition-all duration-200 active:scale-95 flex-shrink-0
+                ${isReading
+                  ? 'bg-forest-100 border-forest-400'
+                  : 'bg-forest-50 border-forest-300'
+                }
+              `}
+              aria-label={isReading ? '読み上げをとめる' : 'お手本を聞く'}
+            >
+              {isReading ? (
+                <svg width="26" height="26" viewBox="0 0 48 48" fill="none">
+                  <rect x="10" y="20" width="28" height="20" rx="5" fill="#3a7a55"/>
+                  <rect x="14" y="9" width="6" height="16" rx="3" fill="#3a7a55"/>
+                  <rect x="21" y="7" width="6" height="17" rx="3" fill="#3a7a55"/>
+                  <rect x="28" y="9" width="6" height="15" rx="3" fill="#3a7a55"/>
+                  <rect x="7" y="22" width="6" height="11" rx="3" fill="#3a7a55"/>
+                </svg>
+              ) : (
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4a7a5a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="none"/>
                   <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
                   <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
                 </svg>
-                <span className="text-[10px] font-bold text-[#4a7a5a] leading-none mt-0.5">
-                  {isReading ? 'とめる' : 'きく'}
-                </span>
-              </button>
-            </div>
-
-            {/* 録音を聴くボタン */}
-            {recState === 'recorded' && audioURL && (
-              <button
-                onClick={handlePlayback}
-                className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
-                aria-label={isPlaying ? 'とめる' : 'じぶんのこえをきいてみる'}
-              >
-                {isPlaying ? (
-                  /* 再生中：とめるボタン */
-                  <div className="w-full py-4 rounded-full text-base font-bold
-                                  flex items-center justify-center gap-2 text-white
-                                  bg-[#4a90c4] shadow-[0_4px_0_#2c5f8a]">
-                    <span className="text-xl">⏹</span>
-                    <span>とめる</span>
-                  </div>
-                ) : (
-                  <Image
-                    src="/jibun-no-koe-kiku.jpeg"
-                    alt="じぶんのこえをきいてみる"
-                    width={600}
-                    height={120}
-                    className="w-full h-auto rounded-full"
-                  />
-                )}
-              </button>
-            )}
-
-            {/* ⭐ ボーナスボタン */}
-            {recState === 'recorded' && (
-              <button
-                onClick={() => {
-                  if (bonusClaimed) return
-                  setBonusClaimed(true)
-                  onBonusStar?.()
-                }}
-                disabled={bonusClaimed}
-                className={`
-                  w-full py-4 rounded-2xl text-lg font-bold
-                  flex items-center justify-center gap-2
-                  border-2 transition-all duration-300 animate-fadeInUp
-                  ${bonusClaimed
-                    ? 'bg-amber-50 border-amber-300 text-amber-600 cursor-default'
-                    : 'bg-gradient-to-r from-amber-100 to-yellow-100 border-amber-400 text-amber-700 active:scale-95'
-                  }
-                `}
-              >
-                {bonusClaimed ? (
-                  <>
-                    <span className="text-2xl">⭐</span>
-                    <span>ボーナス⭐ ゲット！ やったね！</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-2xl">⭐</span>
-                    <span>じょうずによめた！ ⭐ もらう</span>
-                  </>
-                )}
-              </button>
-            )}
-
+              )}
+              <span className="text-[10px] font-bold text-[#4a7a5a] leading-none mt-0.5">
+                {isReading ? 'とめる' : 'きく'}
+              </span>
+            </button>
           </div>
-        ) : null /* listen モードのボタンはフッターの3ボタンに統合 */
-        }
+        )}
 
       </div>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useRef } from 'react'
 import { stories } from '@/data/stories'
 import TitleScreen       from '@/components/screens/TitleScreen'
 import StorySelectScreen from '@/components/screens/StorySelectScreen'
@@ -26,6 +26,44 @@ export default function App() {
   const [correctCount,    setCorrectCount]    = useState(0)
   const [storyMode,       setStoryMode]       = useState<StoryMode>('listen')
   const [bonusStars,      setBonusStars]      = useState(0)
+  const [isGlobalRecording, setIsGlobalRecording] = useState(false)
+
+  // ── 全ページ通し録音（record モード用）──────────────
+  const globalRecorderRef    = useRef<MediaRecorder | null>(null)
+  const globalAudioChunksRef = useRef<Blob[]>([])
+
+  async function startGlobalRecording(storyId: string) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const preferredMime =
+        MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
+        MediaRecorder.isTypeSupported('audio/mp4')  ? 'audio/mp4'  : ''
+      const mr = preferredMime
+        ? new MediaRecorder(stream, { mimeType: preferredMime })
+        : new MediaRecorder(stream)
+      globalAudioChunksRef.current = []
+      mr.ondataavailable = (e) => { if (e.data.size > 0) globalAudioChunksRef.current.push(e.data) }
+      mr.onstop = () => {
+        stream.getTracks().forEach(t => t.stop())
+        const blob = new Blob(globalAudioChunksRef.current, { type: mr.mimeType || 'audio/mp4' })
+        savePageRecording(storyId, 0, blob)  // 全体録音をpage 0として保存
+      }
+      mr.start()
+      globalRecorderRef.current = mr
+      setIsGlobalRecording(true)
+    } catch (e) {
+      console.warn('[recording] マイクが使えませんでした:', e)
+      setIsGlobalRecording(false)
+    }
+  }
+
+  function stopGlobalRecording() {
+    if (globalRecorderRef.current?.state === 'recording') {
+      globalRecorderRef.current.stop()
+    }
+    globalRecorderRef.current = null
+    setIsGlobalRecording(false)
+  }
 
   const story = useMemo(
     () => stories.find(s => s.id === selectedStoryId) ?? stories[0],
@@ -64,16 +102,18 @@ export default function App() {
 
   // お話ページ → 次のページ
   // listen モード: 最終ページ後 → クイズへ
-  // record モード: 最終ページ後 → エンディングへ（クイズはスキップ）
+  // record モード: 最終ページ後 → 録音停止 → エンディングへ（クイズはスキップ）
   function handleStoryNext() {
     const nextPage = storyPageIndex + 1
     if (nextPage < story.pages.length) {
       setStoryPageIndex(nextPage)
     } else if (storyMode === 'record') {
-      recordRead(story.id)   // 読み返しカウント
+      stopGlobalRecording()                    // 全ページ読み終わったら録音停止
+      setBonusStars(story.pages.length)        // 全ページ分ボーナス⭐
+      recordRead(story.id)
       go('ending')
     } else {
-      recordRead(story.id)   // 読み返しカウント
+      recordRead(story.id)
       setQuestionIndex(0)
       setCorrectCount(0)
       go('question')
@@ -97,10 +137,12 @@ export default function App() {
     setStoryMode('record')
     setBonusStars(0)
     go('story')
+    startGlobalRecording(selectedStoryId)  // ページ1表示と同時に録音スタート
   }
 
   // エンディング → もう一度きく（listen モード）
   function handleReadAgain() {
+    stopGlobalRecording()
     setStoryPageIndex(0)
     setQuestionIndex(0)
     setCorrectCount(0)
@@ -111,6 +153,7 @@ export default function App() {
 
   // エンディング → おはなし選択に戻る
   function handleRestart() {
+    stopGlobalRecording()
     setStoryPageIndex(0)
     setQuestionIndex(0)
     setCorrectCount(0)
@@ -151,10 +194,10 @@ export default function App() {
           totalPages={story.pages.length}
           isLastPage={storyPageIndex === story.pages.length - 1}
           mode={storyMode}
+          isRecording={isGlobalRecording}
           onPrev={storyPageIndex > 0 ? handleStoryPrev : undefined}
           onNext={handleStoryNext}
           onBonusStar={() => setBonusStars(b => b + 1)}
-          onRecorded={(blob) => savePageRecording(selectedStoryId, storyPageIndex, blob)}
         />
       )}
 
