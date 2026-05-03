@@ -216,6 +216,7 @@ export default function App() {
       {screen === 'ending' && (
         <EndingScreen
           storyId={story.id}
+          storyTitle={story.title}
           character={story.character}
           correctCount={correctCount}
           totalQuestions={story.questions.length}
