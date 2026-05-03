@@ -131,6 +131,13 @@ export default function App() {
     }
   }
 
+  // 録音を途中で止めてエンディングへ
+  function handleStopRecording() {
+    stopGlobalRecording()
+    recordRead(story.id)
+    go('ending')
+  }
+
   // エンディング → じぶんのこえで よんでみる（record モード）
   function handleRecordMode() {
     setStoryPageIndex(0)
@@ -195,6 +202,7 @@ export default function App() {
           isLastPage={storyPageIndex === story.pages.length - 1}
           mode={storyMode}
           isRecording={isGlobalRecording}
+          onStopRecording={storyMode === 'record' ? handleStopRecording : undefined}
           onPrev={storyPageIndex > 0 ? handleStoryPrev : undefined}
           onNext={handleStoryNext}
           onBonusStar={() => setBonusStars(b => b + 1)}
