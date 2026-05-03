@@ -210,22 +210,7 @@ export default function EndingScreen({
               )}
             </button>
 
-            {/* 録音あり：② じぶんのこえでよんでみよう（赤） */}
-            <button
-              onClick={() => { unlockAudio(); onRecordMode() }}
-              className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
-              aria-label="じぶんのこえでよんでみよう"
-            >
-              <Image
-                src="/jibun-no-koe.jpeg"
-                alt="じぶんのこえでよんでみよう！"
-                width={600}
-                height={120}
-                className="w-full h-auto rounded-full"
-              />
-            </button>
-
-            {/* 録音あり：③ おくる（シェア） */}
+            {/* 録音あり：② おくる（シェア） */}
             <button
               onClick={() => { unlockAudio(); handleShare() }}
               className="w-full py-4 rounded-full text-xl font-bold text-white tracking-wide
@@ -254,23 +239,25 @@ export default function EndingScreen({
           </button>
         )}
 
-        {/* もう一度きく（お手本・緑・常時表示） */}
-        <button
-          onClick={() => { unlockAudio(); onReadAgain() }}
-          className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
-          aria-label="もう一度きく"
-        >
-          <Image
-            src="/mouichido-kiku.jpeg"
-            alt="もういちど きく"
-            width={600}
-            height={120}
-            className="w-full h-auto rounded-full"
-          />
-        </button>
+        {/* もう一度きく・ほかのおはなし・おわる（録音後は非表示） */}
+        {!fromRecordMode && (
+          <button
+            onClick={() => { unlockAudio(); onReadAgain() }}
+            className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
+            aria-label="もう一度きく"
+          >
+            <Image
+              src="/mouichido-kiku.jpeg"
+              alt="もういちど きく"
+              width={600}
+              height={120}
+              className="w-full h-auto rounded-full"
+            />
+          </button>
+        )}
 
-        {/* 下段：ほかのおはなし ＋ おわる */}
-        <div className="flex gap-2">
+        {/* 下段：ほかのおはなし ＋ おわる（録音後は非表示） */}
+        {!fromRecordMode && <div className="flex gap-2">
           <button
             onClick={() => { unlockAudio(); onRestart() }}
             className="flex-1 py-2 rounded-full text-sm font-bold
@@ -309,7 +296,7 @@ export default function EndingScreen({
           >
             おわる
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   )
