@@ -72,9 +72,9 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
     audio.play().catch(() => { URL.revokeObjectURL(url); setPlayingId(null) })
   }
 
-  // フィーチャー：最多読書数のお話。未読なら先頭
+  // フィーチャー：最多読書数のお話。同数・未読なら先頭を維持
   const featured = stories.reduce((best, s) =>
-    (readCounts[s.id] ?? 0) >= (readCounts[best.id] ?? 0) ? s : best
+    (readCounts[s.id] ?? 0) > (readCounts[best.id] ?? 0) ? s : best
   , stories[0])
 
   const rest = stories.filter(s => s.id !== featured.id)

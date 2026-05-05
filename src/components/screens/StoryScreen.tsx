@@ -16,8 +16,6 @@ interface Props {
   mode?: 'listen' | 'record'
   isRecording?: boolean              // 全ページ通し録音中フラグ（page.tsx が管理）
   onStopRecording?: () => void       // 録音を途中で止めてエンディングへ
-  onBonusStar?: () => void
-  onRecorded?: (blob: Blob) => void
 }
 
 // 読み上げ完了後、ページめくり音が鳴り終わる頃にページが変わる
@@ -106,8 +104,6 @@ export default function StoryScreen({
   mode = 'listen',
   isRecording = false,
   onStopRecording,
-  onBonusStar,
-  onRecorded,
 }: Props) {
   const isRecordMode = mode === 'record'
 
@@ -291,7 +287,7 @@ export default function StoryScreen({
         })
         setRecState('recorded')
         stream.getTracks().forEach(t => t.stop())
-        onRecorded?.(blob)  // ページ録音を親コンポーネントへ渡す
+        // ページ録音は全体録音（globalRecorder）で管理するため個別送信不要
       }
 
       mr.start()

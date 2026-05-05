@@ -205,7 +205,6 @@ export default function App() {
           onStopRecording={storyMode === 'record' ? handleStopRecording : undefined}
           onPrev={storyPageIndex > 0 ? handleStoryPrev : undefined}
           onNext={handleStoryNext}
-          onBonusStar={() => setBonusStars(b => b + 1)}
         />
       )}
 
