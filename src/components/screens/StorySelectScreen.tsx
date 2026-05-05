@@ -4,138 +4,36 @@ import Image from 'next/image'
 import { Story } from '@/data/stories'
 import { unlockAudio } from '@/lib/speech'
 import { getRecord } from '@/lib/storage'
-import { getStoriesWithRecordings, loadAllPageRecordings } from '@/lib/recordings'
-
-// 背表紙（スパイン）の色：学年ごと
-const GRADE_SPINE_COLOR: Record<1 | 2, string> = {
-  1: '#f0963a', // オレンジ（小1）
-  2: '#3a7ab8', // ブルー（小2）
-}
+import { getStoriesWithRecordings, loadPageRecording } from '@/lib/recordings'
 
 interface Props {
   stories: Story[]
   onSelect: (storyId: string) => void
 }
 
-function BookCard({
-  story,
-  count,
-  hasRecording,
-  isPlaying,
-  dimmed,
-  onSelect,
-  onTogglePlay,
-}: {
-  story: Story
-  count: number
-  hasRecording: boolean
-  isPlaying: boolean
-  dimmed: boolean
-  onSelect: () => void
-  onTogglePlay: (e: React.MouseEvent) => void
-}) {
-  const spineColor = GRADE_SPINE_COLOR[story.grade]
-  const stars = Math.min(Math.max(count, 0), 3)
-
+function ForestIcon({ size = 44 }: { size?: number }) {
   return (
-    <div
-      className="flex-1 flex flex-col overflow-hidden transition-opacity"
-      style={{
-        opacity: dimmed ? 0.45 : 1,
-        backgroundColor: '#ffffff',
-        borderRadius: '0 6px 6px 0',
-        borderLeft: `10px solid ${spineColor}`,
-        boxShadow: [
-          '4px 6px 12px rgba(0,0,0,0.28)',
-          'inset -2px 0 4px rgba(0,0,0,0.06)',
-        ].join(', '),
-      }}
-    >
-      {/* ── 表紙絵 ── */}
-      <button
-        onClick={onSelect}
-        className="w-full relative flex-shrink-0 active:opacity-80 transition-opacity overflow-hidden"
-        style={{ height: '90px', borderRadius: '0 6px 0 0' }}
-        aria-label={story.title}
-      >
-        {story.pages[0]?.imageSrc ? (
-          <Image
-            src={story.pages[0].imageSrc}
-            alt={story.title}
-            width={300}
-            height={200}
-            className="absolute inset-0 w-full h-full object-cover object-top"
-          />
-        ) : (
-          <div
-            className="w-full h-full flex items-center justify-center"
-            style={{ backgroundColor: '#F3EDE3' }}
-          >
-            <span className="text-4xl">{story.character.emoji}</span>
-          </div>
-        )}
-        {/* よんだよバッジ */}
-        {count > 0 && (
-          <div className="absolute top-1.5 right-1.5 bg-[#4a9068] rounded-full px-1.5 py-0.5">
-            <span className="text-white text-[9px] font-bold leading-none">✓ よんだよ</span>
-          </div>
-        )}
-      </button>
-
-      {/* ── タイトル ── */}
-      <button
-        onClick={onSelect}
-        className="flex-1 flex items-center justify-center px-2 py-2
-                   active:opacity-80 transition-opacity"
-        style={{ backgroundColor: '#ffffff', minHeight: '52px' }}
-      >
-        <p className="text-sm font-bold text-[#1A1A1A] text-center leading-snug break-words">
-          {story.title}
-        </p>
-      </button>
-
-      {/* ── フッター：星 ＋ 録音再生 ── */}
-      <div
-        className="flex items-center justify-between px-2 py-1.5 flex-shrink-0"
-        style={{
-          backgroundColor: '#faf6ea',
-          borderTop: '1px solid #e8dcc8',
-          minHeight: '32px',
-        }}
-      >
-        {/* 星ランク or 未読ラベル */}
-        {count > 0 ? (
-          <span className="text-[11px] leading-none">
-            {Array.from({ length: 3 }, (_, i) => (
-              <span key={i} className={i < stars ? 'opacity-100' : 'opacity-20'}>⭐</span>
-            ))}
-          </span>
-        ) : (
-          <span className="text-[10px] text-[#c8bdb0] font-bold">まだよんでないよ</span>
-        )}
-
-        {/* 🎙 録音きく */}
-        {hasRecording && (
-          <button
-            onClick={onTogglePlay}
-            className="flex items-center gap-0.5 px-1.5 py-1 rounded-full active:scale-90 transition-transform"
-            style={{
-              backgroundColor: isPlaying ? '#468541' : '#e8f5e9',
-              border: '1px solid #468541',
-            }}
-            aria-label={isPlaying ? '再生をとめる' : 'じぶんのこえをきく'}
-          >
-            <span className="text-[10px] leading-none">{isPlaying ? '⏹' : '🎙'}</span>
-            <span
-              className="text-[9px] font-bold leading-none"
-              style={{ color: isPlaying ? '#ffffff' : '#468541' }}
-            >
-              {isPlaying ? 'とめる' : 'きく'}
-            </span>
-          </button>
-        )}
-      </div>
-    </div>
+    <svg width={size} height={size} viewBox="0 0 120 100" fill="none">
+      {/* 左の木 */}
+      <path
+        d="M24,20 C29,20 40,33 40,53 C40,64 37,70 34,70 L14,70 C11,70 8,64 8,53 C8,33 19,20 24,20Z"
+        fill="#3a9040" stroke="#1a1a1a" strokeWidth="6" strokeLinejoin="round"
+      />
+      {/* 中央の木（一番高い） */}
+      <path
+        d="M60,6 C66,6 80,22 80,48 C80,61 77,70 73,70 L47,70 C43,70 40,61 40,48 C40,22 54,6 60,6Z"
+        fill="#8bc34a" stroke="#1a1a1a" strokeWidth="6" strokeLinejoin="round"
+      />
+      {/* 右の木 */}
+      <path
+        d="M96,20 C101,20 112,33 112,53 C112,64 109,70 106,70 L86,70 C83,70 80,64 80,53 C80,33 91,20 96,20Z"
+        fill="#2e7d32" stroke="#1a1a1a" strokeWidth="6" strokeLinejoin="round"
+      />
+      {/* 幹 */}
+      <rect x="19" y="69" width="10" height="16" rx="2" fill="#cd8a4a" stroke="#1a1a1a" strokeWidth="5"/>
+      <rect x="54" y="69" width="12" height="20" rx="2" fill="#cd8a4a" stroke="#1a1a1a" strokeWidth="5"/>
+      <rect x="91" y="69" width="10" height="16" rx="2" fill="#cd8a4a" stroke="#1a1a1a" strokeWidth="5"/>
+    </svg>
   )
 }
 
@@ -162,122 +60,308 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
     e.stopPropagation()
     if (playingId === story.id) { stopPlayback(); return }
     stopPlayback()
-    const blobs = await loadAllPageRecordings(story.id, story.pages.length)
-    const valid = blobs.filter(Boolean) as Blob[]
-    if (valid.length === 0) return
+    // 全体録音（page 0）を再生
+    const blob = await loadPageRecording(story.id, 0)
+    if (!blob) return
     setPlayingId(story.id)
-    let i = 0
-    const playNext = () => {
-      if (i >= valid.length) { setPlayingId(null); return }
-      const url = URL.createObjectURL(valid[i++])
-      const audio = new Audio(url)
-      audioRef.current = audio
-      audio.onended = () => { URL.revokeObjectURL(url); playNext() }
-      audio.onerror = () => { URL.revokeObjectURL(url); playNext() }
-      audio.play().catch(() => { URL.revokeObjectURL(url); setPlayingId(null) })
-    }
-    playNext()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    audioRef.current = audio
+    audio.onended = () => { URL.revokeObjectURL(url); setPlayingId(null) }
+    audio.onerror = () => { URL.revokeObjectURL(url); setPlayingId(null) }
+    audio.play().catch(() => { URL.revokeObjectURL(url); setPlayingId(null) })
   }
 
-  // 読んだ／まだの分類
-  const readStories   = stories.filter(s => (readCounts[s.id] ?? 0) > 0)
-  const unreadStories = stories.filter(s => (readCounts[s.id] ?? 0) === 0)
-  const hasAnyRead    = readStories.length > 0
+  // フィーチャー：最多読書数のお話。未読なら先頭
+  const featured = stories.reduce((best, s) =>
+    (readCounts[s.id] ?? 0) >= (readCounts[best.id] ?? 0) ? s : best
+  , stories[0])
 
-  // 表示順：読んだ本→未読（初回は全部まとめて通常表示）
-  const displayRead   = hasAnyRead ? readStories   : stories
-  const displayUnread = hasAnyRead ? unreadStories : []
+  const rest = stories.filter(s => s.id !== featured.id)
+  const readRest   = rest.filter(s => (readCounts[s.id] ?? 0) > 0)
+  const unreadRest = rest.filter(s => (readCounts[s.id] ?? 0) === 0)
 
-  function toRows(list: Story[]): Story[][] {
-    const rows: Story[][] = []
-    for (let i = 0; i < list.length; i += 2) rows.push(list.slice(i, i + 2))
-    return rows
-  }
-
-  const readRows   = toRows(displayRead)
-  const unreadRows = toRows(displayUnread)
-
-  function renderShelfRows(rows: Story[][], dimmed: boolean, rowOffset: number) {
-    return rows.map((row, rowIdx) => (
-      <div
-        key={rowIdx}
-        className="flex flex-col animate-fadeInUp"
-        style={{ animationDelay: `${(rowOffset + rowIdx) * 120}ms`, animationFillMode: 'both' }}
-      >
-        {/* 本の行 */}
-        <div className="flex gap-4 px-5 pt-5 pb-0 items-end">
-          {row.map(story => (
-            <BookCard
-              key={story.id}
-              story={story}
-              count={readCounts[story.id] ?? 0}
-              hasRecording={recordedIds.has(story.id)}
-              isPlaying={playingId === story.id}
-              dimmed={dimmed}
-              onSelect={() => { unlockAudio(); onSelect(story.id) }}
-              onTogglePlay={(e) => { unlockAudio(); togglePlayback(story, e) }}
-            />
-          ))}
-          {/* 奇数冊のとき空きスペース */}
-          {row.length < 2 && <div className="flex-1" />}
-        </div>
-        {/* 棚板 */}
-        <div
-          style={{
-            height: '18px',
-            backgroundColor: '#9c6b30',
-            boxShadow: '0 6px 10px rgba(0,0,0,0.25)',
-          }}
-        />
-      </div>
-    ))
-  }
+  const featuredCount   = readCounts[featured.id] ?? 0
+  const featuredStars   = Math.min(featuredCount, 3)
+  const featuredHasRec  = recordedIds.has(featured.id)
+  const featuredPlaying = playingId === featured.id
 
   return (
     <div
-      className="min-h-screen-safe flex flex-col pt-safe"
-      style={{ backgroundColor: '#eddfc8' }}
+      className="h-screen-safe flex flex-col pt-safe"
+      style={{ backgroundColor: '#faf6ea' }}
     >
-      {/* ── ヘッダー ── */}
-      <div className="pt-5 pb-3 text-center animate-fadeInUp flex-shrink-0 px-4">
-        <div className="text-3xl mb-0.5">📚</div>
-        <h2 className="text-2xl font-bold text-[#5a3e1b] tracking-wide">
-          おはなしの もり
-        </h2>
-        <p className="text-xs text-[#9a7a5a] font-bold mt-0.5">
-          {hasAnyRead
-            ? `${readStories.length}さつ よんだよ！ すごい！`
-            : 'すきなおはなしをえらんでね'}
-        </p>
-      </div>
+      {/* ── スクロールエリア ── */}
+      <div className="flex-1 scroll-area">
+        <div className="max-w-lg mx-auto px-4 pt-5 pb-8 flex flex-col gap-4">
 
-      {/* ── 本棚エリア ── */}
-      <div className="flex-1 pb-10 flex flex-col gap-0">
-
-        {/* 読んだ本（または初回：全部） */}
-        {renderShelfRows(readRows, false, 0)}
-
-        {/* 区切り：まだよんでないよ */}
-        {displayUnread.length > 0 && (
-          <div
-            className="flex items-center gap-2 px-5 pt-5 pb-0 animate-fadeInUp"
-            style={{
-              animationDelay: `${readRows.length * 120 + 80}ms`,
-              animationFillMode: 'both',
-            }}
-          >
-            <div className="flex-1 h-px" style={{ backgroundColor: '#c8a87a', opacity: 0.7 }} />
-            <span className="text-[11px] font-bold text-[#9a7a5a] whitespace-nowrap tracking-wide">
-              まだよんでないよ
-            </span>
-            <div className="flex-1 h-px" style={{ backgroundColor: '#c8a87a', opacity: 0.7 }} />
+          {/* ヘッダー */}
+          <div className="text-center animate-fadeInUp">
+            <div className="flex justify-center mb-1">
+              <ForestIcon size={48} />
+            </div>
+            <h2 className="text-xl font-bold text-[#5a3e1b] tracking-wide">おはなしの もり</h2>
           </div>
-        )}
 
-        {/* 未読の本（薄く） */}
-        {renderShelfRows(unreadRows, true, readRows.length + 1)}
+          {/* ── フィーチャーカード ── */}
+          <div
+            className="rounded-2xl overflow-hidden shadow-lg border border-[#e8dcc8] animate-popIn"
+            style={{ backgroundColor: '#ffffff' }}
+          >
+            {/* 大きい絵 */}
+            <button
+              onClick={() => { unlockAudio(); onSelect(featured.id) }}
+              className="w-full relative block active:opacity-80 transition-opacity"
+              style={{ height: '200px' }}
+              aria-label={featured.title}
+            >
+              {featured.pages[0]?.imageSrc ? (
+                <Image
+                  src={featured.pages[0].imageSrc}
+                  alt={featured.title}
+                  fill
+                  className="object-cover object-top"
+                />
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ backgroundColor: '#F3EDE3' }}
+                >
+                  <span className="text-7xl">{featured.character.emoji}</span>
+                </div>
+              )}
+              {/* おすすめラベル */}
+              <div
+                className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold text-white"
+                style={{ backgroundColor: '#e07840', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}
+              >
+                {featuredCount > 0 ? '⭐ おきにいり' : '✨ おすすめ'}
+              </div>
+              {/* よんだよバッジ */}
+              {featuredCount > 0 && (
+                <div
+                  className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: '#4a9068' }}
+                >
+                  ✓ よんだよ
+                </div>
+              )}
+            </button>
 
+            {/* カード下段 */}
+            <div className="px-4 py-3 flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-lg font-black text-[#1a1a1a] leading-snug truncate">
+                  {featured.title}
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  {featuredCount > 0 ? (
+                    <>
+                      <span className="text-sm leading-none">
+                        {Array.from({ length: 3 }, (_, i) => (
+                          <span key={i} className={i < featuredStars ? 'opacity-100' : 'opacity-20'}>⭐</span>
+                        ))}
+                      </span>
+                      <span className="text-xs text-[#9a8070] font-bold">{featuredCount}かい よんだよ</span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-[#9a8070]">まだよんでないよ</span>
+                  )}
+                  {/* 録音バッジ */}
+                  {featuredHasRec && (
+                    <button
+                      onClick={(e) => { unlockAudio(); togglePlayback(featured, e) }}
+                      className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full active:scale-90 transition-transform"
+                      style={{
+                        backgroundColor: featuredPlaying ? '#d97706' : '#fef3c7',
+                        border: '1.5px solid #d97706',
+                      }}
+                      aria-label={featuredPlaying ? 'とめる' : 'じぶんのこえをきく'}
+                    >
+                      <span className="text-[11px]">{featuredPlaying ? '⏹' : '🎙'}</span>
+                      <span className="text-[10px] font-bold" style={{ color: featuredPlaying ? '#fff' : '#92400e' }}>
+                        {featuredPlaying ? 'とめる' : 'じぶんのこえ'}
+                      </span>
+                    </button>
+                  )}
+                </div>
+              </div>
+              {/* 丸い再生ボタン */}
+              <button
+                onClick={() => { unlockAudio(); onSelect(featured.id) }}
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                           active:scale-95 transition-transform"
+                style={{
+                  background: 'linear-gradient(135deg, #5aaa78, #3a7a58)',
+                  boxShadow: '0 3px 0 #2a5a3a',
+                }}
+                aria-label="よむ"
+              >
+                <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
+                  <polygon points="11,5 44,24 11,43" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* ── 残りのリスト ── */}
+          <div className="flex flex-col gap-0 rounded-2xl overflow-hidden shadow-sm border border-[#e8dcc8]"
+               style={{ backgroundColor: '#ffffff' }}>
+
+            {/* 読んだ本 */}
+            {readRest.map((story, i) => (
+              <ListRow
+                key={story.id}
+                story={story}
+                count={readCounts[story.id] ?? 0}
+                hasRecording={recordedIds.has(story.id)}
+                isPlaying={playingId === story.id}
+                dimmed={false}
+                isLast={i === readRest.length - 1 && unreadRest.length === 0}
+                onSelect={() => { unlockAudio(); onSelect(story.id) }}
+                onTogglePlay={(e) => { unlockAudio(); togglePlayback(story, e) }}
+                animDelay={i * 60}
+              />
+            ))}
+
+            {/* 区切り */}
+            {unreadRest.length > 0 && (
+              <div
+                className="flex items-center gap-2 px-4 py-2"
+                style={{ backgroundColor: '#f5f0e8', borderTop: readRest.length > 0 ? '1px solid #e8dcc8' : undefined }}
+              >
+                <div className="flex-1 h-px" style={{ backgroundColor: '#c8a87a', opacity: 0.5 }} />
+                <span className="text-[10px] font-bold text-[#9a7a5a] whitespace-nowrap">まだよんでないよ</span>
+                <div className="flex-1 h-px" style={{ backgroundColor: '#c8a87a', opacity: 0.5 }} />
+              </div>
+            )}
+
+            {/* 未読本（薄く） */}
+            {unreadRest.map((story, i) => (
+              <ListRow
+                key={story.id}
+                story={story}
+                count={0}
+                hasRecording={false}
+                isPlaying={false}
+                dimmed={true}
+                isLast={i === unreadRest.length - 1}
+                onSelect={() => { unlockAudio(); onSelect(story.id) }}
+                onTogglePlay={() => {}}
+                animDelay={(readRest.length + i) * 60}
+              />
+            ))}
+          </div>
+
+        </div>
       </div>
+    </div>
+  )
+}
+
+// ── リスト行コンポーネント ──────────────────────────
+function ListRow({
+  story, count, hasRecording, isPlaying, dimmed, isLast,
+  onSelect, onTogglePlay, animDelay,
+}: {
+  story: Story
+  count: number
+  hasRecording: boolean
+  isPlaying: boolean
+  dimmed: boolean
+  isLast: boolean
+  onSelect: () => void
+  onTogglePlay: (e: React.MouseEvent) => void
+  animDelay: number
+}) {
+  const stars = Math.min(count, 3)
+
+  return (
+    <div
+      className="flex items-center gap-3 px-3 py-2.5 animate-fadeInUp"
+      style={{
+        opacity: dimmed ? 0.45 : 1,
+        borderBottom: isLast ? 'none' : '1px solid #f0ebe0',
+        animationDelay: `${animDelay}ms`,
+        animationFillMode: 'both',
+      }}
+    >
+      {/* サムネイル（録音バッジつき） */}
+      <div className="relative flex-shrink-0" style={{ width: 56, height: 56 }}>
+        <button
+          onClick={onSelect}
+          className="w-full h-full rounded-xl overflow-hidden active:opacity-80 transition-opacity"
+          aria-label={story.title}
+        >
+          {story.pages[0]?.imageSrc ? (
+            <Image
+              src={story.pages[0].imageSrc}
+              alt={story.title}
+              width={56}
+              height={56}
+              className="w-full h-full object-cover object-top"
+            />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{ backgroundColor: '#F3EDE3' }}
+            >
+              <span className="text-2xl">{story.character.emoji}</span>
+            </div>
+          )}
+        </button>
+        {/* 🎙 録音バッジ */}
+        {hasRecording && (
+          <button
+            onClick={onTogglePlay}
+            className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center
+                       active:scale-90 transition-transform"
+            style={{
+              backgroundColor: isPlaying ? '#d97706' : '#fbbf24',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            }}
+            aria-label={isPlaying ? 'とめる' : 'じぶんのこえをきく'}
+          >
+            <span className="text-[10px] leading-none">{isPlaying ? '⏹' : '🎙'}</span>
+          </button>
+        )}
+      </div>
+
+      {/* タイトル ＋ 星 */}
+      <button
+        onClick={onSelect}
+        className="flex-1 min-w-0 text-left active:opacity-70 transition-opacity"
+      >
+        <p className="text-sm font-bold text-[#1a1a1a] leading-snug truncate">{story.title}</p>
+        <div className="mt-0.5">
+          {count > 0 ? (
+            <span className="text-[11px] leading-none">
+              {Array.from({ length: 3 }, (_, i) => (
+                <span key={i} className={i < stars ? 'opacity-100' : 'opacity-20'}>⭐</span>
+              ))}
+              <span className="text-[10px] text-[#9a8070] font-bold ml-1">{count}かい</span>
+            </span>
+          ) : (
+            <span className="text-[10px] text-[#c8bdb0]">まだよんでないよ</span>
+          )}
+        </div>
+      </button>
+
+      {/* 丸い再生ボタン */}
+      <button
+        onClick={onSelect}
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
+                   active:scale-95 transition-transform"
+        style={{
+          background: 'linear-gradient(135deg, #5aaa78, #3a7a58)',
+          boxShadow: '0 2px 0 #2a5a3a',
+        }}
+        aria-label="よむ"
+      >
+        <svg width="14" height="14" viewBox="0 0 48 48" fill="none">
+          <polygon points="11,5 44,24 11,43" fill="white"/>
+        </svg>
+      </button>
     </div>
   )
 }
