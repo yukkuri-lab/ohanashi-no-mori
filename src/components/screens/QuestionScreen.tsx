@@ -5,7 +5,7 @@ import ChoiceButton from '@/components/ChoiceButton'
 import { Question, Character, StoryPage } from '@/data/stories'
 import { recordAnswer } from '@/lib/storage'
 import { speak, stopSpeaking } from '@/lib/speech'
-import { playIncorrect } from '@/lib/sounds'
+import { playCorrect, playIncorrect } from '@/lib/sounds'
 
 interface Props {
   question: Question
@@ -127,7 +127,8 @@ export default function QuestionScreen({
     const correctText = question.choices.find(c => c.id === question.correctId)?.text ?? ''
     const incorrectFull = `${question.incorrectFeedback}正解は「${correctText}」だよ！`
 
-    if (!correct) playIncorrect()
+    if (correct) playCorrect()
+    else playIncorrect()
 
     stopSpeaking()
     t4.current = setTimeout(() => {
