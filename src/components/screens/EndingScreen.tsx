@@ -16,7 +16,7 @@ interface Props {
   totalPages: number
   fromRecordMode: boolean   // 今のセッションがrecordモード完走かどうか
   onReadAgain: () => void
-  onRecordMode: () => void
+  onRecordMode: () => boolean | Promise<boolean>  // false ならマイク不可（録音モードに入れない）
   onRestart: () => void
   onQuit: () => void
 }
@@ -36,6 +36,7 @@ export default function EndingScreen({
   onQuit,
 }: Props) {
   const [isPlayingBack, setIsPlayingBack] = useState(false)
+  const [micError, setMicError] = useState(false)   // マイクが使えず録音モードに入れなかった
   const playbackAudioRef = useRef<HTMLAudioElement | null>(null)
   const isPlayingRef = useRef(false)
   useEffect(() => { isPlayingRef.current = isPlayingBack }, [isPlayingBack])
@@ -244,19 +245,42 @@ export default function EndingScreen({
           </>
         ) : (
           /* 録音なし：じぶんのこえでよんでみよう（トップ・赤） */
-          <button
-            onClick={() => { unlockAudio(); onRecordMode() }}
-            className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
-            aria-label="じぶんのこえでよんでみよう"
-          >
-            <Image
-              src="/jibun-no-koe.jpeg"
-              alt="じぶんのこえでよんでみよう！"
-              width={600}
-              height={120}
-              className="w-full h-auto rounded-full"
-            />
-          </button>
+          <>
+            <button
+              onClick={async () => {
+                unlockAudio()
+                setMicError(false)
+                const ok = await onRecordMode()   // マイク確保に成功したら録音モードへ遷移
+                if (!ok) setMicError(true)         // 失敗時は袋小路に入れず、ここで通知
+              }}
+              className="w-full active:scale-95 active:opacity-80 transition-all duration-150"
+              aria-label="じぶんのこえでよんでみよう"
+            >
+              <Image
+                src="/jibun-no-koe.jpeg"
+                alt="じぶんのこえでよんでみよう！"
+                width={600}
+                height={120}
+                className="w-full h-auto rounded-full"
+              />
+            </button>
+
+            {/* マイクが使えない時のやさしい案内 */}
+            {micError && (
+              <div
+                className="rounded-2xl px-4 py-3 text-center animate-popIn
+                           bg-[#fff4e6] border-2 border-[#f0c891]"
+                role="alert"
+              >
+                <p className="text-sm font-bold text-[#b85c00] leading-relaxed">
+                  🎤 マイクが つかえないみたい。
+                </p>
+                <p className="text-xs font-bold text-[#9a7a5a] mt-0.5">
+                  おうちの人に きいてみてね。
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {/* もう一度きく・ほかのおはなし・おわる（録音後は非表示） */}

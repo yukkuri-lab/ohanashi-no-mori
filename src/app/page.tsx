@@ -32,7 +32,8 @@ export default function App() {
   const globalRecorderRef    = useRef<MediaRecorder | null>(null)
   const globalAudioChunksRef = useRef<Blob[]>([])
 
-  async function startGlobalRecording(storyId: string) {
+  // マイク確保＆録音開始。成功で true、失敗（拒否・占有など）で false を返す
+  async function startGlobalRecording(storyId: string): Promise<boolean> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const preferredMime =
@@ -51,9 +52,11 @@ export default function App() {
       mr.start()
       globalRecorderRef.current = mr
       setIsGlobalRecording(true)
+      return true
     } catch (e) {
       console.warn('[recording] マイクが使えませんでした:', e)
       setIsGlobalRecording(false)
+      return false
     }
   }
 
@@ -139,12 +142,15 @@ export default function App() {
   }
 
   // エンディング → じぶんのこえで よんでみる（record モード）
-  function handleRecordMode() {
+  // 先にマイクを確保し、成功した時だけ録音モードへ。失敗時は false を返して袋小路を防ぐ
+  async function handleRecordMode(): Promise<boolean> {
+    const ok = await startGlobalRecording(selectedStoryId)
+    if (!ok) return false
     setStoryPageIndex(0)
     setStoryMode('record')
     setBonusStars(0)
     go('story')
-    startGlobalRecording(selectedStoryId)  // ページ1表示と同時に録音スタート
+    return true
   }
 
   // エンディング → もう一度きく（listen モード）
