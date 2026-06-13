@@ -51,49 +51,6 @@ function splitSentences(text: string): SentenceChunk[] {
   return chunks.length > 0 ? chunks : [{ prefix: '', text }]
 }
 
-function RetryIcon({ size = 40 }: { size?: number }) {
-  // 中心(24,24) 半径15の円
-  // 弧1: (13,34)→(34,13) 時計回り（上を通る）約170°
-  // 弧2: (35,14)→(14,35) 時計回り（下を通る）約170°
-  // 矢印ヘッドは弧の進行方向に合わせた三角形
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* 弧1: 左下→右上（時計回り・上を通る） */}
-      <path
-        d="M 13 34 A 15 15 0 0 1 34 13"
-        stroke="#e05555" strokeWidth="4.5" strokeLinecap="round" fill="none"
-      />
-      {/* 右上の矢印ヘッド（進行方向：右下向き） */}
-      <polygon points="34,13 27,12 32,6" fill="#e05555"/>
-
-      {/* 弧2: 右上→左下（時計回り・下を通る） */}
-      <path
-        d="M 35 14 A 15 15 0 0 1 14 35"
-        stroke="#e05555" strokeWidth="4.5" strokeLinecap="round" fill="none"
-      />
-      {/* 左下の矢印ヘッド（進行方向：左上向き） */}
-      <polygon points="14,35 21,36 16,42" fill="#e05555"/>
-    </svg>
-  )
-}
-
-function MicIcon({ size = 36 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* マイク本体：あかい */}
-      <rect x="18" y="4" width="12" height="22" rx="6" fill="#e05555"/>
-      {/* アーチ：すこし濃いあか */}
-      <path d="M10 24a14 14 0 0 0 28 0" stroke="#b83232" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
-      {/* スタンド縦線 */}
-      <line x1="24" y1="38" x2="24" y2="44" stroke="#b83232" strokeWidth="3.5" strokeLinecap="round"/>
-      {/* スタンド横線 */}
-      <line x1="16" y1="44" x2="32" y2="44" stroke="#c94444" strokeWidth="3.5" strokeLinecap="round"/>
-    </svg>
-  )
-}
-
-type RecordState = 'idle' | 'recording' | 'recorded'
-
 export default function StoryScreen({
   page,
   pageIndex,
@@ -111,18 +68,8 @@ export default function StoryScreen({
   const [readingIndex, setReadingIndex] = useState(-1)
   const [showRuby,     setShowRuby]     = useState(false)
   const [activeHint,   setActiveHint]   = useState<WordHint | null>(null)
-
-  // 録音関連（record モードのみ使用）
-  const [recState,     setRecState]     = useState<RecordState>('idle')
-  const [audioURL,     setAudioURL]     = useState<string | null>(null)
-  const [isPlaying,    setIsPlaying]    = useState(false)
-  const [micError,     setMicError]     = useState<string | null>(null)
   const [speakError,   setSpeakError]   = useState(false)
-  const [bonusClaimed, setBonusClaimed] = useState(false)
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
-  const audioChunksRef   = useRef<Blob[]>([])
-  const playbackRef      = useRef<HTMLAudioElement | null>(null)
   const speakTimerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const advanceTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -187,15 +134,8 @@ export default function StoryScreen({
     return () => {
       clearAll()
       stopSpeaking()
-      stopRecording()
-      stopPlayback()
       setIsReading(false)
       setReadingIndex(-1)
-      setRecState('idle')
-      setAudioURL(prev => {
-        if (prev) URL.revokeObjectURL(prev)
-        return null
-      })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page.text])
@@ -220,8 +160,6 @@ export default function StoryScreen({
   function handlePrev() {
     clearAll()
     stopSpeaking()
-    stopRecording()
-    stopPlayback()
     setIsReading(false)
     setReadingIndex(-1)
     onPrev?.()
@@ -230,97 +168,10 @@ export default function StoryScreen({
   function handleNext() {
     clearAll()
     stopSpeaking()
-    stopRecording()
-    stopPlayback()
     setIsReading(false)
     setReadingIndex(-1)
     playPageTurn()
     onNext()
-  }
-
-  // ── 録音 ──────────────────────────────────────
-  async function handleMic() {
-    if (recState === 'idle') {
-      if (isReading) {
-        clearAll()
-        stopSpeaking()
-        setIsReading(false)
-        setReadingIndex(-1)
-      }
-      await startRecording()
-    } else if (recState === 'recording') {
-      stopRecording()
-    } else {
-      stopPlayback()
-      setBonusClaimed(false)
-      setRecState('idle')
-      setAudioURL(null)
-    }
-  }
-
-  async function startRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-
-      // iOS Safari は audio/webm 非対応 → audio/mp4 を優先
-      // ブラウザが実際に使う mimeType を後で blob 生成に使う
-      const preferredMime =
-        MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
-        MediaRecorder.isTypeSupported('audio/mp4')  ? 'audio/mp4'  : ''
-
-      const mr = preferredMime
-        ? new MediaRecorder(stream, { mimeType: preferredMime })
-        : new MediaRecorder(stream)
-      mediaRecorderRef.current = mr
-      audioChunksRef.current = []
-
-      mr.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data)
-      }
-      mr.onstop = () => {
-        // mr.mimeType = 実際に録音されたフォーマット（iOS: mp4, Chrome: webm など）
-        const blob = new Blob(audioChunksRef.current, { type: mr.mimeType || 'audio/mp4' })
-        const url  = URL.createObjectURL(blob)
-        setAudioURL(prev => {
-          if (prev) URL.revokeObjectURL(prev)
-          return url
-        })
-        setRecState('recorded')
-        stream.getTracks().forEach(t => t.stop())
-        // ページ録音は全体録音（globalRecorder）で管理するため個別送信不要
-      }
-
-      mr.start()
-      setRecState('recording')
-    } catch {
-      setMicError('マイクがつかえませんでした')
-      setTimeout(() => setMicError(null), 3000)
-    }
-  }
-
-  function stopRecording() {
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop()
-    }
-  }
-
-  function handlePlayback() {
-    if (!audioURL) return
-    if (isPlaying) { stopPlayback(); return }
-    const audio = new Audio(audioURL)
-    playbackRef.current = audio
-    setIsPlaying(true)
-    audio.onended = () => setIsPlaying(false)
-    audio.onerror = () => setIsPlaying(false)
-    audio.play().catch(() => setIsPlaying(false))
-  }
-
-  function stopPlayback() {
-    if (playbackRef.current) {
-      playbackRef.current.pause()
-      playbackRef.current = null
-    }
-    setIsPlaying(false)
   }
 
   // ── 最終ページのボタンラベル
@@ -431,10 +282,10 @@ export default function StoryScreen({
         )}
 
         {/* エラーメッセージ */}
-        {(speakError || micError) && (
+        {speakError && (
           <div className="flex-shrink-0 bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-center">
             <p className="text-sm font-bold text-red-500">
-              {micError ?? '🔇 よみあげに しっぱいしました。もういちど おしてね'}
+              🔇 よみあげに しっぱいしました。もういちど おしてね
             </p>
           </div>
         )}
