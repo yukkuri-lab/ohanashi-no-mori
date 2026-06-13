@@ -29,6 +29,7 @@ export default function QuestionScreen({
   const [choicesLocked, setChoicesLocked] = useState(true)  // 音声読み上げ中はロック
   const [selectedId,    setSelectedId]    = useState<string | null>(null)
   const [isCorrect,     setIsCorrect]     = useState<boolean | null>(null)
+  const [feedbackDone,  setFeedbackDone]  = useState(false)  // 解説の読み上げが終わったか
 
   const t1 = useRef<ReturnType<typeof setTimeout> | null>(null)
   const t2 = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -44,6 +45,7 @@ export default function QuestionScreen({
     setChoicesLocked(true)
     setSelectedId(null)
     setIsCorrect(null)
+    setFeedbackDone(false)
 
     const nums = ['１', '２', '３', '４', '５']
     // ⑥ 選択肢を「。」で区切り → TTS が各選択肢の間に自然な間を入れる
@@ -131,15 +133,17 @@ export default function QuestionScreen({
     else playIncorrect()
 
     stopSpeaking()
+
+    // 解説を読み終えてから「つぎへ」を出す
+    const showNext = () => setFeedbackDone(true)
+    // 安全策：TTSが鳴らない環境でも最長8秒で「つぎへ」を表示
+    t5.current = setTimeout(showNext, 8000)
+
     t4.current = setTimeout(() => {
-      if (correct) {
-        // せいかい：フィードバックだけ読む（TTS失敗でも次へ進む）
-        const goNext = () => { t5.current = setTimeout(() => onNext(true), 500) }
-        speak(question.correctFeedback, goNext, goNext)
-      } else {
-        // 不正解テキストの ・ を「と」に変換してから読む
-        speak(incorrectFull.replace(/・/g, 'と'))
-      }
+      const feedback = correct
+        ? question.correctFeedback
+        : incorrectFull.replace(/・/g, 'と')   // 中黒は「と」に置換
+      speak(feedback, showNext, showNext)        // 成功・失敗どちらでも showNext
     }, 200)
   }
 
@@ -339,7 +343,7 @@ export default function QuestionScreen({
         className="flex-shrink-0 px-5 pt-3 bg-[#faf6ea] border-t border-[#ede5d5]"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}
       >
-        {selectedId !== null ? (
+        {selectedId !== null && feedbackDone ? (
           <button
             onClick={() => onNext(isCorrect ?? false)}
             className="w-full py-5 rounded-full text-2xl font-bold text-white tracking-widest
@@ -350,6 +354,12 @@ export default function QuestionScreen({
           >
             {questionIndex + 1 < totalQuestions ? 'つぎへ →' : 'おしまい 🎉'}
           </button>
+        ) : selectedId !== null ? (
+          /* 解説を読み上げている間：つぎへ は出さず「きいてね」と表示 */
+          <div className="w-full py-5 flex items-center justify-center gap-2 animate-popIn">
+            <span className="text-xl animate-bounce">🎧</span>
+            <span className="text-base font-bold text-[#9a8070]">おはなしを きいてね…</span>
+          </div>
         ) : (
           <div className="w-full py-5 opacity-0 pointer-events-none" aria-hidden />
         )}
