@@ -75,17 +75,37 @@ function isAllowedRequest(req: NextRequest): boolean {
   const origin  = req.headers.get('origin')  ?? ''
   const referer = req.headers.get('referer') ?? ''
   const source  = origin || referer
+  const isDev   = process.env.NODE_ENV !== 'production'
 
-  // 開発環境（localhost）は常に許可
-  if (!source || source.includes('localhost') || source.includes('127.0.0.1')) return true
+  // origin も referer も無いリクエスト（curl・スクリプト等）。
+  // ブラウザからのアクセスなら必ずどちらかが付くので、本番では拒否する。
+  // ここを通すと API を誰でも叩けてしまい、TTS 料金を肩代わりすることになる。
+  if (!source) return isDev
+
+  // 判定はホスト名で行う（パスやクエリに文字列を仕込む偽装を防ぐ）
+  let host: string
+  try {
+    host = new URL(source).hostname
+  } catch {
+    return false   // URL として解釈できない source は拒否
+  }
+
+  // ローカル開発（開発時のみ）
+  if (isDev && (host === 'localhost' || host === '127.0.0.1' || host === '[::1]')) return true
 
   // 本番ドメイン（Vercel の環境変数 ALLOWED_ORIGIN で指定）
   const allowedOrigin = process.env.ALLOWED_ORIGIN
-  if (allowedOrigin && source.startsWith(allowedOrigin)) return true
+  if (allowedOrigin) {
+    try {
+      if (host === new URL(allowedOrigin).hostname) return true
+    } catch {
+      // ALLOWED_ORIGIN がホスト名だけで設定されている場合にも対応
+      if (host === allowedOrigin) return true
+    }
+  }
 
-  // Vercel 環境では *.vercel.app からのリクエストを許可
-  // （自分の Vercel アカウントのデプロイURLは全て vercel.app のサブドメイン）
-  if (process.env.VERCEL_URL && source.includes('.vercel.app')) return true
+  // Vercel 環境では自分のデプロイURL（*.vercel.app）からのリクエストを許可
+  if (process.env.VERCEL_URL && host.endsWith('.vercel.app')) return true
 
   return false
 }
