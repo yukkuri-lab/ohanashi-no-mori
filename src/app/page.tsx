@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { stories } from '@/data/stories'
 import TitleScreen       from '@/components/screens/TitleScreen'
 import StorySelectScreen from '@/components/screens/StorySelectScreen'
@@ -30,6 +30,7 @@ export default function App() {
 
   // ── 全ページ通し録音（record モード用）──────────────
   const globalRecorderRef    = useRef<MediaRecorder | null>(null)
+  const globalStreamRef      = useRef<MediaStream | null>(null)
   const globalAudioChunksRef = useRef<Blob[]>([])
 
   // マイク確保＆録音開始。成功で true、失敗（拒否・占有など）で false を返す
@@ -46,11 +47,13 @@ export default function App() {
       mr.ondataavailable = (e) => { if (e.data.size > 0) globalAudioChunksRef.current.push(e.data) }
       mr.onstop = () => {
         stream.getTracks().forEach(t => t.stop())
+        globalStreamRef.current = null
         const blob = new Blob(globalAudioChunksRef.current, { type: mr.mimeType || 'audio/mp4' })
         savePageRecording(storyId, 0, blob)  // 全体録音をpage 0として保存
       }
       mr.start()
       globalRecorderRef.current = mr
+      globalStreamRef.current   = stream
       setIsGlobalRecording(true)
       return true
     } catch (e) {
@@ -62,11 +65,30 @@ export default function App() {
 
   function stopGlobalRecording() {
     if (globalRecorderRef.current?.state === 'recording') {
-      globalRecorderRef.current.stop()
+      globalRecorderRef.current.stop()   // onstop の中で保存とマイク解放が走る
     }
     globalRecorderRef.current = null
     setIsGlobalRecording(false)
   }
+
+  // アプリを閉じる・タブを離れるときに、マイクを確実に止める。
+  // これが無いと、録音中に閉じたときマイクが掴まれたまま残る（録音ランプが消えない）。
+  // 保存より「マイクを止めること」を優先する後始末なので、状態更新はしない。
+  const releaseMicNow = useCallback(() => {
+    try { globalRecorderRef.current?.stop() } catch { /* すでに止まっている */ }
+    globalRecorderRef.current = null
+    globalStreamRef.current?.getTracks().forEach(t => t.stop())
+    globalStreamRef.current = null
+  }, [])
+
+  useEffect(() => {
+    // pagehide はタブを閉じる・別ページへ移る・iOSでアプリを切り替えるときに発火する
+    window.addEventListener('pagehide', releaseMicNow)
+    return () => {
+      window.removeEventListener('pagehide', releaseMicNow)
+      releaseMicNow()   // 画面が消えるとき（アンマウント）にも必ず解放する
+    }
+  }, [releaseMicNow])
 
   const story = useMemo(
     () => stories.find(s => s.id === selectedStoryId) ?? stories[0],

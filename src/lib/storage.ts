@@ -25,8 +25,14 @@ function validateRecord(data: unknown): AppRecord {
     completedStories: Array.isArray(r.completedStories)
       ? r.completedStories.filter((s): s is string => typeof s === 'string')
       : [],
+    // 中身の値まで数値か確かめる。
+    // ここを素通しにすると、壊れたデータのとき readCounts[id] + 1 が NaN や文字列連結になる。
     readCounts: (typeof r.readCounts === 'object' && r.readCounts !== null && !Array.isArray(r.readCounts))
-      ? r.readCounts as Record<string, number>
+      ? Object.entries(r.readCounts as Record<string, unknown>)
+          .reduce<Record<string, number>>((acc, [k, v]) => {
+            if (typeof v === 'number' && Number.isFinite(v)) acc[k] = v
+            return acc
+          }, {})
       : {},
   }
 }
