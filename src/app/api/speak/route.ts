@@ -1,7 +1,6 @@
 // =============================================
 // /api/speak — Google Cloud Text-to-Speech API で音声を生成して返す
 // APIキーは環境変数 GOOGLE_TTS_API_KEY に設定（コードには絶対に書かない）
-// Journey ボイス + SSML で自然な抑揚を実現
 // =============================================
 
 import { NextRequest } from 'next/server'
@@ -16,12 +15,13 @@ const SPEAKING_RATE = 0.93              // 子ども向けにわずかにゆっ�
  *  1. 「台詞」→ ピッチ +2.5st でいきいきと（セリフ感を強める）
  *  2. 感嘆文（！で終わる文節）→ ピッチ +1.5st で明るく・元気よく
  *  3. 疑問文（？で終わる文節）→ ピッチ +1.0st で語尾を上げる
- *  4. 改行 → 650ms ポーズ（場面・段落の切り替え）
+ *  4. 改行 → 500ms ポーズ（場面・段落の切り替え）
  *  5. 句読点ポーズ: 。450ms / 、200ms / ！280ms / ？360ms / …600ms
  *
  * 実装方針：
  *  - 台詞「」をプレースホルダーに置換 → 感嘆・疑問の検出 → ポーズ挿入 → 台詞を戻す
  *  - これにより台詞内の！？を誤って感嘆文・疑問文とみなすのを防ぐ
+ *  - 台詞は Step 4 のポーズ挿入を通らないので、台詞内のポーズは Step 1 で入れておく
  */
 function toSSML(text: string): string {
   // XML特殊文字をエスケープ
@@ -34,8 +34,14 @@ function toSSML(text: string): string {
   const dialogues: string[] = []
   let ssml = esc.replace(/「([^」]*)」/g, (_, inner) => {
     const idx = dialogues.length
-    // 台詞内の読点にもポーズを入れておく
-    const innerWithBreaks = inner.replace(/、/g, '、<break time="180ms"/>')
+    // 台詞は Step 4 を通らないため、句読点のポーズはここで入れ切る。
+    // （入れないと、長い台詞が一息で読まれて聞き取りづらくなる）
+    const innerWithBreaks = inner
+      .replace(/、/g, '、<break time="180ms"/>')
+      .replace(/。/g, '。<break time="380ms"/>')
+      .replace(/！/g, '！<break time="260ms"/>')
+      .replace(/？/g, '？<break time="330ms"/>')
+      .replace(/…/g, '<break time="600ms"/>')
     dialogues.push(`「<prosody pitch="+2.5st">${innerWithBreaks}</prosody>」`)
     return `\x00${idx}\x00`
   })
@@ -58,8 +64,8 @@ function toSSML(text: string): string {
     .replace(/、/g, '、<break time="200ms"/>')  // 読点
     .replace(/！/g, '！<break time="280ms"/>')  // 感嘆
     .replace(/？/g, '？<break time="360ms"/>')  // 疑問
+    .replace(/・・・/g, '<break time="600ms"/>') // 沈黙・余韻（表記ゆれ。…より先に処理する）
     .replace(/…/g, '<break time="600ms"/>')    // 沈黙・余韻
-    .replace(/・・・/g, '<break time="600ms"/>') // 同上（表記ゆれ対応）
 
   // ─── Step 5: 台詞プレースホルダーを戻す ───
   ssml = ssml.replace(/\x00(\d+)\x00/g, (_, idx) => dialogues[parseInt(idx)])
@@ -67,10 +73,96 @@ function toSSML(text: string): string {
   return `<speak>${ssml}</speak>`
 }
 
+// =============================================
+// 使いすぎ・悪用の防止
+//
+// 大事な注意：Origin / Referer は送る側が自由に名乗れるヘッダーなので、
+// これだけでは「本物の歯止め」にはならない（curl 等では偽装できる）。
+// 本当の歯止めは以下の3段構えで、①②がこのファイル、③はGoogle Cloud側の設定。
+//   ① 呼び出し元のドメイン確認（素人向けの入口の鍵）
+//   ② 回数制限＋1日あたりの文字数上限（請求が跳ねないための天井）
+//   ③ Google Cloud で APIキー自体に HTTPリファラ制限と割当上限をかける ← 最重要
+// ③の手順は README-運用メモ.md に書いてあります。
+// =============================================
+
+const RATE_WINDOW_MS    = 60_000   // 集計の窓：1分
+const RATE_MAX_REQUESTS = 60       // 1分あたり60回まで（普通に読ませる分には十分足りる）
+const DAILY_CHAR_BUDGET = 200_000  // 1日あたりの合計文字数の上限（これを超えたら止める）
+
+// サーバーレスではインスタンスごとの集計になるため完全ではないが、
+// 連打やスクリプトによる大量リクエストはこれで確実に頭打ちになる。
+const hits = new Map<string, number[]>()
+let budgetDay  = ''
+let budgetUsed = 0
+
+function clientKey(req: NextRequest): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown'
+  )
+}
+
+/** 短時間に叩きすぎていないか */
+function isRateLimited(req: NextRequest): boolean {
+  const key = clientKey(req)
+  const now = Date.now()
+  const recent = (hits.get(key) ?? []).filter(t => now - t < RATE_WINDOW_MS)
+  recent.push(now)
+  hits.set(key, recent)
+
+  // 記録が溜まりすぎないよう、古いものを掃除する
+  if (hits.size > 1000) {
+    const stale: string[] = []
+    hits.forEach((times, k) => {
+      if (times.every((t: number) => now - t >= RATE_WINDOW_MS)) stale.push(k)
+    })
+    stale.forEach(k => hits.delete(k))
+  }
+  return recent.length > RATE_MAX_REQUESTS
+}
+
+/** 今日の合計文字数が上限を超えていないか（超えていなければ加算する） */
+function isOverDailyBudget(chars: number): boolean {
+  const today = new Date().toISOString().slice(0, 10)
+  if (today !== budgetDay) {
+    budgetDay  = today
+    budgetUsed = 0
+  }
+  if (budgetUsed + chars > DAILY_CHAR_BUDGET) return true
+  budgetUsed += chars
+  return false
+}
+
 /**
- * 自分のドメイン（またはlocalhost）からのリクエストかどうかチェック
- * 外部サイトや野良ツールからの不正利用を防ぐ
+ * 呼び出しを許可するホスト名の一覧を作る
+ * ALLOWED_ORIGIN はカンマ区切りで複数指定できる
  */
+function allowedHosts(): string[] {
+  const hosts: string[] = []
+
+  for (const entry of (process.env.ALLOWED_ORIGIN ?? '').split(',')) {
+    const value = entry.trim()
+    if (!value) continue
+    try {
+      hosts.push(new URL(value).hostname)
+    } catch {
+      // ホスト名だけで書かれている場合（例: my-app.vercel.app）
+      hosts.push(value.replace(/^https?:\/\//, '').split('/')[0])
+    }
+  }
+
+  // Vercel が自動で入れてくれる自分のURL。
+  // ここを「.vercel.app で終わればOK」にすると、他人がVercelに置いたサイトからも
+  // 呼べてしまう（＝料金を肩代わりさせられる）ので、必ず完全一致で照合する。
+  for (const value of [process.env.VERCEL_PROJECT_PRODUCTION_URL, process.env.VERCEL_URL]) {
+    if (value) hosts.push(value.replace(/^https?:\/\//, '').split('/')[0])
+  }
+
+  return hosts
+}
+
+/** 自分のサイトからのリクエストかどうかの一次チェック */
 function isAllowedRequest(req: NextRequest): boolean {
   const origin  = req.headers.get('origin')  ?? ''
   const referer = req.headers.get('referer') ?? ''
@@ -79,7 +171,6 @@ function isAllowedRequest(req: NextRequest): boolean {
 
   // origin も referer も無いリクエスト（curl・スクリプト等）。
   // ブラウザからのアクセスなら必ずどちらかが付くので、本番では拒否する。
-  // ここを通すと API を誰でも叩けてしまい、TTS 料金を肩代わりすることになる。
   if (!source) return isDev
 
   // 判定はホスト名で行う（パスやクエリに文字列を仕込む偽装を防ぐ）
@@ -93,37 +184,38 @@ function isAllowedRequest(req: NextRequest): boolean {
   // ローカル開発（開発時のみ）
   if (isDev && (host === 'localhost' || host === '127.0.0.1' || host === '[::1]')) return true
 
-  // 本番ドメイン（Vercel の環境変数 ALLOWED_ORIGIN で指定）
-  const allowedOrigin = process.env.ALLOWED_ORIGIN
-  if (allowedOrigin) {
-    try {
-      if (host === new URL(allowedOrigin).hostname) return true
-    } catch {
-      // ALLOWED_ORIGIN がホスト名だけで設定されている場合にも対応
-      if (host === allowedOrigin) return true
-    }
-  }
-
-  // Vercel 環境では自分のデプロイURL（*.vercel.app）からのリクエストを許可
-  if (process.env.VERCEL_URL && host.endsWith('.vercel.app')) return true
-
-  return false
+  return allowedHosts().includes(host)
 }
 
 export async function GET(req: NextRequest) {
-  // 不正アクセスをブロック
+  // ① 呼び出し元のドメイン確認
   if (!isAllowedRequest(req)) {
     return new Response('Forbidden', { status: 403 })
+  }
+
+  // ② 短時間の叩きすぎを止める
+  if (isRateLimited(req)) {
+    return new Response('Too Many Requests', {
+      status: 429,
+      headers: { 'Retry-After': '60' },
+    })
   }
 
   const text = req.nextUrl.searchParams.get('text') ?? ''
   if (!text.trim()) {
     return new Response('text is required', { status: 400 })
   }
-  // ① 文字数制限（悪意あるリクエストによる API 料金爆発を防ぐ）
+
+  // 1回あたりの文字数制限（1回のリクエストで請求が跳ねるのを防ぐ）
   const MAX_TEXT_LENGTH = 500
   if (text.length > MAX_TEXT_LENGTH) {
     return new Response(`text too long (max ${MAX_TEXT_LENGTH} chars)`, { status: 400 })
+  }
+
+  // ②' 1日あたりの合計文字数の天井
+  if (isOverDailyBudget(text.length)) {
+    console.warn('[speak API] 1日の文字数上限に達したため停止しました')
+    return new Response('Daily quota exceeded', { status: 429 })
   }
 
   const apiKey = process.env.GOOGLE_TTS_API_KEY

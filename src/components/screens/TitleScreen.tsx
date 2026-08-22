@@ -1,7 +1,8 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { recordOpen } from '@/lib/storage'
+import { recordOpen, clearRecord } from '@/lib/storage'
+import { deleteAllRecordings } from '@/lib/recordings'
 import { unlockAudio } from '@/lib/speech'
 
 interface Props {
@@ -9,7 +10,24 @@ interface Props {
 }
 
 export default function TitleScreen({ onStart }: Props) {
+  const [cleared, setCleared] = useState(false)
   useEffect(() => { recordOpen() }, [])
+
+  // おうちのかた用：学習の記録と、録音した声をすべて消す。
+  // 子どもが誤って押さないよう、隅に小さく置いて確認も挟む。
+  async function handleClearAll() {
+    const ok = window.confirm(
+      'このはしまつは、おうちのかた向けです。\n\n' +
+      '・がくしゅうの きろく（よんだ回数・せいかい数）\n' +
+      '・ろくおんした こえ すべて\n\n' +
+      'この2つを すべて 消します。もとには もどせません。よろしいですか？'
+    )
+    if (!ok) return
+    clearRecord()
+    await deleteAllRecordings()
+    setCleared(true)
+    setTimeout(() => setCleared(false), 3000)
+  }
 
   return (
     <div
@@ -50,6 +68,20 @@ export default function TitleScreen({ onStart }: Props) {
           WebkitTapHighlightColor: 'transparent',
         }}
       />
+
+      {/* ── おうちのかたへ（左下・小さく。子どもが押しにくい位置） ── */}
+      <div
+        className="absolute bottom-1 left-2 z-10"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <button
+          onClick={(e) => { e.stopPropagation(); handleClearAll() }}
+          className="text-[9px] text-black/25 active:text-black/60 px-2 py-1"
+          aria-label="おうちのかた向け：きろくとろくおんをすべて消す"
+        >
+          {cleared ? 'けしました' : 'おうちのかたへ'}
+        </button>
+      </div>
 
       {/* ── バージョン表示（右下・目立たない） ── */}
       <div

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Character } from '@/data/stories'
 import { recordCompletion } from '@/lib/storage'
 import { unlockAudio } from '@/lib/speech'
-import { loadPageRecording } from '@/lib/recordings'
+import { loadPageRecording, deleteStoryRecordings } from '@/lib/recordings'
 
 interface Props {
   storyId: string
@@ -37,7 +37,9 @@ export default function EndingScreen({
 }: Props) {
   const [isPlayingBack, setIsPlayingBack] = useState(false)
   const [micError, setMicError] = useState(false)   // マイクが使えず録音モードに入れなかった
+  const [isDeleted, setIsDeleted] = useState(false) // 録音を消したあとか
   const playbackAudioRef = useRef<HTMLAudioElement | null>(null)
+  const playbackUrlRef   = useRef<string | null>(null)   // 再生用の一時URL（必ず片付ける）
   const isPlayingRef = useRef(false)
   useEffect(() => { isPlayingRef.current = isPlayingBack }, [isPlayingBack])
 
@@ -45,10 +47,22 @@ export default function EndingScreen({
     recordCompletion(storyId)
   }, [storyId])
 
+  // 再生用に作った一時URLを片付ける（放っておくとメモリに残り続ける）
+  function releasePlayback() {
+    playbackAudioRef.current?.pause()
+    if (playbackAudioRef.current) playbackAudioRef.current.src = ''
+    if (playbackUrlRef.current) {
+      URL.revokeObjectURL(playbackUrlRef.current)
+      playbackUrlRef.current = null
+    }
+  }
+
+  // 画面を離れるときにも必ず片付ける
+  useEffect(() => releasePlayback, [])
+
   async function handlePlayRecording() {
     if (isPlayingBack) {
-      playbackAudioRef.current?.pause()
-      if (playbackAudioRef.current) playbackAudioRef.current.src = ''
+      releasePlayback()
       setIsPlayingBack(false)
       return
     }
@@ -60,10 +74,21 @@ export default function EndingScreen({
     audio.setAttribute('playsinline', '')
     playbackAudioRef.current = audio
     const url = URL.createObjectURL(blob)
+    playbackUrlRef.current = url
     audio.src = url
-    audio.onended = () => { URL.revokeObjectURL(url); setIsPlayingBack(false) }
-    audio.onerror = () => { URL.revokeObjectURL(url); setIsPlayingBack(false) }
-    audio.play().catch(() => setIsPlayingBack(false))
+    audio.onended = () => { releasePlayback(); setIsPlayingBack(false) }
+    audio.onerror = () => { releasePlayback(); setIsPlayingBack(false) }
+    audio.play().catch(() => { releasePlayback(); setIsPlayingBack(false) })
+  }
+
+  // 録音を消す（子どもの声が残るデータなので、消す手段は必ず用意しておく）
+  async function handleDeleteRecording() {
+    const ok = window.confirm('この おはなしの ろくおんを けしますか？\n（もとには もどせません）')
+    if (!ok) return
+    releasePlayback()
+    setIsPlayingBack(false)
+    await deleteStoryRecordings(storyId)
+    setIsDeleted(true)
   }
 
   async function handleShare() {
@@ -83,8 +108,12 @@ export default function EndingScreen({
         // フォールバック：ダウンロード
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
-        a.href = url; a.download = file.name; a.click()
-        URL.revokeObjectURL(url)
+        a.href = url; a.download = file.name
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        // すぐ取り消すとダウンロードが始まる前にURLが無効になることがあるので、少し待つ
+        setTimeout(() => URL.revokeObjectURL(url), 60_000)
       }
     } catch {
       // キャンセルは無視
@@ -179,7 +208,7 @@ export default function EndingScreen({
         className="flex-shrink-0 px-5 pt-2 bg-[#faf6ea] border-t border-[#ede5d5] flex flex-col gap-2"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
       >
-        {fromRecordMode ? (
+        {fromRecordMode && !isDeleted ? (
           <>
             {/* 録音あり：① きいてみる（アンバー・トップ） */}
             <button
@@ -242,6 +271,16 @@ export default function EndingScreen({
                 おわる
               </button>
             </div>
+
+            {/* 録音あり：④ ろくおんをけす（子どもの声を残さないための出口） */}
+            <button
+              onClick={handleDeleteRecording}
+              className="w-full py-1.5 text-xs font-bold text-[#b08a8a]
+                         active:text-[#8a5a5a] transition-colors duration-150"
+              aria-label="この おはなしの ろくおんを けす"
+            >
+              ろくおんを けす 🗑
+            </button>
           </>
         ) : (
           /* 録音なし：じぶんのこえでよんでみよう（トップ・赤） */
