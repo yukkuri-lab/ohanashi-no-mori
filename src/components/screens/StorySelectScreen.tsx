@@ -133,7 +133,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
               {/* おすすめラベル */}
               <div
                 className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold text-white"
-                style={{ backgroundColor: '#e07840', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}
+                style={{ backgroundColor: '#ad5314', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}
               >
                 {featuredCount > 0 ? '⭐ おきにいり' : '✨ おすすめ'}
               </div>
@@ -162,10 +162,10 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                           <span key={i} className={i < featuredStars ? 'opacity-100' : 'opacity-20'}>⭐</span>
                         ))}
                       </span>
-                      <span className="text-xs text-[#9a8070] font-bold">{featuredCount}かい よんだよ</span>
+                      <span className="text-xs text-[#7a6555] font-bold">{featuredCount}かい よんだよ</span>
                     </>
                   ) : (
-                    <span className="text-xs text-[#9a8070]">まだよんでないよ</span>
+                    <span className="text-xs text-[#7a6555]">まだよんでないよ</span>
                   )}
                   {/* 録音バッジ */}
                   {featuredHasRec && (
@@ -179,7 +179,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                       aria-label={featuredPlaying ? 'とめる' : 'じぶんのこえをきく'}
                     >
                       <span className="text-[11px]">{featuredPlaying ? '⏹' : '🎙'}</span>
-                      <span className="text-[10px] font-bold" style={{ color: featuredPlaying ? '#fff' : '#92400e' }}>
+                      <span className="text-xs font-bold" style={{ color: featuredPlaying ? '#fff' : '#92400e' }}>
                         {featuredPlaying ? 'とめる' : 'じぶんのこえ'}
                       </span>
                     </button>
@@ -231,7 +231,7 @@ export default function StorySelectScreen({ stories, onSelect }: Props) {
                 style={{ backgroundColor: '#f5f0e8', borderTop: readRest.length > 0 ? '1px solid #e8dcc8' : undefined }}
               >
                 <div className="flex-1 h-px" style={{ backgroundColor: '#c8a87a', opacity: 0.5 }} />
-                <span className="text-[10px] font-bold text-[#9a7a5a] whitespace-nowrap">まだよんでないよ</span>
+                <span className="text-xs font-bold text-[#7a6555] whitespace-nowrap">まだよんでないよ</span>
                 <div className="flex-1 h-px" style={{ backgroundColor: '#c8a87a', opacity: 0.5 }} />
               </div>
             )}
@@ -322,7 +322,7 @@ function ListRow({
             }}
             aria-label={isPlaying ? 'とめる' : 'じぶんのこえをきく'}
           >
-            <span className="text-[10px] leading-none">{isPlaying ? '⏹' : '🎙'}</span>
+            <span className="text-xs leading-none">{isPlaying ? '⏹' : '🎙'}</span>
           </button>
         )}
       </div>
@@ -339,10 +339,10 @@ function ListRow({
               {Array.from({ length: 3 }, (_, i) => (
                 <span key={i} className={i < stars ? 'opacity-100' : 'opacity-20'}>⭐</span>
               ))}
-              <span className="text-[10px] text-[#9a8070] font-bold ml-1">{count}かい</span>
+              <span className="text-xs text-[#7a6555] font-bold ml-1">{count}かい</span>
             </span>
           ) : (
-            <span className="text-[10px] text-[#c8bdb0]">まだよんでないよ</span>
+            <span className="text-xs text-[#7a6555]">まだよんでないよ</span>
           )}
         </div>
       </button>

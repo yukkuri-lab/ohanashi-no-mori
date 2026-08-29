@@ -184,7 +184,7 @@ export default function StoryScreen({
       <div className="flex-shrink-0 flex items-center justify-between px-5 pt-safe pt-3 pb-2">
         <div className="flex items-center gap-2">
           <span className="text-xl">{isRecordMode ? '🎙️' : '📖'}</span>
-          <span className="text-sm text-[#bba898] font-bold tracking-wide">
+          <span className="text-sm text-[#7a6555] font-bold tracking-wide">
             {isRecordMode
               ? <span className="text-forest-600">よみあげ れんしゅう</span>
               : '🌿'.repeat(pageIndex + 1)
@@ -198,12 +198,12 @@ export default function StoryScreen({
             className={`text-xs font-bold px-2.5 py-1 rounded-full border transition-all duration-150 active:scale-95
               ${showRuby
                 ? 'bg-amber-100 border-amber-400 text-amber-700'
-                : 'bg-white/60 border-[#e8dcc8] text-[#bba898]'
+                : 'bg-white/60 border-[#e8dcc8] text-[#7a6555]'
               }`}
           >
             ふりがな
           </button>
-          <span className="text-sm text-[#bba898] font-bold bg-white/60 px-3 py-1 rounded-full border border-[#e8dcc8]">
+          <span className="text-sm text-[#7a6555] font-bold bg-white/60 px-3 py-1 rounded-full border border-[#e8dcc8]">
             {pageIndex + 1} / {totalPages}
           </span>
         </div>
@@ -266,7 +266,7 @@ export default function StoryScreen({
         {/* ことばのふくろ：ヒントチップ */}
         {page.wordHints && page.wordHints.length > 0 && (
           <div className="flex-shrink-0 flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-bold text-[#9a8070] whitespace-nowrap">💬 ことば</span>
+            <span className="text-xs font-bold text-[#7a6555] whitespace-nowrap">💬 ことば</span>
             {page.wordHints.map((hint, i) => (
               <button
                 key={i}
@@ -312,7 +312,7 @@ export default function StoryScreen({
                   {isRecording && <div className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-75" />}
                   <div className={`w-3.5 h-3.5 rounded-full ${isRecording ? 'bg-red-500' : 'bg-gray-300'}`} />
                 </div>
-                <span className={`text-sm font-bold ${isRecording ? 'text-red-600' : 'text-[#9a8070]'}`}>
+                <span className={`text-sm font-bold ${isRecording ? 'text-red-600' : 'text-[#7a6555]'}`}>
                   {isRecording ? 'ろくおんちゅう' : 'マイクがつかえません'}
                 </span>
               </div>
@@ -327,7 +327,7 @@ export default function StoryScreen({
                 aria-label="録音をとめる"
               >
                 <Image src="/Rokuonstop.jpeg" alt="ストップ" width={44} height={44} className="w-8 h-8 object-contain" />
-                <span className="text-[10px] font-bold text-forest-600 leading-none">ストップ</span>
+                <span className="text-xs font-bold text-forest-600 leading-none">ストップ</span>
               </button>
             )}
 
@@ -359,7 +359,7 @@ export default function StoryScreen({
                   <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
                 </svg>
               )}
-              <span className="text-[10px] font-bold text-[#4a7a5a] leading-none mt-0.5">
+              <span className="text-xs font-bold text-[#4a7a5a] leading-none mt-0.5">
                 {isReading ? 'とめる' : 'きく'}
               </span>
             </button>
@@ -386,7 +386,7 @@ export default function StoryScreen({
             {/* ことばラベル */}
             <div className="flex items-baseline gap-3 mb-3">
               <span className="text-3xl font-black text-[#3d3028]">{activeHint.word}</span>
-              <span className="text-base font-bold text-[#9a8070]">【{activeHint.reading}】</span>
+              <span className="text-base font-bold text-[#7a6555]">【{activeHint.reading}】</span>
             </div>
 
             {/* 説明文 */}
@@ -441,7 +441,7 @@ export default function StoryScreen({
               aria-label="前のページへ"
             >
               <span className="text-xl">←</span>
-              <span className="text-[10px] font-bold leading-none">もどる</span>
+              <span className="text-xs font-bold leading-none">もどる</span>
             </button>
 
             {/* ⏸/▶ 本読みを止める／よむ */}
@@ -479,13 +479,13 @@ export default function StoryScreen({
             <button
               onClick={handleNext}
               className="w-20 rounded-2xl flex flex-col items-center justify-center gap-1
-                         border-2 border-forest-400 bg-forest-400 text-white
+                         border-2 border-forest-600 bg-forest-600 text-white
                          active:scale-95 active:brightness-90 transition-all duration-150
                          shadow-[0_3px_0_#224f35] active:shadow-none active:translate-y-0.5"
               aria-label={isLastPage ? 'しつもんへ' : '次のページへ'}
             >
               <span className="text-xl">{isLastPage ? '✏️' : '→'}</span>
-              <span className="text-[10px] font-bold leading-none">
+              <span className="text-xs font-bold leading-none">
                 {isLastPage ? 'もんだい' : 'すすむ'}
               </span>
             </button>

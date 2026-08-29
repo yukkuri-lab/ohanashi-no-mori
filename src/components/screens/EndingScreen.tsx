@@ -264,7 +264,7 @@ export default function EndingScreen({
               </button>
               <button
                 onClick={onQuit}
-                className="flex-1 py-2 rounded-full text-sm font-bold text-[#9a8070]
+                className="flex-1 py-2 rounded-full text-sm font-bold text-[#7a6555]
                            bg-white border-2 border-[#e8dcc8]
                            active:bg-gray-50 active:scale-95 transition-all duration-150"
               >
@@ -314,7 +314,7 @@ export default function EndingScreen({
                 <p className="text-sm font-bold text-[#b85c00] leading-relaxed">
                   🎤 マイクが つかえないみたい。
                 </p>
-                <p className="text-xs font-bold text-[#9a7a5a] mt-0.5">
+                <p className="text-xs font-bold text-[#7a6555] mt-0.5">
                   おうちの人に きいてみてね。
                 </p>
               </div>
@@ -372,7 +372,7 @@ export default function EndingScreen({
           </button>
           <button
             onClick={onQuit}
-            className="flex-1 py-2 rounded-full text-sm font-bold text-[#9a8070]
+            className="flex-1 py-2 rounded-full text-sm font-bold text-[#7a6555]
                        bg-white border-2 border-[#e8dcc8]
                        active:bg-gray-50 active:scale-95
                        transition-all duration-150"

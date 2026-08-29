@@ -263,7 +263,7 @@ export default function QuestionScreen({
                       {choicesLocked && selectedId === null && (
                         <div className="flex items-center gap-1 mt-2">
                           <span className="text-sm animate-bounce">🎧</span>
-                          <span className="text-xs font-bold text-[#9a8070]">きいてね…</span>
+                          <span className="text-xs font-bold text-[#7a6555]">きいてね…</span>
                         </div>
                       )}
                     </>
@@ -358,7 +358,7 @@ export default function QuestionScreen({
           /* 解説を読み上げている間：つぎへ は出さず「きいてね」と表示 */
           <div className="w-full py-5 flex items-center justify-center gap-2 animate-popIn">
             <span className="text-xl animate-bounce">🎧</span>
-            <span className="text-base font-bold text-[#9a8070]">おはなしを きいてね…</span>
+            <span className="text-base font-bold text-[#7a6555]">おはなしを きいてね…</span>
           </div>
         ) : (
           <div className="w-full py-5 opacity-0 pointer-events-none" aria-hidden />
