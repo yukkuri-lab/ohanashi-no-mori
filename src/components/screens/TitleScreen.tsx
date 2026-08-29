@@ -76,7 +76,7 @@ export default function TitleScreen({ onStart }: Props) {
       >
         <button
           onClick={(e) => { e.stopPropagation(); handleClearAll() }}
-          className="text-[9px] text-black/25 active:text-black/60 px-2 py-1"
+          className="inline-flex items-center min-h-[24px] text-xs text-black/70 active:text-black/60 bg-[#faf6ea] rounded-full px-2 py-1"
           aria-label="おうちのかた向け：きろくとろくおんをすべて消す"
         >
           {cleared ? 'けしました' : 'おうちのかたへ'}
@@ -88,7 +88,7 @@ export default function TitleScreen({ onStart }: Props) {
         className="absolute bottom-2 right-3 pointer-events-none select-none"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <span suppressHydrationWarning className="text-[9px] font-mono text-black/20 tracking-tight">
+        <span suppressHydrationWarning className="text-xs font-mono text-black/70 tracking-tight bg-[#faf6ea] rounded-full px-2 py-0.5">
           {process.env.NEXT_PUBLIC_BUILD_TIME}
         </span>
       </div>
