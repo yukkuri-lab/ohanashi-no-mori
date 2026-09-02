@@ -333,18 +333,18 @@ function ListRow({
         className="flex-1 min-w-0 text-left active:opacity-70 transition-opacity"
       >
         <p className="text-sm font-bold text-[#1a1a1a] leading-snug truncate">{story.title}</p>
-        <div className="mt-0.5">
-          {count > 0 ? (
+        {/* 読んだ本にだけ印を出す。未読は無地にして、同じ文言が並ばないようにする
+            （どこからが未読かは、上の「まだよんでないよ」の区切りが示している） */}
+        {count > 0 && (
+          <div className="mt-0.5">
             <span className="text-[11px] leading-none">
               {Array.from({ length: 3 }, (_, i) => (
                 <span key={i} className={i < stars ? 'opacity-100' : 'opacity-20'}>⭐</span>
               ))}
               <span className="text-xs text-[#7a6555] font-bold ml-1">{count}かい</span>
             </span>
-          ) : (
-            <span className="text-xs text-[#7a6555]">まだよんでないよ</span>
-          )}
-        </div>
+          </div>
+        )}
       </button>
 
       {/* 丸い再生ボタン */}
