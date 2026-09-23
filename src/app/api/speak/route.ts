@@ -5,8 +5,16 @@
 
 import { NextRequest } from 'next/server'
 
-const VOICE_NAME    = 'ja-JP-Neural2-C' // Neural2-C: 温かみのある自然な女性の日本語音声
-const SPEAKING_RATE = 0.93              // 子ども向けにわずかにゆっくり
+// 声の種類（?voice= で選ぶ。ここに無い名前は既定の声になる＝勝手な声は使わせない）
+// おはなしの森は既定のまま。ようかい系は「おしえて ようかい」用。
+const VOICES: Record<string, { name: string; rate: number; pitch: number }> = {
+  default:  { name: 'ja-JP-Neural2-C', rate: 0.93, pitch:  0 },  // 温かみのある女性（おはなしの森）
+  'yokai-a':{ name: 'ja-JP-Neural2-D', rate: 0.97, pitch:  2 },  // 男性・少し高め（やんちゃな妖怪）
+  'yokai-b':{ name: 'ja-JP-Neural2-B', rate: 0.97, pitch:  3 },  // 女性・高め（小さい妖怪）
+  'yokai-c':{ name: 'ja-JP-Neural2-D', rate: 0.92, pitch: -2 },  // 男性・低め（のんびりした妖怪）
+  'yokai-d':{ name: 'ja-JP-Neural2-C', rate: 1.00, pitch:  4 },  // 女性・かなり高め（こども妖怪）
+}
+const DEFAULT_VOICE = 'default'
 
 /**
  * テキストを SSML に変換する
@@ -187,6 +195,26 @@ function isAllowedRequest(req: NextRequest): boolean {
   return allowedHosts().includes(host)
 }
 
+/** 別サイト（許可リストのドメイン）から呼ばれたときに付ける許可の札 */
+function corsHeaders(req: NextRequest): Record<string, string> {
+  const origin = req.headers.get('origin')
+  if (!origin) return {}
+  try {
+    if (!allowedHosts().includes(new URL(origin).hostname)) return {}
+  } catch {
+    return {}
+  }
+  return { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin' }
+}
+
+/** ブラウザの事前確認（プリフライト）への返事 */
+export async function OPTIONS(req: NextRequest) {
+  return new Response(null, {
+    status: 204,
+    headers: { ...corsHeaders(req), 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Max-Age': '86400' },
+  })
+}
+
 export async function GET(req: NextRequest) {
   // ① 呼び出し元のドメイン確認
   if (!isAllowedRequest(req)) {
@@ -218,6 +246,10 @@ export async function GET(req: NextRequest) {
     return new Response('Daily quota exceeded', { status: 429 })
   }
 
+  // 声の種類（知らない名前が来たら既定の声にする）
+  const voiceKey = req.nextUrl.searchParams.get('voice') ?? DEFAULT_VOICE
+  const voice = VOICES[voiceKey] ?? VOICES[DEFAULT_VOICE]
+
   const apiKey = process.env.GOOGLE_TTS_API_KEY
   if (!apiKey) {
     return new Response('GOOGLE_TTS_API_KEY が設定されていません', { status: 500 })
@@ -233,11 +265,12 @@ export async function GET(req: NextRequest) {
           input: { ssml: toSSML(text) },  // SSML で抑揚・ポーズを適用
           voice: {
             languageCode: 'ja-JP',
-            name: VOICE_NAME,
+            name: voice.name,
           },
           audioConfig: {
             audioEncoding: 'MP3',
-            speakingRate: SPEAKING_RATE,
+            speakingRate: voice.rate,
+            pitch: voice.pitch,
           },
         }),
       }
@@ -258,6 +291,7 @@ export async function GET(req: NextRequest) {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Cache-Control': 'public, max-age=86400', // 同じテキストは1日キャッシュ（API呼び出し節約）
+        ...corsHeaders(req),
       },
     })
   } catch (err) {
