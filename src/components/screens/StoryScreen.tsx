@@ -181,7 +181,7 @@ export default function StoryScreen({
     <div className="h-screen-safe flex flex-col relative" style={{ backgroundColor: '#faf6ea' }}>
 
       {/* ── ヘッダー ── */}
-      <div className="flex-shrink-0 flex items-center justify-between px-5 pt-safe pt-3 pb-2">
+      <div className="flex-shrink-0 w-full max-w-lg mx-auto flex items-center justify-between px-5 pt-safe pt-3 pb-2">
         <div className="flex items-center gap-2">
           <span className="text-xl">{isRecordMode ? '🎙️' : '📖'}</span>
           <span className="text-sm text-[#7a6555] font-bold tracking-wide">
@@ -210,7 +210,7 @@ export default function StoryScreen({
       </div>
 
       {/* ── コンテンツエリア ── */}
-      <div className="flex-1 flex flex-col px-4 pb-2 gap-2 min-h-0 animate-fadeInUp">
+      <div className="flex-1 w-full max-w-lg mx-auto flex flex-col px-4 pb-2 gap-2 min-h-0 animate-fadeInUp">
 
         {/* 絵 */}
         <div className="rounded-2xl overflow-hidden shadow-md border border-[#e8dcc8] flex-shrink-0">
@@ -218,10 +218,13 @@ export default function StoryScreen({
             <Image
               src={page.imageSrc}
               alt={page.imageLabel}
-              width={800}
-              height={280}
+              width={600}
+              height={300}
               className="w-full object-cover"
-              style={{ maxHeight: 'min(28vw, 140px)' }}
+              // 挿絵は全部 2:1。枠が max-w-lg（本文幅480px）なので高さ240pxで
+              // ちょうど絵が切れずに収まる。横に寝かせた端末など画面が低いときだけ
+              // 32vh が効いて上下が切れる（そこは本文を優先する）
+              style={{ maxHeight: 'min(240px, 32vh)' }}
             />
           ) : (
             <div
@@ -411,7 +414,8 @@ export default function StoryScreen({
 
       {/* ── フッター ── */}
       <div
-        className="flex-shrink-0 px-4 pt-3 bg-[#faf6ea] border-t border-[#ede5d5]"
+        className="flex-shrink-0 px-4 pt-3 bg-[#faf6ea] border-t border-[#ede5d5]
+                   [&>*]:max-w-lg [&>*]:mx-auto"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}
       >
         {isRecordMode ? (
