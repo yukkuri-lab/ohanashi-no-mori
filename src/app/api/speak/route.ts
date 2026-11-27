@@ -15,6 +15,13 @@ const VOICES: Record<string, { name: string; rate: number; pitch: number; plain?
   'yokai-c':{ name: 'ja-JP-Neural2-D', rate: 0.92, pitch: -2 },  // 男性・低め（のんびりした妖怪）
   'yokai-d':{ name: 'ja-JP-Neural2-C', rate: 1.00, pitch:  4 },  // 男性の声をかなり高めに（こども妖怪）
   school:   { name: 'ja-JP-Chirp3-HD-Aoede', rate: 0.95, pitch: 0, plain: true },  // 女性（ゆっくりスクール）
+  // ゆっくりスクールの先生の声の候補（教室の担任＝女性・校門の先生＝男性）。選んだあとも残してよい（一覧にある声しか使えない作りは同じ）
+  'sensei-f1': { name: 'ja-JP-Chirp3-HD-Kore',    rate: 0.95, pitch: 0, plain: true },  // 女性
+  'sensei-f2': { name: 'ja-JP-Chirp3-HD-Leda',    rate: 0.95, pitch: 0, plain: true },  // 女性
+  'sensei-f3': { name: 'ja-JP-Chirp3-HD-Despina', rate: 0.95, pitch: 0, plain: true },  // 女性
+  'sensei-m1': { name: 'ja-JP-Chirp3-HD-Charon',  rate: 0.95, pitch: 0, plain: true },  // 男性
+  'sensei-m2': { name: 'ja-JP-Chirp3-HD-Puck',    rate: 0.95, pitch: 0, plain: true },  // 男性
+  'sensei-m3': { name: 'ja-JP-Chirp3-HD-Orus',    rate: 0.95, pitch: 0, plain: true },  // 男性
 }
 const DEFAULT_VOICE = 'default'
 
