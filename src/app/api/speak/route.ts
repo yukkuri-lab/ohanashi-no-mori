@@ -6,13 +6,15 @@
 import { NextRequest } from 'next/server'
 
 // 声の種類（?voice= で選ぶ。ここに無い名前は既定の声になる＝勝手な声は使わせない）
-// おはなしの森は既定のまま。ようかい系は「おしえて ようかい」用。
-const VOICES: Record<string, { name: string; rate: number; pitch: number }> = {
-  default:  { name: 'ja-JP-Neural2-C', rate: 0.93, pitch:  0 },  // 温かみのある女性（おはなしの森）
+// おはなしの森は既定のまま。ようかい系は「おしえて ようかい」用。school は「ゆっくりスクール」用。
+// plain: true の声（Chirp3-HD）は SSML と pitch を受け付けないので、文章をそのまま送る。
+const VOICES: Record<string, { name: string; rate: number; pitch: number; plain?: boolean }> = {
+  default:  { name: 'ja-JP-Neural2-C', rate: 0.93, pitch:  0 },  // 男性・やわらかい（おはなしの森）
   'yokai-a':{ name: 'ja-JP-Neural2-D', rate: 0.97, pitch:  2 },  // 男性・少し高め（やんちゃな妖怪）
   'yokai-b':{ name: 'ja-JP-Neural2-B', rate: 0.97, pitch:  3 },  // 女性・高め（小さい妖怪）
   'yokai-c':{ name: 'ja-JP-Neural2-D', rate: 0.92, pitch: -2 },  // 男性・低め（のんびりした妖怪）
-  'yokai-d':{ name: 'ja-JP-Neural2-C', rate: 1.00, pitch:  4 },  // 女性・かなり高め（こども妖怪）
+  'yokai-d':{ name: 'ja-JP-Neural2-C', rate: 1.00, pitch:  4 },  // 男性の声をかなり高めに（こども妖怪）
+  school:   { name: 'ja-JP-Chirp3-HD-Aoede', rate: 0.95, pitch: 0, plain: true },  // 女性（ゆっくりスクール）
 }
 const DEFAULT_VOICE = 'default'
 
@@ -262,7 +264,7 @@ export async function GET(req: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: { ssml: toSSML(text) },  // SSML で抑揚・ポーズを適用
+          input: voice.plain ? { text } : { ssml: toSSML(text) },  // SSML で抑揚・ポーズを適用（plain の声は文章のまま）
           voice: {
             languageCode: 'ja-JP',
             name: voice.name,
@@ -270,7 +272,7 @@ export async function GET(req: NextRequest) {
           audioConfig: {
             audioEncoding: 'MP3',
             speakingRate: voice.rate,
-            pitch: voice.pitch,
+            ...(voice.plain ? {} : { pitch: voice.pitch }),
           },
         }),
       }
