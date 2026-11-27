@@ -17,6 +17,18 @@ interface Props {
 // 3: ボタン登場
 type Phase = 0 | 1 | 2 | 3
 
+// 読み上げが鳴らなくても、おそくともこの時間でボタンを出す。
+// speak() は音が鳴り出すと自前の保険タイマーを外すので、途中で止まると
+// 読み終わりの合図（onEnd）もエラーも来ない。このままだと先に進むボタンが
+// 永久に出ず、子どもが詰まってしまうので、最後の受け皿として必ず出す。
+const SHOW_BUTTON_AT_LATEST_MS = 12_000
+
+/** 何度呼ばれても一度しか走らせない（onEnd と onError が両方来ることがあるため） */
+function once(fn: () => void): () => void {
+  let done = false
+  return () => { if (!done) { done = true; fn() } }
+}
+
 export default function IntroScreen({ storyTitle, character, onNext }: Props) {
   const [phase, setPhase] = useState<Phase>(0)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -31,19 +43,25 @@ export default function IntroScreen({ storyTitle, character, onNext }: Props) {
   }
 
   useEffect(() => {
+    // 読み上げが止まっても必ずボタンが出るようにしておく（袋小路の防止）
+    addTimer(setTimeout(() => setPhase(3), SHOW_BUTTON_AT_LATEST_MS))
+
+    // タイトルを読み上げ → ボタン登場
+    const afterTitle = once(() => {
+      addTimer(setTimeout(() => setPhase(3), 400))
+    })
+    // introMessage を読み上げ → タイトル登場
+    const afterIntro = once(() => {
+      addTimer(setTimeout(() => {
+        setPhase(2)
+        speak(storyTitle, afterTitle, afterTitle)
+      }, 300))
+    })
+
     // キャラクターが歩いてくる（1.8s アニメ終了後）→ 吹き出し
     addTimer(setTimeout(() => {
       setPhase(1)
-      // introMessage を読み上げ → 終わったらタイトル登場
-      speak(character.introMessage, () => {
-        addTimer(setTimeout(() => {
-          setPhase(2)
-          // タイトルを読み上げ → ボタン登場
-          speak(storyTitle, () => {
-            addTimer(setTimeout(() => setPhase(3), 400))
-          })
-        }, 300))
-      })
+      speak(character.introMessage, afterIntro, afterIntro)
     }, 1900))
 
     return () => {
